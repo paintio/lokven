@@ -1,0 +1,394 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Backgrounds */
+    --background: #F5F7FA;
+    --background-alt: #FAFBFC;
+    --surface: #FFFFFF;
+    --card: #FFFFFF;
+    --card-hover: #FCFCFD;
+
+    /* Glass */
+    --glass: rgba(255,255,255,.62);
+    --glass-hover: rgba(255,255,255,.82);
+
+    /* Borders */
+    --border: #E5E7EB;
+    --border-light: #F1F3F5;
+    --border-dark: #D8DCE3;
+
+    /* Gray */
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-300: #D1D5DB;
+    --gray-400: #9CA3AF;
+    --gray-500: #6B7280;
+    --gray-600: #4B5563;
+    --gray-700: #374151;
+    --gray-800: #1F2937;
+    --gray-900: #111827;
+
+    /* Text */
+    --text: #111827;
+    --text-secondary: #4B5563;
+    --text-muted: #6B7280;
+    --text-placeholder: #9CA3AF;
+    --text-disabled: #CBD5E1;
+
+    /* Primary - меняем на черный/серый */
+    --primary: #111827;
+    --primary-hover: #374151;
+    --primary-pressed: #1F2937;
+    --primary-light: #F3F4F6;
+    --primary-extra-light: #F9FAFB;
+
+    /* Status */
+    --success: #10B981;
+    --success-light: #D1FAE5;
+    --warning: #F59E0B;
+    --danger: #EF4444;
+
+    /* Premium */
+    --premium: #D4AF37;
+    --premium-light: #F6E8A6;
+    --premium-dark: #A77A00;
+
+    /* Shadows */
+    --shadow-small: 0 2px 8px rgba(15,23,42,.04);
+    --shadow-medium: 0 8px 24px rgba(15,23,42,.06);
+    --shadow-large: 0 20px 60px rgba(15,23,42,.08);
+    --shadow-glass: 0 12px 40px rgba(15,23,42,.08);
+
+    /* Radius */
+    --radius-small: 12px;
+    --radius-medium: 18px;
+    --radius-large: 24px;
+    --radius-hero: 32px;
+    --radius-button: 16px;
+    --radius-input: 16px;
+    --radius-card: 24px;
+  }
+
+  /* Отключаем все дефолтные цвета Tailwind */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--background);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  button {
+    font-family: inherit;
+  }
+}
+
+@layer components {
+  .container-custom {
+    max-width: 72rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .container-custom {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  /* Header Glass */
+  .header-glass {
+    background: rgba(255,255,255,.72);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-bottom: 1px solid rgba(255,255,255,.45);
+  }
+
+  /* Кнопки - только черно-белые */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #FFFFFF;
+    background: var(--text);
+    border: none;
+    border-radius: var(--radius-button);
+    transition: all 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .btn-primary:hover {
+    background: var(--text-secondary);
+  }
+
+  .btn-primary:active {
+    background: var(--gray-700);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: var(--gray-100);
+    border: none;
+    border-radius: var(--radius-button);
+    transition: all 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .btn-secondary:hover {
+    background: var(--gray-200);
+  }
+
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-small);
+    transition: all 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .btn-outline:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-300);
+  }
+
+  .btn-link {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+    transition: color 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .btn-link:hover {
+    color: var(--text);
+  }
+
+  /* Поля ввода */
+  .input-field {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-input);
+    color: var(--text);
+    transition: all 0.2s;
+  }
+
+  .input-field:focus {
+    outline: none;
+    border-color: var(--text);
+    box-shadow: 0 0 0 4px rgba(0,0,0,.05);
+  }
+
+  .input-field::placeholder {
+    color: var(--text-placeholder);
+  }
+
+  /* Карточки */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-small);
+    transition: all 0.2s;
+    overflow: hidden;
+  }
+
+  .card:hover {
+    background: var(--card-hover);
+    box-shadow: var(--shadow-medium);
+    border-color: var(--border-dark);
+  }
+
+  /* Статистика */
+  .stat-card {
+    background: var(--card);
+    padding: 1rem 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-medium);
+  }
+
+  .stat-card .stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .stat-card .stat-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  /* Категории */
+  .category-item {
+    display: block;
+    padding: 1rem;
+    text-align: center;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-medium);
+    transition: all 0.2s;
+    text-decoration: none;
+    cursor: pointer;
+    color: var(--text);
+  }
+
+  .category-item:hover {
+    background: var(--gray-50);
+    border-color: var(--text);
+    box-shadow: var(--shadow-small);
+  }
+
+  .category-item .category-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .category-item .category-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .category-item .category-count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  /* Герой блок */
+  .hero-block {
+    background: var(--card);
+    padding: 1.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-hero);
+    background: linear-gradient(180deg, #FFFFFF 0%, #F7F9FC 100%);
+  }
+
+  .hero-block h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.375rem;
+  }
+
+  .hero-block p {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  /* Теги */
+  .tag {
+    display: inline-block;
+    padding: 0.125rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 9999px;
+    background: var(--gray-100);
+    color: var(--text-secondary);
+  }
+
+  /* Цена */
+  .price {
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  /* Ссылки - только черно-белые */
+  .link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .link:hover {
+    color: var(--text);
+  }
+
+  /* Текст */
+  .text-muted {
+    color: var(--text-muted);
+  }
+
+  .text-secondary {
+    color: var(--text-secondary);
+  }
+
+  .text-primary {
+    color: var(--text);
+  }
+
+  /* Заголовки */
+  .section-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  /* Скролл */
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--background);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-400);
+  }
+
+  ::selection {
+    background: var(--gray-200);
+    color: var(--text);
+  }
+}
