@@ -16,7 +16,6 @@ export class AuthService {
   async register(registerDto: RegisterDto) {
     const { phone, email, password, name, isSeller, ...sellerData } = registerDto;
 
-    // Проверка существования пользователя
     const existingUser = await this.prisma.user.findFirst({
       where: {
         OR: [{ phone }, { email: email || undefined }],
@@ -27,10 +26,8 @@ export class AuthService {
       throw new ConflictException('Пользователь с таким телефоном или email уже существует');
     }
 
-    // Хеширование пароля
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Создание пользователя
     const user = await this.prisma.user.create({
       data: {
         phone,
@@ -55,7 +52,7 @@ export class AuthService {
     const { password: _, ...result } = user;
     return {
       user: result,
-      token: this.generateToken(user.id),
+      token: this.generateToken(user.id, user.role),
     };
   }
 
@@ -82,7 +79,7 @@ export class AuthService {
     const { password: _, ...result } = user;
     return {
       user: result,
-      token: this.generateToken(user.id),
+      token: this.generateToken(user.id, user.role),
     };
   }
 
@@ -119,7 +116,6 @@ export class AuthService {
   async updateProfile(userId: string, updateDto: UpdateProfileDto) {
     const { phone, email, ...data } = updateDto;
 
-    // Проверка уникальности
     if (phone || email) {
       const existing = await this.prisma.user.findFirst({
         where: {
@@ -169,7 +165,7 @@ export class AuthService {
     return { message: 'Пароль успешно изменен' };
   }
 
-  private generateToken(userId: string): string {
-    return this.jwtService.sign({ sub: userId });
+  private generateToken(userId: string, role: string): string {
+    return this.jwtService.sign({ sub: userId, role });
   }
 }

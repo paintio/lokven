@@ -65,7 +65,6 @@ export class CmsController {
     return this.cmsService.deleteFooterLink(id);
   }
 
-  // Настройки
   @Get('settings')
   @UseGuards(JwtAuthGuard)
   async getSettings() {
