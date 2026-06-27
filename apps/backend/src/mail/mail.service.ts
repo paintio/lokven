@@ -9,11 +9,12 @@ export class MailService {
     await this.mailerService.sendMail({
       to: email,
       subject: 'Добро пожаловать в Локвен!',
-      template: 'welcome',
-      context: {
-        name: name || 'Пользователь',
-        url: process.env.FRONTEND_URL || 'https://lokven-frontend.onrender.com',
-      },
+      html: `
+        <h1>Добро пожаловать, ${name || 'Пользователь'}!</h1>
+        <p>Вы успешно зарегистрировались на платформе Локвен.</p>
+        <p>Теперь вы можете создавать объявления, покупать и продавать товары.</p>
+        <a href="${process.env.FRONTEND_URL || 'https://lokven-frontend.onrender.com'}">Перейти на сайт</a>
+      `,
     });
   }
 
@@ -21,11 +22,11 @@ export class MailService {
     await this.mailerService.sendMail({
       to: email,
       subject: 'Ваше объявление создано!',
-      template: 'listing-created',
-      context: {
-        title: listingTitle,
-        url: `${process.env.FRONTEND_URL || 'https://lokven-frontend.onrender.com'}/listings/${listingId}`,
-      },
+      html: `
+        <h1>Объявление "${listingTitle}" создано!</h1>
+        <p>Оно будет опубликовано после проверки модератором.</p>
+        <a href="${process.env.FRONTEND_URL || 'https://lokven-frontend.onrender.com'}/listings/${listingId}">Посмотреть объявление</a>
+      `,
     });
   }
 
@@ -33,13 +34,11 @@ export class MailService {
     await this.mailerService.sendMail({
       to: email,
       subject: `Объявление "${listingTitle}" ${status === 'active' ? 'одобрено' : 'отклонено'}`,
-      template: 'listing-moderated',
-      context: {
-        title: listingTitle,
-        status: status === 'active' ? 'одобрено ✅' : 'отклонено ❌',
-        note: note || '',
-        url: `${process.env.FRONTEND_URL || 'https://lokven-frontend.onrender.com'}/listings`,
-      },
+      html: `
+        <h1>Объявление "${listingTitle}" ${status === 'active' ? 'одобрено ✅' : 'отклонено ❌'}</h1>
+        ${note ? `<p><strong>Причина:</strong> ${note}</p>` : ''}
+        <a href="${process.env.FRONTEND_URL || 'https://lokven-frontend.onrender.com'}/listings">Перейти к объявлениям</a>
+      `,
     });
   }
 
@@ -47,10 +46,12 @@ export class MailService {
     await this.mailerService.sendMail({
       to: email,
       subject: 'Восстановление пароля',
-      template: 'password-reset',
-      context: {
-        url: `${process.env.FRONTEND_URL || 'https://lokven-frontend.onrender.com'}/auth/reset-password?token=${token}`,
-      },
+      html: `
+        <h1>Восстановление пароля</h1>
+        <p>Для сброса пароля перейдите по ссылке:</p>
+        <a href="${process.env.FRONTEND_URL || 'https://lokven-frontend.onrender.com'}/auth/reset-password?token=${token}">Сбросить пароль</a>
+        <p>Ссылка действительна в течение 1 часа.</p>
+      `,
     });
   }
 
@@ -58,26 +59,25 @@ export class MailService {
     await this.mailerService.sendMail({
       to: email,
       subject: 'Новый заказ на Локвен',
-      template: 'order-notification',
-      context: {
-        orderId,
-        total: total.toLocaleString('ru-RU'),
-        url: `${process.env.FRONTEND_URL || 'https://lokven-frontend.onrender.com'}/profile/orders`,
-      },
+      html: `
+        <h1>Новый заказ #${orderId}</h1>
+        <p>Сумма заказа: ${total.toLocaleString('ru-RU')} ₽</p>
+        <a href="${process.env.FRONTEND_URL || 'https://lokven-frontend.onrender.com'}/profile/orders">Посмотреть заказы</a>
+      `,
     });
   }
 
   async sendReviewNotificationEmail(email: string, reviewerName: string, rating: number) {
+    const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
     await this.mailerService.sendMail({
       to: email,
       subject: 'Новый отзыв на ваше объявление',
-      template: 'review-notification',
-      context: {
-        name: reviewerName || 'Пользователь',
-        rating: rating,
-        stars: '★'.repeat(rating) + '☆'.repeat(5 - rating),
-        url: `${process.env.FRONTEND_URL || 'https://lokven-frontend.onrender.com'}/profile/reviews`,
-      },
+      html: `
+        <h1>Новый отзыв</h1>
+        <p>${reviewerName || 'Пользователь'} оставил отзыв с оценкой ${rating} ★</p>
+        <p>${stars}</p>
+        <a href="${process.env.FRONTEND_URL || 'https://lokven-frontend.onrender.com'}/profile/reviews">Посмотреть отзывы</a>
+      `,
     });
   }
 }
