@@ -1,12 +1,30 @@
 import { Injectable } from '@nestjs/common';
-import { MailerService } from '@nestjs-modules/mailer';
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class MailService {
-  constructor(private mailerService: MailerService) {}
+  private transporter: nodemailer.Transporter;
+
+  constructor() {
+    this.transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: parseInt(process.env.SMTP_PORT) || 587,
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false,
+      },
+      // Принудительно используем IPv4
+      family: 4,
+    });
+  }
 
   async sendWelcomeEmail(email: string, name: string) {
-    await this.mailerService.sendMail({
+    await this.transporter.sendMail({
+      from: `"Локвен" <${process.env.SMTP_FROM || 'noreply@lokven.ru'}>`,
       to: email,
       subject: 'Добро пожаловать в Локвен!',
       html: `
@@ -19,7 +37,8 @@ export class MailService {
   }
 
   async sendListingCreatedEmail(email: string, listingTitle: string, listingId: string) {
-    await this.mailerService.sendMail({
+    await this.transporter.sendMail({
+      from: `"Локвен" <${process.env.SMTP_FROM || 'noreply@lokven.ru'}>`,
       to: email,
       subject: 'Ваше объявление создано!',
       html: `
@@ -31,7 +50,8 @@ export class MailService {
   }
 
   async sendListingModeratedEmail(email: string, listingTitle: string, status: string, note?: string) {
-    await this.mailerService.sendMail({
+    await this.transporter.sendMail({
+      from: `"Локвен" <${process.env.SMTP_FROM || 'noreply@lokven.ru'}>`,
       to: email,
       subject: `Объявление "${listingTitle}" ${status === 'active' ? 'одобрено' : 'отклонено'}`,
       html: `
@@ -43,7 +63,8 @@ export class MailService {
   }
 
   async sendPasswordResetEmail(email: string, token: string) {
-    await this.mailerService.sendMail({
+    await this.transporter.sendMail({
+      from: `"Локвен" <${process.env.SMTP_FROM || 'noreply@lokven.ru'}>`,
       to: email,
       subject: 'Восстановление пароля',
       html: `
@@ -56,7 +77,8 @@ export class MailService {
   }
 
   async sendOrderNotificationEmail(email: string, orderId: string, total: number) {
-    await this.mailerService.sendMail({
+    await this.transporter.sendMail({
+      from: `"Локвен" <${process.env.SMTP_FROM || 'noreply@lokven.ru'}>`,
       to: email,
       subject: 'Новый заказ на Локвен',
       html: `
@@ -69,7 +91,8 @@ export class MailService {
 
   async sendReviewNotificationEmail(email: string, reviewerName: string, rating: number) {
     const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
-    await this.mailerService.sendMail({
+    await this.transporter.sendMail({
+      from: `"Локвен" <${process.env.SMTP_FROM || 'noreply@lokven.ru'}>`,
       to: email,
       subject: 'Новый отзыв на ваше объявление',
       html: `
