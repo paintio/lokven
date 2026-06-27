@@ -1,13 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
+import type { Options } from 'nodemailer/lib/smtp-transport';
 
 @Injectable()
 export class MailService {
   private transporter: nodemailer.Transporter;
 
   constructor() {
-    // Используем прямые настройки с обходом IPv6
-    this.transporter = nodemailer.createTransport({
+    // Принудительное использование IPv4
+    const dns = require('dns');
+    const originalLookup = dns.lookup;
+
+    // Переопределяем DNS lookup для использования только IPv4
+    dns.lookup = (hostname: string, options: any, callback: any) => {
+      if (typeof options === 'function') {
+        callback = options;
+        options = { family: 4 };
+      } else {
+        options = { ...options, family: 4 };
+      }
+      return originalLookup(hostname, options, callback);
+    };
+
+    const transportOptions: Options = {
       host: 'smtp.gmail.com',
       port: 587,
       secure: false,
@@ -17,15 +32,13 @@ export class MailService {
       },
       tls: {
         rejectUnauthorized: false,
-        ciphers: 'SSLv3',
       },
-      // Принудительно используем IPv4
-      lookup: (hostname, options, callback) => {
-        // Используем только IPv4
-        const dns = require('dns');
-        dns.lookup(hostname, { family: 4 }, callback);
-      },
-    });
+    };
+
+    this.transporter = nodemailer.createTransport(transportOptions);
+
+    // Восстанавливаем оригинальный lookup
+    dns.lookup = originalLookup;
   }
 
   async sendWelcomeEmail(email: string, name: string) {
