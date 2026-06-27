@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -23,9 +24,31 @@ const menuItems = [
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <aside className="w-64 bg-white border-r border-[#E5E7EB] min-h-screen p-4 flex-shrink-0 sticky top-0">
+        <div className="mb-6">
+          <h2 className="text-sm font-semibold text-[#9CA3AF] uppercase tracking-wider">Админка</h2>
+        </div>
+        <nav className="space-y-1">
+          {menuItems.map((item) => (
+            <div key={item.href} className="flex items-center gap-3 px-3 py-2 text-sm text-[#6B7280]">
+              <span>{item.label}</span>
+            </div>
+          ))}
+        </nav>
+      </aside>
+    );
+  }
 
   return (
-    <aside className="w-64 bg-white border-r border-[#E5E7EB] min-h-screen p-4 flex-shrink-0 overflow-y-auto">
+    <aside className="w-64 bg-white border-r border-[#E5E7EB] min-h-screen p-4 flex-shrink-0 sticky top-0">
       <div className="mb-6">
         <h2 className="text-sm font-semibold text-[#9CA3AF] uppercase tracking-wider">Админка</h2>
       </div>

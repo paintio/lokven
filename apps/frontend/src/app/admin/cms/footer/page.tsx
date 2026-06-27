@@ -81,7 +81,6 @@ export default function AdminFooter() {
       if (response.ok) {
         fetchLinks();
         resetForm();
-        alert('Ссылка сохранена!');
       } else {
         const error = await response.json();
         alert('Ошибка: ' + JSON.stringify(error));
@@ -101,7 +100,6 @@ export default function AdminFooter() {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       fetchLinks();
-      alert('Ссылка удалена!');
     } catch (error) {
       console.error('Error deleting link:', error);
       alert('Ошибка при удалении');
@@ -138,7 +136,6 @@ export default function AdminFooter() {
     return acc;
   }, {} as Record<string, FooterLink[]>);
 
-  // Показываем заглушку на сервере
   if (!mounted) {
     return <div className="text-[#9CA3AF]">Загрузка...</div>;
   }
