@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import ProfileSidebar from '@/components/profile/ProfileSidebar';
 import StarRating from '@/components/reviews/StarRating';
-import ReviewList from '@/components/reviews/ReviewList';
 
 interface User {
   id: string;
@@ -30,7 +30,13 @@ export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('profile');
+  const [stats, setStats] = useState({
+    totalListings: 0,
+    totalOrders: 0,
+    totalFavorites: 0,
+    totalReviews: 0,
+    averageRating: 0,
+  });
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -44,9 +50,7 @@ export default function ProfilePage() {
   const fetchProfile = async (token: string) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/profile`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
       });
 
       if (!response.ok) {
@@ -55,6 +59,15 @@ export default function ProfilePage() {
 
       const data = await response.json();
       setUser(data);
+      
+      // Обновляем статистику
+      setStats({
+        totalListings: data._count.listings || 0,
+        totalOrders: (data._count.ordersAsBuyer || 0) + (data._count.ordersAsSeller || 0),
+        totalFavorites: data._count.favorites || 0,
+        totalReviews: 0,
+        averageRating: 0,
+      });
     } catch (error) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -70,27 +83,6 @@ export default function ProfilePage() {
     router.push('/');
   };
 
-  const handleDeleteListing = async (id: string) => {
-    if (!confirm('Вы уверены, что хотите удалить это объявление?')) return;
-    
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/listings/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const token = localStorage.getItem('token');
-        fetchProfile(token!);
-      }
-    } catch (error) {
-      console.error('Error deleting listing:', error);
-    }
-  };
-
   if (loading) {
     return (
       <div className="container-custom py-12 text-center text-[#9CA3AF]">
@@ -103,195 +95,145 @@ export default function ProfilePage() {
     return null;
   }
 
-  const tabs = [
-    { id: 'profile', label: 'Профиль' },
-    { id: 'listings', label: 'Мои объявления' },
-    { id: 'orders', label: 'Заказы' },
-    { id: 'favorites', label: 'Избранное' },
-    { id: 'reviews', label: 'Отзывы' },
+  const getRoleLabel = () => {
+    if (user.role === 'admin') return 'Администратор';
+    if (user.role === 'employer') return 'Работодатель';
+    if (user.isSeller) return 'Продавец';
+    return 'Покупатель';
+  };
+
+  const getRoleBadge = () => {
+    if (user.role === 'admin') {
+      return <span className="tag bg-purple-100 text-purple-700">Администратор</span>;
+    }
+    if (user.role === 'employer') {
+      return <span className="tag bg-blue-100 text-blue-700">Работодатель</span>;
+    }
+    if (user.isSeller) {
+      return <span className={`tag ${user.sellerStatus === 'approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+        {user.sellerStatus === 'approved' ? '✅ Продавец' : '⏳ На модерации'}
+      </span>;
+    }
+    return <span className="tag bg-gray-100 text-gray-700">Покупатель</span>;
+  };
+
+  const statCards = [
+    { label: 'Объявлений', value: stats.totalListings, icon: '📋' },
+    { label: 'Заказов', value: stats.totalOrders, icon: '📦' },
+    { label: 'В избранном', value: stats.totalFavorites, icon: '❤️' },
+    { label: 'Отзывов', value: stats.totalReviews, icon: '⭐' },
   ];
 
   return (
     <div className="container-custom py-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-[#111827]">Личный кабинет</h1>
-        <button onClick={handleLogout} className="btn-secondary">
+        <button onClick={handleLogout} className="btn-secondary text-sm">
           Выйти
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-xl border border-[#E5E7EB] p-4">
-            <div className="text-center mb-4">
-              <div className="w-20 h-20 bg-[#F3F4F6] rounded-full mx-auto flex items-center justify-center text-3xl">
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Боковое меню */}
+        <ProfileSidebar role={user.role} isSeller={user.isSeller} />
+
+        {/* Основной контент */}
+        <div className="flex-1 space-y-6">
+          {/* Карточка профиля */}
+          <div className="bg-white rounded-xl p-6 border border-[#E5E7EB]">
+            <div className="flex items-center gap-4">
+              <div className="w-20 h-20 bg-[#F3F4F6] rounded-full flex items-center justify-center text-3xl flex-shrink-0">
                 {user.avatar ? (
                   <img src={user.avatar} alt="" className="w-full h-full rounded-full object-cover" />
                 ) : (
                   user.name?.[0] || '👤'
                 )}
               </div>
-              <h3 className="font-semibold mt-2">{user.name || 'Без имени'}</h3>
-              <p className="text-xs text-[#6B7280]">{user.phone}</p>
-              {user.isSeller && (
-                <span className={`tag text-xs mt-1 ${user.sellerStatus === 'approved' ? '' : 'tag-gray'}`}>
-                  {user.sellerStatus === 'approved' ? '✅ Продавец' : '⏳ На модерации'}
-                </span>
-              )}
-            </div>
-
-            <nav className="space-y-1">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${
-                    activeTab === tab.id
-                      ? 'bg-[#F3F4F6] text-[#111827] font-medium'
-                      : 'text-[#6B7280] hover:bg-[#F9FAFB]'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </nav>
-          </div>
-
-          <div className="bg-white rounded-xl border border-[#E5E7EB] p-4 mt-4">
-            <div className="grid grid-cols-2 gap-2 text-center">
-              <div>
-                <div className="text-xl font-bold text-[#111827]">{user._count.listings}</div>
-                <div className="text-xs text-[#6B7280]">Объявлений</div>
+              <div className="flex-1">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <h2 className="text-xl font-semibold text-[#111827]">
+                    {user.name || 'Без имени'}
+                  </h2>
+                  {getRoleBadge()}
+                </div>
+                <p className="text-sm text-[#6B7280] mt-1">{user.phone}</p>
+                {user.email && (
+                  <p className="text-sm text-[#6B7280]">{user.email}</p>
+                )}
+                {user.companyName && (
+                  <p className="text-sm font-medium text-[#111827] mt-1">
+                    {user.companyName}
+                  </p>
+                )}
               </div>
-              <div>
-                <div className="text-xl font-bold text-[#111827]">{user._count.ordersAsBuyer + user._count.ordersAsSeller}</div>
-                <div className="text-xs text-[#6B7280]">Заказов</div>
-              </div>
-              <div>
-                <div className="text-xl font-bold text-[#111827]">{user._count.favorites}</div>
-                <div className="text-xs text-[#6B7280]">Избранное</div>
-              </div>
-              <div>
-                <div className="text-xl font-bold text-[#111827]">{user.role}</div>
-                <div className="text-xs text-[#6B7280]">Роль</div>
-              </div>
+              <Link href="/profile/settings" className="btn-secondary text-sm">
+                ✏️ Редактировать
+              </Link>
             </div>
           </div>
-        </div>
 
-        <div className="lg:col-span-3">
-          {activeTab === 'profile' && (
-            <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="font-semibold text-[#111827]">Профиль</h2>
-                <Link href="/profile/edit" className="btn-primary text-sm">
-                  Редактировать
-                </Link>
+          {/* Статистика */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {statCards.map((stat, index) => (
+              <div key={index} className="bg-white rounded-xl p-4 border border-[#E5E7EB] text-center">
+                <div className="text-2xl mb-1">{stat.icon}</div>
+                <div className="text-xl font-bold text-[#111827]">{stat.value}</div>
+                <div className="text-xs text-[#6B7280]">{stat.label}</div>
               </div>
+            ))}
+          </div>
+
+          {/* Быстрые действия */}
+          <div className="bg-white rounded-xl p-6 border border-[#E5E7EB]">
+            <h3 className="font-semibold text-[#111827] mb-4">⚡ Быстрые действия</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <Link href="/listings/create" className="btn-primary text-center text-sm py-2">
+                📝 Создать объявление
+              </Link>
+              <Link href="/profile/listings" className="btn-secondary text-center text-sm py-2">
+                📋 Мои объявления
+              </Link>
+              <Link href="/profile/orders" className="btn-secondary text-center text-sm py-2">
+                📦 Заказы
+              </Link>
+              <Link href="/profile/settings" className="btn-secondary text-center text-sm py-2">
+                ⚙️ Настройки
+              </Link>
+            </div>
+          </div>
+
+          {/* Последние объявления */}
+          {user.listings && user.listings.length > 0 && (
+            <div className="bg-white rounded-xl p-6 border border-[#E5E7EB]">
+              <h3 className="font-semibold text-[#111827] mb-4">📋 Мои объявления</h3>
               <div className="space-y-3">
-                <div className="flex justify-between py-2 border-b border-[#F3F4F6]">
-                  <span className="text-sm text-[#6B7280]">Имя</span>
-                  <span className="text-sm font-medium">{user.name || 'Не указано'}</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-[#F3F4F6]">
-                  <span className="text-sm text-[#6B7280]">Телефон</span>
-                  <span className="text-sm font-medium">{user.phone}</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-[#F3F4F6]">
-                  <span className="text-sm text-[#6B7280]">Email</span>
-                  <span className="text-sm font-medium">{user.email || 'Не указан'}</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-[#F3F4F6]">
-                  <span className="text-sm text-[#6B7280]">Роль</span>
-                  <span className="text-sm font-medium">
-                    {user.role === 'admin' ? 'Администратор' : 
-                     user.role === 'moderator' ? 'Модератор' : 
-                     user.isSeller ? 'Продавец' : 'Покупатель'}
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'listings' && (
-            <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="font-semibold text-[#111827]">Мои объявления</h2>
-                <Link href="/listings/create" className="btn-primary text-sm">
-                  + Создать
-                </Link>
-              </div>
-              {user.listings.length === 0 ? (
-                <p className="text-[#6B7280] text-sm text-center py-8">У вас пока нет объявлений</p>
-              ) : (
-                <div className="space-y-3">
-                  {user.listings.map((listing) => (
-                    <div key={listing.id} className="flex items-center gap-4 p-3 border border-[#F3F4F6] rounded-lg hover:bg-[#F9FAFB] transition-colors">
-                      {listing.images && listing.images.length > 0 ? (
-                        <img src={listing.images[0].url} alt="" className="w-16 h-16 object-cover rounded-lg" />
-                      ) : (
-                        <div className="w-16 h-16 bg-[#F3F4F6] rounded-lg flex items-center justify-center text-2xl">📦</div>
-                      )}
-                      <div className="flex-1">
-                        <Link href={`/listings/${listing.id}`} className="font-medium text-[#111827] hover:text-[#3B82F6] transition-colors">
-                          {listing.title}
-                        </Link>
-                        <p className="text-xs text-[#6B7280]">
-                          {listing.price.toLocaleString('ru-RU')} ₽ • {listing.views} просмотров
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className={`tag ${listing.status === 'active' ? '' : 'tag-gray'}`}>
-                          {listing.status === 'active' ? 'Активно' : 
-                           listing.status === 'pending' ? 'На модерации' : 
-                           listing.status === 'sold' ? 'Продано' : 'В архиве'}
-                        </span>
-                        {listing.status === 'active' && (
-                          <Link
-                            href={`/listings/${listing.id}/edit`}
-                            className="text-xs text-[#3B82F6] hover:underline"
-                          >
-                            ✏️ Редактировать
-                          </Link>
-                        )}
-                        <button
-                          onClick={() => handleDeleteListing(listing.id)}
-                          className="text-xs text-red-500 hover:underline"
-                        >
-                          🗑️
-                        </button>
-                      </div>
+                {user.listings.slice(0, 3).map((listing) => (
+                  <div key={listing.id} className="flex items-center gap-4 p-3 border border-[#F3F4F6] rounded-lg">
+                    {listing.images && listing.images.length > 0 ? (
+                      <img src={listing.images[0].url} alt="" className="w-16 h-16 object-cover rounded-lg" />
+                    ) : (
+                      <div className="w-16 h-16 bg-[#F3F4F6] rounded-lg flex items-center justify-center text-2xl">📦</div>
+                    )}
+                    <div className="flex-1">
+                      <Link href={`/listings/${listing.id}`} className="font-medium text-[#111827] hover:text-[#3B82F6]">
+                        {listing.title}
+                      </Link>
+                      <p className="text-xs text-[#6B7280]">
+                        {listing.price.toLocaleString('ru-RU')} ₽ • {listing.views} просмотров
+                      </p>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {activeTab === 'orders' && (
-            <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
-              <h2 className="font-semibold text-[#111827] mb-4">Заказы</h2>
-              <p className="text-[#6B7280] text-sm text-center py-8">История заказов будет здесь</p>
-            </div>
-          )}
-
-          {activeTab === 'favorites' && (
-            <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
-              <h2 className="font-semibold text-[#111827] mb-4">Избранное</h2>
-              <p className="text-[#6B7280] text-sm text-center py-8">Здесь будут избранные объявления</p>
-            </div>
-          )}
-
-          {activeTab === 'reviews' && (
-            <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
-              <h2 className="font-semibold text-[#111827] mb-4">⭐ Отзывы</h2>
-              {user.isSeller ? (
-                <ReviewList sellerId={user.id} />
-              ) : (
-                <p className="text-[#6B7280] text-sm text-center py-8">
-                  Вы пока не можете оставлять отзывы<br />
-                  <span className="text-xs text-[#9CA3AF]">Отзывы доступны после завершения заказов</span>
-                </p>
+                    <span className={`tag ${listing.status === 'active' ? '' : 'tag-gray'}`}>
+                      {listing.status === 'active' ? '✅ Активно' : 
+                       listing.status === 'pending' ? '⏳ На модерации' : 
+                       listing.status === 'sold' ? '💸 Продано' : '📦 В архиве'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              {user.listings.length > 3 && (
+                <Link href="/profile/listings" className="text-sm text-[#3B82F6] hover:underline mt-3 inline-block">
+                  Смотреть все ({user.listings.length})
+                </Link>
               )}
             </div>
           )}
