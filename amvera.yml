@@ -1,16 +1,10 @@
 meta:
-  # Указываем, что наше приложение использует Node.js
   environment: node
-  # Версия Node.js (используйте ту, что у вас в проекте, например 20 или 18)
   toolchain:
     version: 20
 
 build:
-  # Команда для установки зависимостей и сборки бэкенда
-  # Обратите внимание: мы переходим в папку apps/backend
   command: cd apps/backend && npm install && npm run build
 
 run:
-  # Команда для запуска собранного приложения
-  # Указываем относительный путь к главному файлу
   main: apps/backend/dist/main.js
