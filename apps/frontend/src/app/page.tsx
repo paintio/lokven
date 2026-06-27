@@ -64,8 +64,7 @@ export default function Home() {
     {
       id: 1,
       title: 'Недвижимость',
-      description: 'Квартиры, дома, коммерческая недвижимость',
-      tags: ['Покупка и аренда', 'Проверенные варианты', 'Удобный поиск'],
+      description: 'Квартиры и дома для покупки и аренды',
       button: 'Смотреть объекты →',
       image: '/images/cards/card-realty.png',
       href: '/realty',
@@ -73,8 +72,7 @@ export default function Home() {
     {
       id: 2,
       title: 'Маркетплейс',
-      description: 'Товары, электроника, одежда, всё для дома',
-      tags: ['Покупка и продажа', 'Гарантия качества', 'Быстрая доставка'],
+      description: 'Миллионы товаров для дома и жизни',
       button: 'Перейти в маркетплейс →',
       image: '/images/cards/card-marketplace.png',
       href: '/marketplace',
@@ -82,8 +80,7 @@ export default function Home() {
     {
       id: 3,
       title: 'Авто',
-      description: 'Автомобили с пробегом, новые, коммерческий транспорт',
-      tags: ['Продажа и покупка', 'Проверка авто', 'Выгодные цены'],
+      description: 'Автомобили с пробегом от проверенных продавцов',
       button: 'Подобрать авто →',
       image: '/images/cards/card-auto.png',
       href: '/auto',
@@ -91,8 +88,7 @@ export default function Home() {
     {
       id: 4,
       title: 'Объявления',
-      description: 'Частные объявления, б/у товары, услуги и другое',
-      tags: ['Бесплатные объявления', 'Быстрый поиск', 'По всей России'],
+      description: 'Частные объявления на любой вкус',
       button: 'Смотреть объявления →',
       image: '/images/cards/card-ads.png',
       href: '/ads',
@@ -100,8 +96,7 @@ export default function Home() {
     {
       id: 5,
       title: 'Работа',
-      description: 'Вакансии, резюме, стажировки, работа в IT',
-      tags: ['Поиск работы', 'Размещение вакансий', 'Карьерный рост'],
+      description: 'Вакансии и карьерные возможности',
       button: 'Найти работу →',
       image: '/images/cards/card-jobs.png',
       href: '/jobs',
@@ -109,8 +104,7 @@ export default function Home() {
     {
       id: 6,
       title: 'Услуги',
-      description: 'Специалисты, сервисы, ремонт, клининг, доставка',
-      tags: ['Поиск специалистов', 'Рейтинг и отзывы', 'Безопасные сделки'],
+      description: 'Специалисты и сервисы рядом с вами',
       button: 'Найти специалиста →',
       image: '/images/cards/card-services.png',
       href: '/services',
@@ -118,71 +112,62 @@ export default function Home() {
   ];
 
   const categories = [
-    { name: 'Авто', count: '125 000+', icon: '/icons/auto.svg', slug: 'avto' },
-    { name: 'Недвижимость', count: '31 000+', icon: '/icons/realty.svg', slug: 'nedvizhimost' },
-    { name: 'Электроника', count: '80 000+', icon: '/icons/electronics.svg', slug: 'elektronika' },
-    { name: 'Медиа и стиль', count: '75 000+', icon: '/icons/fashion.svg', slug: 'media-i-stil' },
-    { name: 'Для дома и сада', count: '42 000+', icon: '/icons/home.svg', slug: 'dom-i-sad' },
-    { name: 'Спорт и отдых', count: '45 000+', icon: '/icons/sport.svg', slug: 'sport-i-otdyh' },
+    { name: 'Авто', count: '125 000+', icon: '🚗', slug: 'avto' },
+    { name: 'Недвижимость', count: '31 000+', icon: '🏠', slug: 'nedvizhimost' },
+    { name: 'Электроника', count: '80 000+', icon: '📱', slug: 'elektronika' },
+    { name: 'Медиа и стиль', count: '75 000+', icon: '👕', slug: 'media-i-stil' },
+    { name: 'Для дома и сада', count: '42 000+', icon: '🏡', slug: 'dom-i-sad' },
+    { name: 'Спорт и отдых', count: '45 000+', icon: '⚽', slug: 'sport-i-otdyh' },
   ];
 
   return (
     <div className="container-custom">
-      <div className="hero-block p-6 mb-5">
-        <h1 className="text-2xl font-bold text-[#111827] mb-1.5">
-          Найдите всё, что вам нужно
-        </h1>
-        <p className="text-[#4B5563] text-sm font-medium mb-4">
-          Товары + Авто + Недвижимость + Работа + Услуги
-        </p>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {heroCards.map((card) => (
-            <a
-              key={card.id}
-              href={card.href}
-              className="group relative block rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 h-48"
-            >
-              <Image
-                src={card.image}
-                alt={card.title}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              />
-              
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/5 group-hover:from-black/70 group-hover:via-black/30 transition-all duration-300" />
-              
-              <div className="absolute inset-0 p-5 flex flex-col justify-end">
-                <h3 className="text-xl font-bold text-white drop-shadow-lg mb-1">
-                  {card.title}
-                </h3>
-                
-                <p className="text-sm text-white/90 leading-relaxed drop-shadow-md mb-2">
-                  {card.description}
-                </p>
-                
-                <div className="flex flex-wrap gap-1.5 mb-2">
-                  {card.tags.slice(0, 2).map((tag, idx) => (
-                    <span key={idx} className="text-[10px] px-2.5 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white border border-white/10 font-medium">
-                      {tag}
-                    </span>
-                  ))}
-                  {card.tags.length > 2 && (
-                    <span className="text-[10px] px-2.5 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white border border-white/10 font-medium">
-                      +{card.tags.length - 2}
-                    </span>
-                  )}
+      <div className="hero-block-new py-20 px-6 mb-12">
+        <div className="max-w-3xl mx-auto text-center">
+          <h1 className="text-5xl md:text-6xl font-bold text-[#111827] tracking-tight leading-[1.1] mb-4">
+            Найдите всё,<br />
+            <span className="text-[#3B82F6]">что вам нужно</span>
+          </h1>
+          <p className="text-lg text-[#4B5563] max-w-2xl mx-auto leading-relaxed">
+            Покупайте товары, находите работу, выбирайте автомобили, недвижимость и услуги на одной современной платформе.
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7 mb-12">
+        {heroCards.map((card) => (
+          <a
+            key={card.id}
+            href={card.href}
+            className="group relative block rounded-[32px] overflow-hidden transition-all duration-500 ease-[cubic-bezier(.22,.61,.36,1)] hover:-translate-y-2 hover:scale-[1.01] hover:shadow-[0_30px_70px_rgba(15,23,42,.15)] h-[340px]"
+          >
+            <Image
+              src={card.image}
+              alt={card.title}
+              fill
+              className="object-cover transition-transform duration-700 ease-[cubic-bezier(.22,.61,.36,1)] group-hover:scale-[1.06]"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
+            
+            <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/30 group-hover:to-black/40 transition-all duration-500" />
+            
+            <div className="absolute bottom-0 left-0 right-0 p-6 backdrop-blur-[18px] bg-white/75 rounded-b-[32px] transition-all duration-500 group-hover:bg-white/85">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-xl font-semibold text-[#111827] tracking-tight">
+                    {card.title}
+                  </h3>
+                  <p className="text-sm text-[#6B7280] mt-0.5">
+                    {card.description}
+                  </p>
                 </div>
-                
-                <span className="text-sm font-semibold text-white group-hover:text-white transition-colors drop-shadow-lg inline-flex items-center gap-1">
-                  {card.button}
-                  <span className="group-hover:translate-x-1 transition-transform">→</span>
+                <span className="text-sm font-medium text-[#3B82F6] group-hover:translate-x-1 transition-transform duration-300 whitespace-nowrap ml-4">
+                  Смотреть →
                 </span>
               </div>
-            </a>
-          ))}
-        </div>
+            </div>
+          </a>
+        ))}
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
@@ -203,9 +188,9 @@ export default function Home() {
           <a 
             key={index} 
             href={`/listings?category=${cat.slug}`}
-            className="category-item flex flex-col items-center"
+            className="category-item"
           >
-            <img src={cat.icon} alt={cat.name} className="w-8 h-8 mb-1 text-[#111827]" />
+            <div className="text-2xl mb-1">{cat.icon}</div>
             <div className="text-sm font-semibold text-[#111827]">{cat.name}</div>
             <div className="text-xs text-[#6B7280]">{cat.count}</div>
           </a>
