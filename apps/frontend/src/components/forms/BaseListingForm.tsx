@@ -36,10 +36,9 @@ export default function BaseListingForm({ type, children, initialData, isEdit }:
     setFormData({ ...formData, images: urls });
   };
 
-  // Обновляем attributes когда children передают новые данные
   useEffect(() => {
     if (initialData?.attributes) {
-      setFormData(prev => ({
+      setFormData((prev: any) => ({
         ...prev,
         attributes: initialData.attributes,
       }));
@@ -95,7 +94,6 @@ export default function BaseListingForm({ type, children, initialData, isEdit }:
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Общие поля */}
       <div>
         <label className="block text-sm font-medium text-[#6B7280] mb-1">Название *</label>
         <input
@@ -146,10 +144,8 @@ export default function BaseListingForm({ type, children, initialData, isEdit }:
         </div>
       </div>
 
-      {/* Специфические поля для категории */}
       {children}
 
-      {/* Загрузка изображений */}
       <div>
         <label className="block text-sm font-medium text-[#6B7280] mb-2">Изображения</label>
         <ImageUploader
@@ -159,7 +155,6 @@ export default function BaseListingForm({ type, children, initialData, isEdit }:
         />
       </div>
 
-      {/* Адрес */}
       <div>
         <label className="block text-sm font-medium text-[#6B7280] mb-1">Адрес</label>
         <input
