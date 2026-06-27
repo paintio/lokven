@@ -10,7 +10,7 @@ export class UploadsController {
 
   @Post('single')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadSingle(@UploadedFile() file: Express.Multer.File) {
+  async uploadSingle(@UploadedFile() file: any) {
     this.logger.log('Запрос на загрузку одного файла');
     const url = await this.uploadsService.saveFile(file);
     return { url };
@@ -18,7 +18,7 @@ export class UploadsController {
 
   @Post('multiple')
   @UseInterceptors(FilesInterceptor('files', 10))
-  async uploadMultiple(@UploadedFiles() files: Express.Multer.File[]) {
+  async uploadMultiple(@UploadedFiles() files: any[]) {
     this.logger.log(`Запрос на загрузку ${files?.length || 0} файлов`);
     if (!files || files.length === 0) {
       throw new Error('Файлы не переданы');
