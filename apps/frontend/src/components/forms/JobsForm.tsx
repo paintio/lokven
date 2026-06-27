@@ -46,7 +46,6 @@ export default function JobsForm({ initialData, isEdit }: JobsFormProps) {
     });
   };
 
-  // Администратор всегда может создавать вакансии
   if (!isEmployer && !isAdmin) {
     return (
       <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">

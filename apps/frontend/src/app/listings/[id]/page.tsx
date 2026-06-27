@@ -38,6 +38,7 @@ export default function ListingDetailPage() {
   const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
+  const [isAuthor, setIsAuthor] = useState(false);
 
   useEffect(() => {
     if (params.id) {
@@ -53,6 +54,13 @@ export default function ListingDetailPage() {
       }
       const data = await response.json();
       setListing(data);
+      
+      // Проверяем, является ли пользователь автором
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        setIsAuthor(user.id === data.author.id);
+      }
       
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/listings/${params.id}/views`, {
         method: 'POST',
@@ -99,6 +107,237 @@ export default function ListingDetailPage() {
       service: '🔧',
     };
     return icons[type] || '📌';
+  };
+
+  // Рендер атрибутов в зависимости от типа
+  const renderAttributes = () => {
+    if (!listing?.attributes) return null;
+
+    const attrs = listing.attributes;
+    const type = listing.type;
+
+    // Для вакансий (job)
+    if (type === 'job') {
+      const jobFields: { key: string; label: string }[] = [
+        { key: 'employment', label: 'Тип занятости' },
+        { key: 'schedule', label: 'График работы' },
+        { key: 'experience', label: 'Опыт работы' },
+        { key: 'education', label: 'Образование' },
+        { key: 'skills', label: 'Ключевые навыки' },
+        { key: 'companyName', label: 'Компания' },
+        { key: 'contactPerson', label: 'Контактное лицо' },
+        { key: 'responsibilities', label: 'Обязанности' },
+        { key: 'requirements', label: 'Требования' },
+        { key: 'conditions', label: 'Условия работы' },
+        { key: 'companyDescription', label: 'Описание компании' },
+      ];
+
+      const filtered = jobFields.filter(f => attrs[f.key]);
+      if (filtered.length === 0) return null;
+
+      return (
+        <div className="mt-6">
+          <h3 className="font-semibold text-[#111827] mb-3">Информация о вакансии</h3>
+          <div className="space-y-2">
+            {filtered.map(({ key, label }) => (
+              <div key={key} className="flex justify-between py-1 border-b border-[#F3F4F6]">
+                <span className="text-sm text-[#6B7280]">{label}</span>
+                <span className="text-sm font-medium text-[#111827]">{attrs[key]}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Для авто
+    if (type === 'auto') {
+      const autoFields: { key: string; label: string }[] = [
+        { key: 'brand', label: 'Марка' },
+        { key: 'model', label: 'Модель' },
+        { key: 'year', label: 'Год выпуска' },
+        { key: 'mileage', label: 'Пробег, км' },
+        { key: 'engineVolume', label: 'Объем двигателя, л' },
+        { key: 'enginePower', label: 'Мощность, л.с.' },
+        { key: 'engineType', label: 'Тип двигателя' },
+        { key: 'transmission', label: 'Коробка передач' },
+        { key: 'drive', label: 'Привод' },
+        { key: 'bodyType', label: 'Тип кузова' },
+        { key: 'color', label: 'Цвет' },
+        { key: 'condition', label: 'Состояние' },
+        { key: 'owners', label: 'Владельцев' },
+        { key: 'accident', label: 'Был в ДТП' },
+        { key: 'customs', label: 'Растаможен' },
+        { key: 'pts', label: 'ПТС' },
+        { key: 'vin', label: 'VIN номер' },
+      ];
+
+      const filtered = autoFields.filter(f => attrs[f.key]);
+      if (filtered.length === 0) return null;
+
+      return (
+        <div className="mt-6">
+          <h3 className="font-semibold text-[#111827] mb-3">Характеристики автомобиля</h3>
+          <div className="space-y-2">
+            {filtered.map(({ key, label }) => (
+              <div key={key} className="flex justify-between py-1 border-b border-[#F3F4F6]">
+                <span className="text-sm text-[#6B7280]">{label}</span>
+                <span className="text-sm font-medium text-[#111827]">
+                  {typeof attrs[key] === 'boolean' ? (attrs[key] ? 'Да' : 'Нет') : attrs[key]}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Для недвижимости
+    if (type === 'realty') {
+      const realtyFields: { key: string; label: string }[] = [
+        { key: 'realtyType', label: 'Тип недвижимости' },
+        { key: 'rooms', label: 'Комнат' },
+        { key: 'area', label: 'Площадь, м²' },
+        { key: 'kitchenArea', label: 'Площадь кухни, м²' },
+        { key: 'floor', label: 'Этаж' },
+        { key: 'totalFloors', label: 'Этажей в доме' },
+        { key: 'ceilingHeight', label: 'Высота потолков, м' },
+        { key: 'wallMaterial', label: 'Материал стен' },
+        { key: 'condition', label: 'Состояние' },
+        { key: 'furniture', label: 'Мебель' },
+        { key: 'appliances', label: 'Бытовая техника' },
+        { key: 'internet', label: 'Интернет' },
+        { key: 'parking', label: 'Парковка' },
+        { key: 'yearBuilt', label: 'Год постройки' },
+        { key: 'cadastralNumber', label: 'Кадастровый номер' },
+      ];
+
+      const filtered = realtyFields.filter(f => attrs[f.key]);
+      if (filtered.length === 0) return null;
+
+      return (
+        <div className="mt-6">
+          <h3 className="font-semibold text-[#111827] mb-3">Характеристики недвижимости</h3>
+          <div className="space-y-2">
+            {filtered.map(({ key, label }) => (
+              <div key={key} className="flex justify-between py-1 border-b border-[#F3F4F6]">
+                <span className="text-sm text-[#6B7280]">{label}</span>
+                <span className="text-sm font-medium text-[#111827]">
+                  {typeof attrs[key] === 'boolean' ? (attrs[key] ? 'Да' : 'Нет') : attrs[key]}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Для маркетплейса
+    if (type === 'product') {
+      const productFields: { key: string; label: string }[] = [
+        { key: 'category', label: 'Категория' },
+        { key: 'brand', label: 'Бренд' },
+        { key: 'model', label: 'Модель' },
+        { key: 'condition', label: 'Состояние' },
+        { key: 'color', label: 'Цвет' },
+        { key: 'size', label: 'Размер' },
+        { key: 'material', label: 'Материал' },
+        { key: 'warranty', label: 'Гарантия, мес.' },
+        { key: 'inStock', label: 'В наличии' },
+        { key: 'delivery', label: 'Доставка' },
+      ];
+
+      const filtered = productFields.filter(f => attrs[f.key]);
+      if (filtered.length === 0) return null;
+
+      return (
+        <div className="mt-6">
+          <h3 className="font-semibold text-[#111827] mb-3">Характеристики товара</h3>
+          <div className="space-y-2">
+            {filtered.map(({ key, label }) => (
+              <div key={key} className="flex justify-between py-1 border-b border-[#F3F4F6]">
+                <span className="text-sm text-[#6B7280]">{label}</span>
+                <span className="text-sm font-medium text-[#111827]">
+                  {typeof attrs[key] === 'boolean' ? (attrs[key] ? 'Да' : 'Нет') : attrs[key]}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Для услуг
+    if (type === 'service') {
+      const serviceFields: { key: string; label: string }[] = [
+        { key: 'serviceType', label: 'Тип услуги' },
+        { key: 'experience', label: 'Опыт работы' },
+        { key: 'education', label: 'Образование' },
+        { key: 'workTime', label: 'Время выполнения' },
+        { key: 'guarantee', label: 'Гарантия' },
+        { key: 'documents', label: 'Документы' },
+        { key: 'homeVisit', label: 'Выезд на дом' },
+        { key: 'portfolio', label: 'Портфолио' },
+        { key: 'certificates', label: 'Сертификаты' },
+      ];
+
+      const filtered = serviceFields.filter(f => attrs[f.key]);
+      if (filtered.length === 0) return null;
+
+      return (
+        <div className="mt-6">
+          <h3 className="font-semibold text-[#111827] mb-3">Информация об услуге</h3>
+          <div className="space-y-2">
+            {filtered.map(({ key, label }) => (
+              <div key={key} className="flex justify-between py-1 border-b border-[#F3F4F6]">
+                <span className="text-sm text-[#6B7280]">{label}</span>
+                <span className="text-sm font-medium text-[#111827]">
+                  {typeof attrs[key] === 'boolean' ? (attrs[key] ? 'Да' : 'Нет') : attrs[key]}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Для объявлений
+    if (type === 'ads') {
+      const adsFields: { key: string; label: string }[] = [
+        { key: 'category', label: 'Категория' },
+        { key: 'condition', label: 'Состояние' },
+        { key: 'brand', label: 'Бренд' },
+        { key: 'model', label: 'Модель' },
+        { key: 'year', label: 'Год' },
+        { key: 'color', label: 'Цвет' },
+        { key: 'size', label: 'Размер' },
+        { key: 'material', label: 'Материал' },
+        { key: 'reason', label: 'Причина продажи' },
+        { key: 'exchange', label: 'Возможен обмен' },
+        { key: 'bargain', label: 'Торг уместен' },
+      ];
+
+      const filtered = adsFields.filter(f => attrs[f.key]);
+      if (filtered.length === 0) return null;
+
+      return (
+        <div className="mt-6">
+          <h3 className="font-semibold text-[#111827] mb-3">Информация об объявлении</h3>
+          <div className="space-y-2">
+            {filtered.map(({ key, label }) => (
+              <div key={key} className="flex justify-between py-1 border-b border-[#F3F4F6]">
+                <span className="text-sm text-[#6B7280]">{label}</span>
+                <span className="text-sm font-medium text-[#111827]">
+                  {typeof attrs[key] === 'boolean' ? (attrs[key] ? 'Да' : 'Нет') : attrs[key]}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    return null;
   };
 
   if (loading) {
@@ -190,7 +429,10 @@ export default function ListingDetailPage() {
               {listing.description && (
                 <div>
                   <h3 className="font-semibold text-[#111827]">Описание</h3>
-                  <p className="text-[#6B7280] mt-1 whitespace-pre-wrap">{listing.description}</p>
+                  <div 
+                    className="text-[#6B7280] mt-1 prose prose-sm max-w-none"
+                    dangerouslySetInnerHTML={{ __html: listing.description }}
+                  />
                 </div>
               )}
 
@@ -200,6 +442,8 @@ export default function ListingDetailPage() {
                   <p className="text-[#6B7280] mt-1">{listing.address}</p>
                 </div>
               )}
+
+              {renderAttributes()}
 
               <div>
                 <h3 className="font-semibold text-[#111827]">Продавец</h3>
@@ -218,32 +462,26 @@ export default function ListingDetailPage() {
                 <h3 className="font-semibold text-[#111827]">Дата публикации</h3>
                 <p className="text-[#6B7280] mt-1">{formatDate(listing.createdAt)}</p>
               </div>
-
-              {listing.attributes && Object.keys(listing.attributes).length > 0 && (
-                <div>
-                  <h3 className="font-semibold text-[#111827]">Характеристики</h3>
-                  <div className="mt-1 space-y-1">
-                    {Object.entries(listing.attributes).map(([key, value]) => (
-                      <div key={key} className="flex justify-between text-sm">
-                        <span className="text-[#6B7280]">{key}</span>
-                        <span className="text-[#111827] font-medium">{String(value)}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
 
             <div className="mt-6 pt-6 border-t border-[#E5E7EB] flex flex-col gap-3">
-              <button className="btn-primary w-full">
-                📞 Показать телефон
-              </button>
-              <button className="btn-secondary w-full">
-                💬 Написать сообщение
-              </button>
-              <button className="btn-outline w-full">
-                ❤️ В избранное
-              </button>
+              {isAuthor ? (
+                <Link href={`/listings/${listing.id}/edit`} className="btn-primary w-full text-center">
+                  ✏️ Редактировать
+                </Link>
+              ) : (
+                <>
+                  <button className="btn-primary w-full">
+                    📞 Показать телефон
+                  </button>
+                  <button className="btn-secondary w-full">
+                    💬 Написать сообщение
+                  </button>
+                  <button className="btn-outline w-full">
+                    ❤️ В избранное
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
