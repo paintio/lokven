@@ -76,6 +76,7 @@ export default function AdminDashboard() {
     { 
       label: 'Всего пользователей', 
       value: stats?.totalUsers || 0, 
+      icon: '/icons/users.svg',
       change: stats?.newUsersToday || 0,
       changeLabel: 'новых сегодня',
       color: 'text-blue-600',
@@ -84,6 +85,7 @@ export default function AdminDashboard() {
     { 
       label: 'Всего объявлений', 
       value: stats?.totalListings || 0, 
+      icon: '/icons/listings.svg',
       change: stats?.newListingsToday || 0,
       changeLabel: 'новых сегодня',
       color: 'text-purple-600',
@@ -92,6 +94,7 @@ export default function AdminDashboard() {
     { 
       label: 'На модерации', 
       value: stats?.pendingListings || 0, 
+      icon: '/icons/listings.svg',
       change: 'ожидают проверки',
       changeLabel: '',
       color: 'text-yellow-600',
@@ -100,6 +103,7 @@ export default function AdminDashboard() {
     { 
       label: 'Всего заказов', 
       value: stats?.totalOrders || 0, 
+      icon: '/icons/orders.svg',
       change: '',
       changeLabel: '',
       color: 'text-green-600',
@@ -108,6 +112,7 @@ export default function AdminDashboard() {
     { 
       label: 'Выручка', 
       value: `${(stats?.totalRevenue || 0).toLocaleString('ru-RU')} ₽`, 
+      icon: '/icons/payments.svg',
       change: '',
       changeLabel: '',
       color: 'text-emerald-600',
@@ -116,6 +121,7 @@ export default function AdminDashboard() {
     { 
       label: 'Отзывы', 
       value: stats?.totalReviews || 0, 
+      icon: '/icons/reviews.svg',
       change: stats?.averageRating ? `${stats.averageRating.toFixed(1)} ★` : 'Нет',
       changeLabel: 'средний рейтинг',
       color: 'text-amber-600',
