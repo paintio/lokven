@@ -10,6 +10,7 @@ interface JobsFormProps {
 
 export default function JobsForm({ initialData, isEdit }: JobsFormProps) {
   const [isEmployer, setIsEmployer] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [attributes, setAttributes] = useState({
     employment: initialData?.attributes?.employment || '',
     experience: initialData?.attributes?.experience || '',
@@ -25,12 +26,12 @@ export default function JobsForm({ initialData, isEdit }: JobsFormProps) {
   });
 
   useEffect(() => {
-    // Проверяем, является ли пользователь работодателем
     const userStr = localStorage.getItem('user');
     if (userStr) {
       try {
         const user = JSON.parse(userStr);
-        setIsEmployer(user.isSeller || user.role === 'employer');
+        setIsEmployer(user.isSeller || user.role === 'seller' || user.role === 'employer');
+        setIsAdmin(user.role === 'admin');
       } catch (e) {
         console.error('Error parsing user data:', e);
       }
@@ -45,7 +46,8 @@ export default function JobsForm({ initialData, isEdit }: JobsFormProps) {
     });
   };
 
-  if (!isEmployer) {
+  // Администратор всегда может создавать вакансии
+  if (!isEmployer && !isAdmin) {
     return (
       <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
         <div className="text-4xl mb-3">⚠️</div>
@@ -64,6 +66,12 @@ export default function JobsForm({ initialData, isEdit }: JobsFormProps) {
     <BaseListingForm type="job" initialData={{ ...initialData, attributes }} isEdit={isEdit}>
       <div className="border-t border-[#E5E7EB] pt-4 mt-4">
         <h3 className="font-semibold text-[#111827] mb-3">Информация о вакансии</h3>
+        
+        {isAdmin && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 text-sm text-blue-700">
+            ⚡ Вы администратор, поэтому можете создавать вакансии
+          </div>
+        )}
         
         <div className="grid grid-cols-2 gap-4">
           <div>
