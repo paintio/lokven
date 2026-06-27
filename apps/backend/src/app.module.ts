@@ -6,17 +6,18 @@ import { ListingsModule } from './listings/listings.module';
 import { AdminModule } from './admin/admin.module';
 import { AuthModule } from './auth/auth.module';
 import { UploadsModule } from './uploads/uploads.module';
-import { CmsModule } from './cms/cms.module';
+import { ReviewsModule } from './reviews/reviews.module';
 
 @Module({
-  imports: [
-    ListingsModule,
-    AdminModule,
-    AuthModule,
-    UploadsModule,
-    CmsModule,
-  ],
+  imports: [ListingsModule, AdminModule, AuthModule, UploadsModule, ReviewsModule],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })
 export class AppModule {}
+import { CmsModule } from './cms/cms.module';
+
+// Добавить в imports
+@Module({
+  imports: [ListingsModule, AdminModule, AuthModule, UploadsModule, ReviewsModule, CmsModule],
+  // ...
+})
