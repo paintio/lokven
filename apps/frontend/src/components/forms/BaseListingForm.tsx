@@ -23,6 +23,7 @@ export default function BaseListingForm({ type, children, initialData, isEdit }:
     lat: '',
     lng: '',
     images: [] as string[],
+    attributes: {},
     ...initialData,
   });
 
@@ -34,6 +35,16 @@ export default function BaseListingForm({ type, children, initialData, isEdit }:
   const handleImagesUpload = (urls: string[]) => {
     setFormData({ ...formData, images: urls });
   };
+
+  // Обновляем attributes когда children передают новые данные
+  useEffect(() => {
+    if (initialData?.attributes) {
+      setFormData(prev => ({
+        ...prev,
+        attributes: initialData.attributes,
+      }));
+    }
+  }, [initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -46,6 +46,12 @@ export default function JobsForm({ initialData, isEdit }: JobsFormProps) {
     });
   };
 
+  // Передаём attributes в BaseListingForm
+  const formData = {
+    ...initialData,
+    attributes: attributes,
+  };
+
   if (!isEmployer && !isAdmin) {
     return (
       <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
@@ -62,7 +68,7 @@ export default function JobsForm({ initialData, isEdit }: JobsFormProps) {
   }
 
   return (
-    <BaseListingForm type="job" initialData={{ ...initialData, attributes }} isEdit={isEdit}>
+    <BaseListingForm type="job" initialData={formData} isEdit={isEdit}>
       <div className="border-t border-[#E5E7EB] pt-4 mt-4">
         <h3 className="font-semibold text-[#111827] mb-3">Информация о вакансии</h3>
         

@@ -55,7 +55,6 @@ export default function ListingDetailPage() {
       const data = await response.json();
       setListing(data);
       
-      // Проверяем, является ли пользователь автором
       const userStr = localStorage.getItem('user');
       if (userStr) {
         const user = JSON.parse(userStr);
@@ -109,235 +108,91 @@ export default function ListingDetailPage() {
     return icons[type] || '📌';
   };
 
-  // Рендер атрибутов в зависимости от типа
-  const renderAttributes = () => {
+  // Рендер атрибутов для вакансии
+  const renderJobAttributes = () => {
     if (!listing?.attributes) return null;
-
     const attrs = listing.attributes;
-    const type = listing.type;
 
-    // Для вакансий (job)
-    if (type === 'job') {
-      const jobFields: { key: string; label: string }[] = [
-        { key: 'employment', label: 'Тип занятости' },
-        { key: 'schedule', label: 'График работы' },
-        { key: 'experience', label: 'Опыт работы' },
-        { key: 'education', label: 'Образование' },
-        { key: 'skills', label: 'Ключевые навыки' },
-        { key: 'companyName', label: 'Компания' },
-        { key: 'contactPerson', label: 'Контактное лицо' },
-        { key: 'responsibilities', label: 'Обязанности' },
-        { key: 'requirements', label: 'Требования' },
-        { key: 'conditions', label: 'Условия работы' },
-        { key: 'companyDescription', label: 'Описание компании' },
-      ];
+    const jobFields: { key: string; label: string }[] = [
+      { key: 'employment', label: 'Тип занятости' },
+      { key: 'schedule', label: 'График работы' },
+      { key: 'experience', label: 'Опыт работы' },
+      { key: 'education', label: 'Образование' },
+      { key: 'skills', label: 'Ключевые навыки' },
+      { key: 'companyName', label: 'Компания' },
+      { key: 'contactPerson', label: 'Контактное лицо' },
+      { key: 'responsibilities', label: 'Обязанности' },
+      { key: 'requirements', label: 'Требования' },
+      { key: 'conditions', label: 'Условия работы' },
+      { key: 'companyDescription', label: 'Описание компании' },
+    ];
 
-      const filtered = jobFields.filter(f => attrs[f.key]);
-      if (filtered.length === 0) return null;
+    const filtered = jobFields.filter(f => attrs[f.key] && attrs[f.key] !== '');
+    if (filtered.length === 0) return null;
 
-      return (
-        <div className="mt-6">
-          <h3 className="font-semibold text-[#111827] mb-3">Информация о вакансии</h3>
-          <div className="space-y-2">
-            {filtered.map(({ key, label }) => (
+    // Группируем поля для лучшего отображения
+    const mainFields = filtered.filter(f => ['employment', 'schedule', 'experience', 'education', 'companyName', 'contactPerson'].includes(f.key));
+    const textFields = filtered.filter(f => ['skills', 'responsibilities', 'requirements', 'conditions', 'companyDescription'].includes(f.key));
+
+    return (
+      <div className="mt-6">
+        <h3 className="font-semibold text-[#111827] mb-3">Информация о вакансии</h3>
+        
+        {/* Основные поля */}
+        {mainFields.length > 0 && (
+          <div className="space-y-2 mb-4">
+            {mainFields.map(({ key, label }) => (
               <div key={key} className="flex justify-between py-1 border-b border-[#F3F4F6]">
                 <span className="text-sm text-[#6B7280]">{label}</span>
                 <span className="text-sm font-medium text-[#111827]">{attrs[key]}</span>
               </div>
             ))}
           </div>
-        </div>
-      );
+        )}
+
+        {/* Текстовые поля */}
+        {textFields.map(({ key, label }) => {
+          if (!attrs[key] || attrs[key] === '') return null;
+          return (
+            <div key={key} className="mt-3">
+              <h4 className="text-sm font-semibold text-[#111827]">{label}</h4>
+              <div className="text-sm text-[#6B7280] mt-1 whitespace-pre-wrap">{attrs[key]}</div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  // Рендер атрибутов для других типов
+  const renderAttributes = () => {
+    if (!listing?.attributes) return null;
+    const type = listing.type;
+
+    if (type === 'job') {
+      return renderJobAttributes();
     }
 
-    // Для авто
-    if (type === 'auto') {
-      const autoFields: { key: string; label: string }[] = [
-        { key: 'brand', label: 'Марка' },
-        { key: 'model', label: 'Модель' },
-        { key: 'year', label: 'Год выпуска' },
-        { key: 'mileage', label: 'Пробег, км' },
-        { key: 'engineVolume', label: 'Объем двигателя, л' },
-        { key: 'enginePower', label: 'Мощность, л.с.' },
-        { key: 'engineType', label: 'Тип двигателя' },
-        { key: 'transmission', label: 'Коробка передач' },
-        { key: 'drive', label: 'Привод' },
-        { key: 'bodyType', label: 'Тип кузова' },
-        { key: 'color', label: 'Цвет' },
-        { key: 'condition', label: 'Состояние' },
-        { key: 'owners', label: 'Владельцев' },
-        { key: 'accident', label: 'Был в ДТП' },
-        { key: 'customs', label: 'Растаможен' },
-        { key: 'pts', label: 'ПТС' },
-        { key: 'vin', label: 'VIN номер' },
-      ];
+    // Для других типов показываем все атрибуты
+    const attrs = listing.attributes;
+    const keys = Object.keys(attrs).filter(k => attrs[k] !== '' && attrs[k] !== null && attrs[k] !== undefined);
+    if (keys.length === 0) return null;
 
-      const filtered = autoFields.filter(f => attrs[f.key]);
-      if (filtered.length === 0) return null;
-
-      return (
-        <div className="mt-6">
-          <h3 className="font-semibold text-[#111827] mb-3">Характеристики автомобиля</h3>
-          <div className="space-y-2">
-            {filtered.map(({ key, label }) => (
-              <div key={key} className="flex justify-between py-1 border-b border-[#F3F4F6]">
-                <span className="text-sm text-[#6B7280]">{label}</span>
-                <span className="text-sm font-medium text-[#111827]">
-                  {typeof attrs[key] === 'boolean' ? (attrs[key] ? 'Да' : 'Нет') : attrs[key]}
-                </span>
-              </div>
-            ))}
-          </div>
+    return (
+      <div className="mt-6">
+        <h3 className="font-semibold text-[#111827] mb-3">Характеристики</h3>
+        <div className="space-y-2">
+          {keys.map((key) => (
+            <div key={key} className="flex justify-between py-1 border-b border-[#F3F4F6]">
+              <span className="text-sm text-[#6B7280]">{key}</span>
+              <span className="text-sm font-medium text-[#111827]">
+                {typeof attrs[key] === 'boolean' ? (attrs[key] ? 'Да' : 'Нет') : attrs[key]}
+              </span>
+            </div>
+          ))}
         </div>
-      );
-    }
-
-    // Для недвижимости
-    if (type === 'realty') {
-      const realtyFields: { key: string; label: string }[] = [
-        { key: 'realtyType', label: 'Тип недвижимости' },
-        { key: 'rooms', label: 'Комнат' },
-        { key: 'area', label: 'Площадь, м²' },
-        { key: 'kitchenArea', label: 'Площадь кухни, м²' },
-        { key: 'floor', label: 'Этаж' },
-        { key: 'totalFloors', label: 'Этажей в доме' },
-        { key: 'ceilingHeight', label: 'Высота потолков, м' },
-        { key: 'wallMaterial', label: 'Материал стен' },
-        { key: 'condition', label: 'Состояние' },
-        { key: 'furniture', label: 'Мебель' },
-        { key: 'appliances', label: 'Бытовая техника' },
-        { key: 'internet', label: 'Интернет' },
-        { key: 'parking', label: 'Парковка' },
-        { key: 'yearBuilt', label: 'Год постройки' },
-        { key: 'cadastralNumber', label: 'Кадастровый номер' },
-      ];
-
-      const filtered = realtyFields.filter(f => attrs[f.key]);
-      if (filtered.length === 0) return null;
-
-      return (
-        <div className="mt-6">
-          <h3 className="font-semibold text-[#111827] mb-3">Характеристики недвижимости</h3>
-          <div className="space-y-2">
-            {filtered.map(({ key, label }) => (
-              <div key={key} className="flex justify-between py-1 border-b border-[#F3F4F6]">
-                <span className="text-sm text-[#6B7280]">{label}</span>
-                <span className="text-sm font-medium text-[#111827]">
-                  {typeof attrs[key] === 'boolean' ? (attrs[key] ? 'Да' : 'Нет') : attrs[key]}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    // Для маркетплейса
-    if (type === 'product') {
-      const productFields: { key: string; label: string }[] = [
-        { key: 'category', label: 'Категория' },
-        { key: 'brand', label: 'Бренд' },
-        { key: 'model', label: 'Модель' },
-        { key: 'condition', label: 'Состояние' },
-        { key: 'color', label: 'Цвет' },
-        { key: 'size', label: 'Размер' },
-        { key: 'material', label: 'Материал' },
-        { key: 'warranty', label: 'Гарантия, мес.' },
-        { key: 'inStock', label: 'В наличии' },
-        { key: 'delivery', label: 'Доставка' },
-      ];
-
-      const filtered = productFields.filter(f => attrs[f.key]);
-      if (filtered.length === 0) return null;
-
-      return (
-        <div className="mt-6">
-          <h3 className="font-semibold text-[#111827] mb-3">Характеристики товара</h3>
-          <div className="space-y-2">
-            {filtered.map(({ key, label }) => (
-              <div key={key} className="flex justify-between py-1 border-b border-[#F3F4F6]">
-                <span className="text-sm text-[#6B7280]">{label}</span>
-                <span className="text-sm font-medium text-[#111827]">
-                  {typeof attrs[key] === 'boolean' ? (attrs[key] ? 'Да' : 'Нет') : attrs[key]}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    // Для услуг
-    if (type === 'service') {
-      const serviceFields: { key: string; label: string }[] = [
-        { key: 'serviceType', label: 'Тип услуги' },
-        { key: 'experience', label: 'Опыт работы' },
-        { key: 'education', label: 'Образование' },
-        { key: 'workTime', label: 'Время выполнения' },
-        { key: 'guarantee', label: 'Гарантия' },
-        { key: 'documents', label: 'Документы' },
-        { key: 'homeVisit', label: 'Выезд на дом' },
-        { key: 'portfolio', label: 'Портфолио' },
-        { key: 'certificates', label: 'Сертификаты' },
-      ];
-
-      const filtered = serviceFields.filter(f => attrs[f.key]);
-      if (filtered.length === 0) return null;
-
-      return (
-        <div className="mt-6">
-          <h3 className="font-semibold text-[#111827] mb-3">Информация об услуге</h3>
-          <div className="space-y-2">
-            {filtered.map(({ key, label }) => (
-              <div key={key} className="flex justify-between py-1 border-b border-[#F3F4F6]">
-                <span className="text-sm text-[#6B7280]">{label}</span>
-                <span className="text-sm font-medium text-[#111827]">
-                  {typeof attrs[key] === 'boolean' ? (attrs[key] ? 'Да' : 'Нет') : attrs[key]}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    // Для объявлений
-    if (type === 'ads') {
-      const adsFields: { key: string; label: string }[] = [
-        { key: 'category', label: 'Категория' },
-        { key: 'condition', label: 'Состояние' },
-        { key: 'brand', label: 'Бренд' },
-        { key: 'model', label: 'Модель' },
-        { key: 'year', label: 'Год' },
-        { key: 'color', label: 'Цвет' },
-        { key: 'size', label: 'Размер' },
-        { key: 'material', label: 'Материал' },
-        { key: 'reason', label: 'Причина продажи' },
-        { key: 'exchange', label: 'Возможен обмен' },
-        { key: 'bargain', label: 'Торг уместен' },
-      ];
-
-      const filtered = adsFields.filter(f => attrs[f.key]);
-      if (filtered.length === 0) return null;
-
-      return (
-        <div className="mt-6">
-          <h3 className="font-semibold text-[#111827] mb-3">Информация об объявлении</h3>
-          <div className="space-y-2">
-            {filtered.map(({ key, label }) => (
-              <div key={key} className="flex justify-between py-1 border-b border-[#F3F4F6]">
-                <span className="text-sm text-[#6B7280]">{label}</span>
-                <span className="text-sm font-medium text-[#111827]">
-                  {typeof attrs[key] === 'boolean' ? (attrs[key] ? 'Да' : 'Нет') : attrs[key]}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    return null;
+      </div>
+    );
   };
 
   if (loading) {
