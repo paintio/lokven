@@ -112,12 +112,12 @@ export default function Home() {
   ];
 
   const categories = [
-    { name: 'Авто', count: '125 000+', icon: '🚗', slug: 'avto' },
-    { name: 'Недвижимость', count: '31 000+', icon: '🏠', slug: 'nedvizhimost' },
-    { name: 'Электроника', count: '80 000+', icon: '📱', slug: 'elektronika' },
-    { name: 'Медиа и стиль', count: '75 000+', icon: '👕', slug: 'media-i-stil' },
-    { name: 'Для дома и сада', count: '42 000+', icon: '🏡', slug: 'dom-i-sad' },
-    { name: 'Спорт и отдых', count: '45 000+', icon: '⚽', slug: 'sport-i-otdyh' },
+    { name: 'Авто', count: '125 000+', icon: '/icons/auto.svg', slug: 'avto' },
+    { name: 'Недвижимость', count: '31 000+', icon: '/icons/realty.svg', slug: 'nedvizhimost' },
+    { name: 'Электроника', count: '80 000+', icon: '/icons/electronics.svg', slug: 'elektronika' },
+    { name: 'Медиа и стиль', count: '75 000+', icon: '/icons/fashion.svg', slug: 'media-i-stil' },
+    { name: 'Для дома и сада', count: '42 000+', icon: '/icons/home.svg', slug: 'dom-i-sad' },
+    { name: 'Спорт и отдых', count: '45 000+', icon: '/icons/sport.svg', slug: 'sport-i-otdyh' },
   ];
 
   return (
@@ -190,7 +190,7 @@ export default function Home() {
             href={`/listings?category=${cat.slug}`}
             className="category-item"
           >
-            <div className="text-2xl mb-1">{cat.icon}</div>
+            <img src={cat.icon} alt={cat.name} className="w-8 h-8 mx-auto mb-1 text-[#111827]" />
             <div className="text-sm font-semibold text-[#111827]">{cat.name}</div>
             <div className="text-xs text-[#6B7280]">{cat.count}</div>
           </a>
