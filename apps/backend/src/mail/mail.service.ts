@@ -6,6 +6,7 @@ export class MailService {
   private transporter: nodemailer.Transporter;
 
   constructor() {
+    // Используем nodemailer напрямую с настройками IPv4
     this.transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'smtp.gmail.com',
       port: parseInt(process.env.SMTP_PORT) || 587,
@@ -17,8 +18,6 @@ export class MailService {
       tls: {
         rejectUnauthorized: false,
       },
-      // Принудительно используем IPv4
-      family: 4,
     });
   }
 

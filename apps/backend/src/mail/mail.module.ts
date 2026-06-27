@@ -17,8 +17,6 @@ import { MailController } from './mail.controller';
         tls: {
           rejectUnauthorized: false,
         },
-        // Принудительно используем IPv4
-        family: 4,
       },
       defaults: {
         from: `"Локвен" <${process.env.SMTP_FROM || 'noreply@lokven.ru'}>`,
