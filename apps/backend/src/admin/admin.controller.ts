@@ -1,7 +1,10 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query } from '@nestjs/common';
+// apps/backend/src/admin/admin.controller.ts
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('admin')
+@UseGuards(JwtAuthGuard)
 export class AdminController {
   constructor(private prisma: PrismaService) {}
 
@@ -261,7 +264,7 @@ export class AdminController {
     });
   }
 
-  // Экспорт данных
+  // Экспорт
   @Get('export/:type')
   async exportData(@Param('type') type: string) {
     let data = [];
@@ -333,7 +336,7 @@ export class AdminController {
     });
   }
 
-  // Массовая рассылка уведомлений
+  // Массовая рассылка
   @Post('notifications/send-all')
   async sendAllNotifications(@Body() body: { title: string; message: string; type: string }) {
     const users = await this.prisma.user.findMany({
@@ -376,7 +379,6 @@ export class AdminController {
         startDate.setDate(now.getDate() - 7);
     }
 
-    // Дневная статистика
     const dailyStats: any[] = await this.prisma.$queryRaw`
       SELECT 
         DATE("createdAt") as date,
@@ -394,14 +396,12 @@ export class AdminController {
       ORDER BY date ASC
     `;
 
-    // Статистика по категориям
     const categoryStats = await this.prisma.listing.groupBy({
       by: ['type'],
       where: { status: 'active' },
       _count: true,
     });
 
-    // Активность по часам
     const userActivity: any[] = await this.prisma.$queryRaw`
       SELECT 
         EXTRACT(HOUR FROM "createdAt") as hour,
@@ -412,7 +412,6 @@ export class AdminController {
       ORDER BY hour ASC
     `;
 
-    // Выручка по месяцам
     const revenueStats: any[] = await this.prisma.$queryRaw`
       SELECT 
         TO_CHAR("createdAt", 'YYYY-MM') as month,
@@ -424,7 +423,6 @@ export class AdminController {
       ORDER BY month ASC
     `;
 
-    // Топ категории
     const topCategories = await this.prisma.listing.groupBy({
       by: ['type'],
       where: { status: 'active' },
@@ -433,7 +431,6 @@ export class AdminController {
       take: 5,
     });
 
-    // Статусы объявлений
     const statusStats = await this.prisma.listing.groupBy({
       by: ['status'],
       _count: true,
