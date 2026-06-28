@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ProfileSidebar from '@/components/profile/ProfileSidebar';
 
@@ -10,8 +10,7 @@ export default function ProfileBalance() {
   const [loading, setLoading] = useState(true);
   const [balance, setBalance] = useState(1500);
 
-  // Временно, пока нет реального пользователя
-  useState(() => {
+  useEffect(() => {
     const userStr = localStorage.getItem('user');
     if (userStr) {
       setUser(JSON.parse(userStr));
@@ -27,6 +26,11 @@ export default function ProfileBalance() {
     );
   }
 
+  if (!user) {
+    router.push('/auth/login');
+    return null;
+  }
+
   return (
     <div className="container-custom py-8">
       <h1 className="text-2xl font-bold text-[#111827] mb-6">💰 Баланс</h1>
@@ -35,7 +39,6 @@ export default function ProfileBalance() {
         <ProfileSidebar role={user?.role || 'user'} isSeller={user?.isSeller || false} />
 
         <div className="flex-1 space-y-6">
-          {/* Баланс */}
           <div className="bg-white rounded-xl p-6 border border-[#E5E7EB]">
             <div className="text-center">
               <p className="text-sm text-[#6B7280]">Доступный баланс</p>
@@ -47,7 +50,6 @@ export default function ProfileBalance() {
             </div>
           </div>
 
-          {/* История операций */}
           <div className="bg-white rounded-xl p-6 border border-[#E5E7EB]">
             <h3 className="font-semibold text-[#111827] mb-4">📊 История операций</h3>
             <div className="space-y-3">
