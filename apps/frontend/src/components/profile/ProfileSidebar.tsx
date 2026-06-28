@@ -11,6 +11,9 @@ interface ProfileSidebarProps {
 export default function ProfileSidebar({ role, isSeller }: ProfileSidebarProps) {
   const pathname = usePathname();
 
+  // Админ видит всё
+  const isAdmin = role === 'admin';
+
   const buyerMenu = [
     { href: '/profile', label: 'Обзор' },
     { href: '/profile/orders', label: 'Мои заказы' },
@@ -35,9 +38,36 @@ export default function ProfileSidebar({ role, isSeller }: ProfileSidebarProps) 
     { href: '/profile/settings', label: 'Настройки' },
   ];
 
+  const performerMenu = [
+    { href: '/profile', label: 'Обзор' },
+    { href: '/profile/services', label: 'Мои услуги' },
+    { href: '/profile/orders', label: 'Заказы' },
+    { href: '/profile/balance', label: 'Баланс' },
+    { href: '/profile/settings', label: 'Настройки' },
+  ];
+
+  // Выбор меню в зависимости от роли
   let menu = buyerMenu;
-  if (role === 'employer') menu = employerMenu;
-  else if (isSeller) menu = sellerMenu;
+  if (isAdmin) {
+    // Админ видит все меню в одном списке
+    menu = [
+      ...buyerMenu,
+      ...sellerMenu.filter(m => m.label !== 'Обзор' && m.label !== 'Настройки'),
+      ...employerMenu.filter(m => m.label !== 'Обзор' && m.label !== 'Настройки'),
+      ...performerMenu.filter(m => m.label !== 'Обзор' && m.label !== 'Настройки'),
+    ];
+    // Убираем дубликаты
+    const uniqueMenu = menu.filter((item, index, self) => 
+      self.findIndex(m => m.href === item.href) === index
+    );
+    menu = uniqueMenu;
+  } else if (role === 'employer') {
+    menu = employerMenu;
+  } else if (role === 'performer') {
+    menu = performerMenu;
+  } else if (isSeller) {
+    menu = sellerMenu;
+  }
 
   return (
     <aside className="w-64 bg-white rounded-xl border border-[#E5E7EB] p-4 sticky top-20">

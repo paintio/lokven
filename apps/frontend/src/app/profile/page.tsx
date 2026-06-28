@@ -30,12 +30,14 @@ export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [stats, setStats] = useState({
     totalListings: 0,
     totalOrders: 0,
     totalFavorites: 0,
     totalReviews: 0,
     averageRating: 0,
+    balance: 0,
   });
 
   useEffect(() => {
@@ -59,14 +61,15 @@ export default function ProfilePage() {
 
       const data = await response.json();
       setUser(data);
+      setIsAdmin(data.role === 'admin');
       
-      // Обновляем статистику
       setStats({
         totalListings: data._count.listings || 0,
         totalOrders: (data._count.ordersAsBuyer || 0) + (data._count.ordersAsSeller || 0),
         totalFavorites: data._count.favorites || 0,
         totalReviews: 0,
         averageRating: 0,
+        balance: 1500, // временно
       });
     } catch (error) {
       localStorage.removeItem('token');
@@ -98,6 +101,7 @@ export default function ProfilePage() {
   const getRoleLabel = () => {
     if (user.role === 'admin') return 'Администратор';
     if (user.role === 'employer') return 'Работодатель';
+    if (user.role === 'performer') return 'Исполнитель';
     if (user.isSeller) return 'Продавец';
     return 'Покупатель';
   };
@@ -108,6 +112,9 @@ export default function ProfilePage() {
     }
     if (user.role === 'employer') {
       return <span className="tag bg-blue-100 text-blue-700">Работодатель</span>;
+    }
+    if (user.role === 'performer') {
+      return <span className="tag bg-green-100 text-green-700">Исполнитель</span>;
     }
     if (user.isSeller) {
       return <span className={`tag ${user.sellerStatus === 'approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
@@ -122,6 +129,7 @@ export default function ProfilePage() {
     { label: 'Заказов', value: stats.totalOrders, icon: '📦' },
     { label: 'В избранном', value: stats.totalFavorites, icon: '❤️' },
     { label: 'Отзывов', value: stats.totalReviews, icon: '⭐' },
+    { label: 'Баланс', value: `${stats.balance} ₽`, icon: '💰' },
   ];
 
   return (
@@ -134,20 +142,21 @@ export default function ProfilePage() {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* Боковое меню */}
         <ProfileSidebar role={user.role} isSeller={user.isSeller} />
 
-        {/* Основной контент */}
         <div className="flex-1 space-y-6">
-          {/* Карточка профиля */}
+          {/* Карточка профиля с аватаром */}
           <div className="bg-white rounded-xl p-6 border border-[#E5E7EB]">
             <div className="flex items-center gap-4">
-              <div className="w-20 h-20 bg-[#F3F4F6] rounded-full flex items-center justify-center text-3xl flex-shrink-0">
+              <div className="relative w-20 h-20 bg-[#F3F4F6] rounded-full flex items-center justify-center text-3xl flex-shrink-0 overflow-hidden">
                 {user.avatar ? (
                   <img src={user.avatar} alt="" className="w-full h-full rounded-full object-cover" />
                 ) : (
-                  user.name?.[0] || '👤'
+                  <span className="text-4xl">{user.name?.[0] || '👤'}</span>
                 )}
+                <button className="absolute bottom-0 right-0 bg-[#3B82F6] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-[#2563EB] transition-colors">
+                  📷
+                </button>
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-3 flex-wrap">
@@ -173,9 +182,9 @@ export default function ProfilePage() {
           </div>
 
           {/* Статистика */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
             {statCards.map((stat, index) => (
-              <div key={index} className="bg-white rounded-xl p-4 border border-[#E5E7EB] text-center">
+              <div key={index} className="bg-white rounded-xl p-4 border border-[#E5E7EB] text-center hover:shadow-md transition-shadow">
                 <div className="text-2xl mb-1">{stat.icon}</div>
                 <div className="text-xl font-bold text-[#111827]">{stat.value}</div>
                 <div className="text-xs text-[#6B7280]">{stat.label}</div>
@@ -196,8 +205,8 @@ export default function ProfilePage() {
               <Link href="/profile/orders" className="btn-secondary text-center text-sm py-2">
                 📦 Заказы
               </Link>
-              <Link href="/profile/settings" className="btn-secondary text-center text-sm py-2">
-                ⚙️ Настройки
+              <Link href="/profile/balance" className="btn-secondary text-center text-sm py-2">
+                💰 Баланс
               </Link>
             </div>
           </div>
@@ -208,7 +217,7 @@ export default function ProfilePage() {
               <h3 className="font-semibold text-[#111827] mb-4">📋 Мои объявления</h3>
               <div className="space-y-3">
                 {user.listings.slice(0, 3).map((listing) => (
-                  <div key={listing.id} className="flex items-center gap-4 p-3 border border-[#F3F4F6] rounded-lg">
+                  <div key={listing.id} className="flex items-center gap-4 p-3 border border-[#F3F4F6] rounded-lg hover:bg-[#F9FAFB] transition-colors">
                     {listing.images && listing.images.length > 0 ? (
                       <img src={listing.images[0].url} alt="" className="w-16 h-16 object-cover rounded-lg" />
                     ) : (
@@ -237,6 +246,25 @@ export default function ProfilePage() {
               )}
             </div>
           )}
+
+          {/* Ссылки на другие разделы */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <Link href="/profile/orders" className="bg-white rounded-xl p-4 border border-[#E5E7EB] hover:shadow-md transition-all text-center">
+              <div className="text-2xl mb-1">📦</div>
+              <div className="font-medium text-[#111827]">Мои заказы</div>
+              <div className="text-xs text-[#6B7280]">История покупок</div>
+            </Link>
+            <Link href="/profile/favorites" className="bg-white rounded-xl p-4 border border-[#E5E7EB] hover:shadow-md transition-all text-center">
+              <div className="text-2xl mb-1">❤️</div>
+              <div className="font-medium text-[#111827]">Избранное</div>
+              <div className="text-xs text-[#6B7280]">Сохраненные товары</div>
+            </Link>
+            <Link href="/profile/balance" className="bg-white rounded-xl p-4 border border-[#E5E7EB] hover:shadow-md transition-all text-center">
+              <div className="text-2xl mb-1">💰</div>
+              <div className="font-medium text-[#111827]">Баланс</div>
+              <div className="text-xs text-[#6B7280]">Пополнить и вывести</div>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
