@@ -1,7 +1,6 @@
 import { Injectable, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import * as jwt from 'jsonwebtoken';
 import { PrismaService } from '../prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -168,42 +167,5 @@ export class AuthService {
 
   private generateToken(userId: string, role: string): string {
     return this.jwtService.sign({ sub: userId, role });
-  }
-
-  // ===== МЕТОДЫ ДЛЯ АДМИН-ТОКЕНА (ФЛЕШКА) =====
-
-  async validateAdmin(userId: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: { role: true },
-    });
-    return user?.role === 'admin' ? user : null;
-  }
-
-  generateAdminToken(userId: string): string {
-    return jwt.sign(
-      { sub: userId, type: 'admin_access' },
-      process.env.ADMIN_TOKEN_SECRET || 'admin-secret-key',
-      { expiresIn: '7d' }
-    );
-  }
-
-  async saveAdminToken(userId: string, token: string) {
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        adminToken: token,
-        adminTokenExpiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      },
-    });
-  }
-
-  async verifyAdminToken(token: string): Promise<boolean> {
-    try {
-      const decoded = jwt.verify(token, process.env.ADMIN_TOKEN_SECRET || 'admin-secret-key') as any;
-      return decoded && decoded.type === 'admin_access';
-    } catch {
-      return false;
-    }
   }
 }

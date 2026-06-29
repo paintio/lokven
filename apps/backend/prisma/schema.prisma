@@ -33,9 +33,6 @@ model User {
   resetToken    String?
   resetTokenExpiry DateTime?
   
-  adminToken    String?
-  adminTokenExpiry DateTime?
-  
   listings      Listing[]
   messagesFrom  Message[] @relation("SenderMessages")
   messagesTo    Message[] @relation("ReceiverMessages")
@@ -48,6 +45,7 @@ model User {
   reviewsAsSeller Review[] @relation("SellerReviews")
   reviewsAsBuyer  Review[] @relation("BuyerReviews")
 }
+
 model Session {
   id          String   @id @default(cuid())
   userId      String
