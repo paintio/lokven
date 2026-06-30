@@ -284,3 +284,8 @@ model AdminUsbToken {
   expiresAt DateTime
   createdAt DateTime    @default(now())
 }
+enum TokenStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
