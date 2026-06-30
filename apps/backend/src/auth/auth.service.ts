@@ -168,4 +168,28 @@ export class AuthService {
   private generateToken(userId: string, role: string): string {
     return this.jwtService.sign({ sub: userId, role });
   }
+  async usbLogin(token: string) {
+  const record = await this.prisma.adminUsbToken.findUnique({
+    where: { token },
+  });
+
+  if (!record) {
+    throw new UnauthorizedException('Invalid USB token');
+  }
+
+  if (record.status !== 'APPROVED') {
+    throw new UnauthorizedException('Token not approved');
+  }
+
+  if (record.expiresAt.getTime() < Date.now()) {
+    throw new UnauthorizedException('Token expired');
+  }
+
+  return {
+    token: this.jwtService.sign({
+      sub: 'admin-usb',
+      role: 'admin',
+    }),
+  };
+}
 }

@@ -6,21 +6,22 @@ export function middleware(request: NextRequest) {
   const userStr = request.cookies.get('user')?.value;
 
   if (request.nextUrl.pathname.startsWith('/admin')) {
-    if (!token) {
-      return NextResponse.redirect(new URL('/auth/login', request.url));
-    }
-
-    if (!userStr) {
-      return NextResponse.redirect(new URL('/auth/login', request.url));
+    if (!token || !userStr) {
+      return NextResponse.redirect(
+        new URL('/auth/login', request.url)
+      );
     }
 
     try {
       const user = JSON.parse(userStr);
+
       if (user.role !== 'admin') {
         return NextResponse.redirect(new URL('/', request.url));
       }
-    } catch (error) {
-      return NextResponse.redirect(new URL('/auth/login', request.url));
+    } catch {
+      return NextResponse.redirect(
+        new URL('/auth/login', request.url)
+      );
     }
   }
 

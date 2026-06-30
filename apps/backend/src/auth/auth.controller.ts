@@ -39,4 +39,9 @@ export class AuthController {
   ) {
     return this.authService.changePassword(req.user.id, body.oldPassword, body.newPassword);
   }
+  @Post('usb-login')
+async usbLogin(@Body() body: { token: string }) {
+  return this.authService.usbLogin(body.token);
 }
+}
+
