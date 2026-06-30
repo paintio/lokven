@@ -8,19 +8,22 @@ export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith('/admin')) {
     if (!token || !userStr) {
       return NextResponse.redirect(
-        new URL('/auth/login', request.url)
+        new URL('/auth/login', request.url),
       );
     }
 
     try {
       const user = JSON.parse(userStr);
 
-      if (user.type === 'usb' || user.role === 'admin') {
-  return NextResponse.next();
-}
+      // ЖЁСТКАЯ ПРОВЕРКА РОЛИ
+      if (user.role !== 'admin') {
+        return NextResponse.redirect(new URL('/', request.url));
+      }
+
+      return NextResponse.next();
     } catch {
       return NextResponse.redirect(
-        new URL('/auth/login', request.url)
+        new URL('/auth/login', request.url),
       );
     }
   }
