@@ -1,4 +1,13 @@
-import { Controller, Post, Get, Put, Body, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Body,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
+
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -10,38 +19,45 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('register')
-  async register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
+  register(@Body() dto: RegisterDto) {
+    return this.authService.register(dto);
   }
 
   @Post('login')
-  async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  login(@Body() dto: LoginDto) {
+    return this.authService.login(dto);
   }
 
   @Get('profile')
   @UseGuards(JwtAuthGuard)
-  async getProfile(@Request() req) {
+  profile(@Request() req) {
     return this.authService.getProfile(req.user.id);
   }
 
   @Put('profile')
   @UseGuards(JwtAuthGuard)
-  async updateProfile(@Request() req, @Body() updateDto: UpdateProfileDto) {
-    return this.authService.updateProfile(req.user.id, updateDto);
+  update(@Request() req, @Body() dto: UpdateProfileDto) {
+    return this.authService.updateProfile(req.user.id, dto);
   }
 
   @Put('change-password')
   @UseGuards(JwtAuthGuard)
-  async changePassword(
+  changePassword(
     @Request() req,
     @Body() body: { oldPassword: string; newPassword: string },
   ) {
-    return this.authService.changePassword(req.user.id, body.oldPassword, body.newPassword);
+    return this.authService.changePassword(
+      req.user.id,
+      body.oldPassword,
+      body.newPassword,
+    );
   }
-  @Post('usb-login')
-async usbLogin(@Body() body: { token: string }) {
-  return this.authService.usbLogin(body.token);
-}
-}
 
+  // =========================
+  // USB ADMIN LOGIN
+  // =========================
+  @Post('usb-login')
+  usbLogin(@Body() body: { token: string }, @Request() req) {
+    return this.authService.usbLogin(body.token, req.ip);
+  }
+}
