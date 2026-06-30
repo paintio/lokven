@@ -278,18 +278,9 @@ model Setting {
 }
 
 model AdminUsbToken {
-  id         String      @id @default(cuid())
-  token      String      @unique
-  status     TokenStatus @default(PENDING)
-
-  expiresAt  DateTime
-  usedAt     DateTime?
-  usedByIp   String?
-
-  createdAt  DateTime    @default(now())
-}
-enum TokenStatus {
-  PENDING
-  APPROVED
-  REJECTED
+  id        String      @id @default(cuid())
+  token     String      @unique
+  status    TokenStatus @default(PENDING)
+  expiresAt DateTime
+  createdAt DateTime    @default(now())
 }

@@ -15,9 +15,9 @@ export function middleware(request: NextRequest) {
     try {
       const user = JSON.parse(userStr);
 
-      if (user.role !== 'admin') {
-        return NextResponse.redirect(new URL('/', request.url));
-      }
+      if (user.type === 'usb' || user.role === 'admin') {
+  return NextResponse.next();
+}
     } catch {
       return NextResponse.redirect(
         new URL('/auth/login', request.url)
