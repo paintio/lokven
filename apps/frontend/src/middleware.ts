@@ -1,38 +1,37 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
-  const token = request.cookies.get('token')?.value;
-  const userStr = request.cookies.get('user')?.value;
-
-  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
-
-  if (!isAdminRoute) {
-    return NextResponse.next();
-  }
-
-  // нет авторизации вообще
-  if (!token || !userStr) {
-    return NextResponse.redirect(new URL('/auth/login', request.url));
-  }
+function safeParseUser(value: string | undefined) {
+  if (!value) return null;
 
   try {
-    const user = JSON.parse(userStr);
+    return JSON.parse(decodeURIComponent(value));
+  } catch {
+    return null;
+  }
+}
 
-    // ВАЖНО: если админ ИЛИ usb-админ
-    const isAdmin =
-      user.role === 'admin' ||
-      user.role === 'moderator' ||
-      user.type === 'usb';
+export function middleware(req: NextRequest) {
+  const token = req.cookies.get('token')?.value;
+  const userCookie = req.cookies.get('user')?.value;
 
-    if (!isAdmin) {
-      return NextResponse.redirect(new URL('/', request.url));
+  const user = safeParseUser(userCookie);
+
+  const isAdminRoute = req.nextUrl.pathname.startsWith('/admin');
+
+  if (isAdminRoute) {
+    if (!token || !user) {
+      return NextResponse.redirect(new URL('/auth/login', req.url));
+    }
+
+    if (user.role !== 'admin') {
+      return NextResponse.redirect(new URL('/'));
     }
 
     return NextResponse.next();
-  } catch (e) {
-    return NextResponse.redirect(new URL('/auth/login', request.url));
   }
+
+  return NextResponse.next();
 }
 
 export const config = {

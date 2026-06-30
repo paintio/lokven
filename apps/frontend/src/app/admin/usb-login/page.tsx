@@ -1,9 +1,10 @@
 'use client';
 
+import { getDeviceId } from '@/lib/device';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function UsbLoginPage() {
+export default function UsbLogin() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -13,27 +14,34 @@ export default function UsbLoginPage() {
 
     setLoading(true);
 
-    const text = await file.text();
-
     try {
+      const content = JSON.parse(await file.text());
+
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/usb-login`,
+        `${process.env.NEXT_PUBLIC_API_URL}/admin-usb/verify`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token: text.trim() }),
-        },
+          body: JSON.stringify({
+            token: content.token,
+            deviceId: getDeviceId(),
+          }),
+        }
       );
 
-      if (!res.ok) throw new Error('Access denied');
+      if (!res.ok) throw new Error();
 
       const data = await res.json();
 
-      localStorage.setItem('admin_token', data.token);
+      document.cookie = `token=${data.token}; path=/`;
+      document.cookie = `user=${JSON.stringify({
+        role: 'admin',
+        type: 'usb',
+      })}; path=/`;
 
       router.push('/admin');
-    } catch (err) {
-      alert('USB access denied');
+    } catch {
+      alert('USB rejected');
     } finally {
       setLoading(false);
     }
@@ -41,13 +49,9 @@ export default function UsbLoginPage() {
 
   return (
     <div style={{ padding: 40 }}>
-      <h1>USB Admin Login</h1>
-
-      <input
-        type="file"
-        onChange={handleFile}
-        disabled={loading}
-      />
+      <h1>Enterprise USB Login</h1>
+      <input type="file" accept=".key,.json" onChange={handleFile} />
+      {loading && <p>Verifying device...</p>}
     </div>
   );
 }
