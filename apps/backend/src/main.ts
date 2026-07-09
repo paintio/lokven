@@ -10,12 +10,16 @@ async function bootstrap() {
 
   app.enableCors({
   origin: [
+    'https://lokven.store',
+    'https://www.lokven.store',
+    'https://api.lokven.store',
     'http://localhost:3000',
     'http://localhost:3001',
     'http://localhost:3002',
     'https://lokven.onrender.com',
     'https://lokven-frontend.onrender.com',  // 👈 ДОБАВЬТЕ ЭТОТ URL
     /\.onrender\.com$/,  // 👈 ИЛИ РАЗРЕШИТЕ ВСЕ ПОДДОМЕНЫ onrender.com
+    
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
