@@ -7,6 +7,7 @@ import Link from 'next/link';
 export default function RegisterPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [step, setStep] = useState(1);
   const [agreements, setAgreements] = useState({
     personalData: false,
@@ -31,13 +32,11 @@ export default function RegisterPage() {
     const { name, value, type } = e.target;
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
-      // Обработка флажка "isSeller"
       if (name === 'isSeller') {
         setFormData({
           ...formData,
           isSeller: checked,
         });
-        // Если флажок снят - очищаем поля продавца
         if (!checked) {
           setFormData(prev => ({
             ...prev,
@@ -73,16 +72,20 @@ export default function RegisterPage() {
     });
   };
 
+  const setCookie = (name: string, value: string) => {
+    document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=604800; SameSite=Lax`;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Проверка согласий
     if (!agreements.personalData || !agreements.userAgreement) {
       alert('Необходимо принять условия обработки персональных данных и пользовательское соглашение');
       return;
     }
 
     setLoading(true);
+    setError('');
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
@@ -97,11 +100,16 @@ export default function RegisterPage() {
       }
 
       const data = await response.json();
+
+      setCookie('token', data.token);
+      setCookie('user', JSON.stringify(data.user));
+
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
+
       router.push('/');
-    } catch (error) {
-      alert(error instanceof Error ? error.message : 'Ошибка регистрации');
+    } catch (error: any) {
+      setError(error.message || 'Ошибка регистрации');
     } finally {
       setLoading(false);
     }
@@ -124,8 +132,13 @@ export default function RegisterPage() {
         <h1 className="text-2xl font-bold text-[#111827] mb-2">Регистрация</h1>
         <p className="text-[#6B7280] text-sm mb-6">Создайте аккаунт на Локвен</p>
 
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Шаг 1: Основная информация */}
           {step === 1 && (
             <>
               <div>
@@ -136,7 +149,7 @@ export default function RegisterPage() {
                   required
                   value={formData.phone}
                   onChange={handleChange}
-                  className="input-field"
+                  className="input-field w-full"
                   placeholder="+7 999 123-45-67"
                 />
               </div>
@@ -147,7 +160,7 @@ export default function RegisterPage() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="input-field"
+                  className="input-field w-full"
                   placeholder="example@mail.ru"
                 />
               </div>
@@ -160,7 +173,7 @@ export default function RegisterPage() {
                   minLength={6}
                   value={formData.password}
                   onChange={handleChange}
-                  className="input-field"
+                  className="input-field w-full"
                   placeholder="Минимум 6 символов"
                 />
               </div>
@@ -171,12 +184,11 @@ export default function RegisterPage() {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="input-field"
+                  className="input-field w-full"
                   placeholder="Ваше имя"
                 />
               </div>
               
-              {/* Чекбокс продавца */}
               <div className="flex items-center gap-3">
                 <input
                   type="checkbox"
@@ -190,7 +202,6 @@ export default function RegisterPage() {
                 </label>
               </div>
 
-              {/* Согласия */}
               <div className="space-y-2 pt-2 border-t border-[#F3F4F6]">
                 <div className="flex items-start gap-3">
                   <input
@@ -251,7 +262,6 @@ export default function RegisterPage() {
             </>
           )}
 
-          {/* Шаг 2: Документы для продавца */}
           {step === 2 && (
             <>
               {formData.isSeller ? (
@@ -267,7 +277,7 @@ export default function RegisterPage() {
                       required={formData.isSeller}
                       value={formData.inn}
                       onChange={handleChange}
-                      className="input-field"
+                      className="input-field w-full"
                       placeholder="1234567890"
                     />
                   </div>
@@ -278,7 +288,7 @@ export default function RegisterPage() {
                       name="ogrn"
                       value={formData.ogrn}
                       onChange={handleChange}
-                      className="input-field"
+                      className="input-field w-full"
                       placeholder="1234567890123"
                     />
                   </div>
@@ -290,7 +300,7 @@ export default function RegisterPage() {
                       required={formData.isSeller}
                       value={formData.companyName}
                       onChange={handleChange}
-                      className="input-field"
+                      className="input-field w-full"
                       placeholder="ООО Ромашка"
                     />
                   </div>
@@ -302,7 +312,7 @@ export default function RegisterPage() {
                       required={formData.isSeller}
                       value={formData.legalAddress}
                       onChange={handleChange}
-                      className="input-field"
+                      className="input-field w-full"
                       placeholder="г. Москва, ул. Тверская, 1"
                     />
                   </div>
@@ -313,7 +323,7 @@ export default function RegisterPage() {
                       name="bankAccount"
                       value={formData.bankAccount}
                       onChange={handleChange}
-                      className="input-field"
+                      className="input-field w-full"
                       placeholder="40817810099910004312"
                     />
                   </div>
@@ -324,7 +334,7 @@ export default function RegisterPage() {
                       name="bik"
                       value={formData.bik}
                       onChange={handleChange}
-                      className="input-field"
+                      className="input-field w-full"
                       placeholder="044525974"
                     />
                   </div>
@@ -342,7 +352,7 @@ export default function RegisterPage() {
                           // ignore
                         }
                       }}
-                      className="input-field"
+                      className="input-field w-full"
                       placeholder='{"passport": "url", "inn": "url"}'
                     />
                   </div>
@@ -382,7 +392,7 @@ export default function RegisterPage() {
 
         <div className="mt-6 text-center text-sm text-[#6B7280]">
           Уже есть аккаунт?{' '}
-          <Link href="/auth/login" className="link">
+          <Link href="/auth/login" className="text-[#6366F1] hover:underline">
             Войти
           </Link>
         </div>

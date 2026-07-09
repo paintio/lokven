@@ -8,20 +8,18 @@ import * as cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  // =========================
-  // CORS (ВАЖНО ДЛЯ COOKIES)
-  // =========================
   app.enableCors({
     origin: [
       'http://localhost:3000',
+      'http://localhost:3001',
+      'http://localhost:3002',
       'https://lokven.onrender.com',
     ],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Cookie'],
   });
 
-  // =========================
-  // COOKIES SUPPORT (КРИТИЧНО)
-  // =========================
   app.use(cookieParser());
 
   app.useGlobalPipes(
@@ -31,14 +29,11 @@ async function bootstrap() {
     }),
   );
 
-  // =========================
-  // STATIC FILES
-  // =========================
   app.useStaticAssets(join(process.cwd(), 'uploads'), {
     prefix: '/uploads/',
   });
 
-  const port = process.env.PORT || 3001;
+  const port = process.env.PORT || 5000;
 
   await app.listen(port);
 

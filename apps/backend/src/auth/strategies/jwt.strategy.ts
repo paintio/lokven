@@ -27,31 +27,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: payload.sub },
-      include: {
-        _count: {
-          select: {
-            listings: true,
-            ordersAsBuyer: true,
-            ordersAsSeller: true,
-          },
-        },
-      },
-    });
-
-    // =========================
-    // NORMAL USER CHECK
-    // =========================
-    if (user) {
-      if (user.isBlocked) {
-        throw new UnauthorizedException('User is blocked');
-      }
-
-      const { password, resetToken, resetTokenExpiry, ...result } = user;
-      return result;
-    }
-
     // =========================
     // USB ADMIN CHECK
     // =========================
@@ -72,21 +47,42 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         throw new UnauthorizedException('USB session expired');
       }
 
-      // optional device binding enforcement
-      if (session.deviceId && payload.deviceId) {
-        if (session.deviceId !== payload.deviceId) {
-          throw new UnauthorizedException('Device mismatch');
-        }
-      }
-
       return {
         id: 'usb-admin',
         role: 'admin',
         type: 'usb',
         deviceId: session.deviceId,
+        sessionId: session.id,
       };
     }
 
-    throw new UnauthorizedException('Invalid token');
+    // =========================
+    // NORMAL USER CHECK
+    // =========================
+    const user = await this.prisma.user.findUnique({
+      where: { id: payload.sub },
+      include: {
+        _count: {
+          select: {
+            listings: true,
+            ordersAsBuyer: true,
+            ordersAsSeller: true,
+            reviewsAsSeller: true,
+            reviewsAsBuyer: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    if (user.isBlocked) {
+      throw new UnauthorizedException('User is blocked');
+    }
+
+    const { password, resetToken, resetTokenExpiry, ...result } = user;
+    return result;
   }
 }

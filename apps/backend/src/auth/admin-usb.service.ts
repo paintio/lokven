@@ -1,88 +1,112 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import * as crypto from 'crypto';
-import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AdminUsbService {
-  constructor(
-    private prisma: PrismaService,
-    private jwt: JwtService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
-  private hash(token: string) {
-    return crypto.createHash('sha256').update(token).digest('hex');
-  }
+  // Проверка USB-токена (используется в AuthService)
+  async verifyToken(rawToken: string, deviceId?: string) {
+    const tokenHash = crypto
+      .createHash('sha256')
+      .update(rawToken)
+      .digest('hex');
 
-  async verifyUsbToken(token: string, deviceId: string, ip: string) {
-    const tokenHash = this.hash(token);
-
-    const record = await this.prisma.adminUsbToken.findUnique({
+    const token = await this.prisma.adminUsbToken.findUnique({
       where: { tokenHash },
     });
 
-    if (!record) throw new UnauthorizedException('Invalid USB token');
-    if (record.status !== 'APPROVED')
-      throw new UnauthorizedException('Token not approved');
-    if (record.expiresAt < new Date())
-      throw new UnauthorizedException('Token expired');
-    if (record.usedAt)
-      throw new UnauthorizedException('Token already used');
+    if (!token) {
+      throw new UnauthorizedException('Invalid USB token');
+    }
 
-    // device binding
-    if (record.deviceId && record.deviceId !== deviceId) {
+    if (token.status !== 'APPROVED') {
+      throw new UnauthorizedException('Token not approved');
+    }
+
+    if (token.expiresAt < new Date()) {
+      throw new UnauthorizedException('Token expired');
+    }
+
+    if (token.deviceId && deviceId && token.deviceId !== deviceId) {
       throw new UnauthorizedException('Device mismatch');
     }
 
-    const sessionId = crypto.randomUUID();
+    return token;
+  }
 
-    await this.prisma.$transaction([
-      this.prisma.adminUsbToken.update({
-        where: { id: record.id },
-        data: {
-          usedAt: new Date(),
-          deviceId,
-        },
-      }),
+  // Создание нового USB-токена
+  async createToken(rawToken: string, deviceId?: string) {
+    const tokenHash = crypto
+      .createHash('sha256')
+      .update(rawToken)
+      .digest('hex');
 
-      this.prisma.adminSession.create({
-        data: {
-          token: sessionId,
-          deviceId,
-          ip,
-          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        },
-      }),
-    ]);
+    return this.prisma.adminUsbToken.create({
+      data: {
+        tokenHash,
+        status: 'PENDING',
+        deviceId: deviceId || null,
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      },
+    });
+  }
 
+  // Генерация случайного токена
+  async generateToken(deviceId?: string) {
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const token = await this.createToken(rawToken, deviceId);
+    
     return {
-      token: this.jwt.sign({
-        sub: 'usb-admin',
-        role: 'admin',
-        type: 'usb',
-        sid: sessionId, // 🔥 КЛЮЧЕВОЕ ДОБАВЛЕНИЕ
-      }),
+      id: token.id,
+      rawToken,
+      status: token.status,
+      expiresAt: token.expiresAt,
     };
   }
 
-  async createUsbToken() {
-    const raw = crypto.randomBytes(32).toString('hex');
-
-    const expires = new Date();
-    expires.setDate(expires.getDate() + 7);
-
-    const token = await this.prisma.adminUsbToken.create({
-      data: {
-        tokenHash: this.hash(raw),
-        expiresAt: expires,
+  // Получение всех токенов
+  async getAllTokens() {
+    return this.prisma.adminUsbToken.findMany({
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        status: true,
+        deviceId: true,
+        usedAt: true,
+        expiresAt: true,
+        createdAt: true,
       },
     });
+  }
 
-    // ⚠️ ВАЖНО: вернуть RAW токен, иначе его нельзя использовать
-    return {
-      token: raw,
-      id: token.id,
-      expiresAt: token.expiresAt,
-    };
+  // Обновление статуса токена
+  async updateTokenStatus(tokenId: string, status: 'PENDING' | 'APPROVED' | 'REJECTED') {
+    return this.prisma.adminUsbToken.update({
+      where: { id: tokenId },
+      data: { status },
+    });
+  }
+
+  // Удаление токена
+  async deleteToken(tokenId: string) {
+    return this.prisma.adminUsbToken.delete({
+      where: { id: tokenId },
+    });
+  }
+
+  // Проверка существования токена
+  async tokenExists(rawToken: string): Promise<boolean> {
+    const tokenHash = crypto
+      .createHash('sha256')
+      .update(rawToken)
+      .digest('hex');
+
+    const token = await this.prisma.adminUsbToken.findUnique({
+      where: { tokenHash },
+    });
+
+    return !!token;
   }
 }

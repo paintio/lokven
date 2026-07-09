@@ -7,9 +7,6 @@ import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PrismaService } from '../prisma.service';
 
-import { AdminUsbService } from './admin-usb.service';
-import { AdminUsbController } from './admin-usb.controller';
-
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
@@ -18,16 +15,8 @@ import { AdminUsbController } from './admin-usb.controller';
       signOptions: { expiresIn: '7d' },
     }),
   ],
-  controllers: [
-    AuthController,
-    AdminUsbController,
-  ],
-  providers: [
-    AuthService,
-    JwtStrategy,
-    PrismaService,
-    AdminUsbService,
-  ],
+  controllers: [AuthController],
+  providers: [AuthService, JwtStrategy, PrismaService],
   exports: [AuthService],
 })
 export class AuthModule {}

@@ -7,7 +7,7 @@ import Link from 'next/link';
 export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     phone: '',
     password: '',
@@ -20,9 +20,14 @@ export default function LoginPage() {
     });
   };
 
+  const setCookie = (name: string, value: string) => {
+    document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=604800; SameSite=Lax`;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
 
     try {
       const response = await fetch(
@@ -30,7 +35,10 @@ export default function LoginPage() {
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({ 
+            phone: formData.phone, 
+            password: formData.password 
+          }),
         }
       );
 
@@ -41,16 +49,15 @@ export default function LoginPage() {
 
       const data = await response.json();
 
-      // ✅ ВАЖНО: теперь используем cookies (middleware их читает)
-      document.cookie = `token=${data.token}; path=/; max-age=604800`;
+      setCookie('token', data.token);
+      setCookie('user', JSON.stringify(data.user));
 
-      document.cookie = `user=${encodeURIComponent(
-        JSON.stringify(data.user)
-      )}; path=/; max-age=604800`;
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
 
       router.push('/');
-    } catch (error) {
-      alert(error instanceof Error ? error.message : 'Ошибка входа');
+    } catch (error: any) {
+      setError(error.message || 'Ошибка входа');
     } finally {
       setLoading(false);
     }
@@ -60,27 +67,46 @@ export default function LoginPage() {
     <div className="container-custom max-w-md py-12">
       <div className="bg-white rounded-xl p-8 border border-[#E5E7EB]">
         <h1 className="text-2xl font-bold text-[#111827] mb-2">Вход</h1>
+        <p className="text-[#6B7280] text-sm mb-6">
+          Войдите, чтобы размещать объявления
+        </p>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="tel"
-            name="phone"
-            required
-            value={formData.phone}
-            onChange={handleChange}
-            placeholder="Телефон"
-            className="input-field"
-          />
+          <div>
+            <label className="block text-sm font-medium text-[#6B7280] mb-1">
+              Телефон
+            </label>
+            <input
+              type="tel"
+              name="phone"
+              required
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="+7 (XXX) XXX-XX-XX"
+              className="input-field w-full"
+            />
+          </div>
 
-          <input
-            type="password"
-            name="password"
-            required
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="Пароль"
-            className="input-field"
-          />
+          <div>
+            <label className="block text-sm font-medium text-[#6B7280] mb-1">
+              Пароль
+            </label>
+            <input
+              type="password"
+              name="password"
+              required
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="••••••••"
+              className="input-field w-full"
+            />
+          </div>
 
           <button
             type="submit"
@@ -91,8 +117,11 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="mt-4 text-center text-sm">
-          Нет аккаунта? <Link href="/auth/register">Регистрация</Link>
+        <div className="mt-4 text-center text-sm text-[#6B7280]">
+          Нет аккаунта?{' '}
+          <Link href="/auth/register" className="text-[#6366F1] hover:underline">
+            Зарегистрироваться
+          </Link>
         </div>
       </div>
     </div>
