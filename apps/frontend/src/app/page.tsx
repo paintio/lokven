@@ -10,7 +10,7 @@ import {
   Car,
   Wrench,
   Megaphone,
-  Home,
+  HomeIcon,
   Briefcase,
   Pin,
   Building,
@@ -80,7 +80,7 @@ export default function Home() {
       auto: Car,
       service: Wrench,
       ads: Megaphone,
-      realty: Home,
+      realty: HomeIcon,
       job: Briefcase,
     };
     return icons[type] || Pin;
@@ -100,7 +100,7 @@ export default function Home() {
       description: 'Квартиры и дома для покупки и аренды',
       image: '/images/cards/card-realty.png',
       href: '/listings?category=realty',
-      icon: Home,
+      icon: HomeIcon,
     },
     {
       id: 2,
@@ -146,7 +146,7 @@ export default function Home() {
 
   const categories = [
     { name: 'Авто', count: '125 000+', icon: Car, slug: 'avto' },
-    { name: 'Недвижимость', count: '31 000+', icon: Home, slug: 'nedvizhimost' },
+    { name: 'Недвижимость', count: '31 000+', icon: HomeIcon, slug: 'nedvizhimost' },
     { name: 'Электроника', count: '80 000+', icon: Smartphone, slug: 'elektronika' },
     { name: 'Медиа и стиль', count: '75 000+', icon: Shirt, slug: 'media-i-stil' },
     { name: 'Для дома и сада', count: '42 000+', icon: Sofa, slug: 'dom-i-sad' },
