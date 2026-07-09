@@ -3,6 +3,19 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import {
+  ShoppingBag,
+  Megaphone,
+  Car,
+  Home,
+  Briefcase,
+  Wrench,
+  Pin,
+  AlertCircle,
+  Search,
+  ArrowLeft,
+  Edit,
+} from 'lucide-react';
 import AutoForm from '@/components/forms/AutoForm';
 import RealtyForm from '@/components/forms/RealtyForm';
 import JobsForm from '@/components/forms/JobsForm';
@@ -43,7 +56,6 @@ export default function EditListingPage() {
 
       const data = await response.json();
       
-      // Проверяем, что пользователь - владелец
       const userStr = localStorage.getItem('user');
       const user = JSON.parse(userStr || '{}');
       if (data.author.id !== user.id && user.role !== 'admin') {
@@ -99,15 +111,15 @@ export default function EditListingPage() {
   };
 
   const getTypeIcon = (type: string) => {
-    const icons: Record<string, string> = {
-      product: '🛍️',
-      ads: '📋',
-      auto: '🚗',
-      realty: '🏠',
-      job: '💼',
-      service: '🔧',
+    const icons: Record<string, any> = {
+      product: ShoppingBag,
+      ads: Megaphone,
+      auto: Car,
+      realty: Home,
+      job: Briefcase,
+      service: Wrench,
     };
-    return icons[type] || '📌';
+    return icons[type] || Pin;
   };
 
   if (loading) {
@@ -121,7 +133,7 @@ export default function EditListingPage() {
   if (error) {
     return (
       <div className="container-custom py-12 text-center">
-        <div className="text-4xl mb-4">⚠️</div>
+        <AlertCircle className="w-16 h-16 text-[#EF4444] mx-auto mb-4" />
         <h1 className="text-2xl font-bold text-[#111827] mb-2">Ошибка</h1>
         <p className="text-[#6B7280] mb-4">{error}</p>
         <Link href="/profile" className="btn-primary">Вернуться в профиль</Link>
@@ -132,19 +144,24 @@ export default function EditListingPage() {
   if (!listing) {
     return (
       <div className="container-custom py-12 text-center">
-        <div className="text-4xl mb-4">🔍</div>
+        <Search className="w-16 h-16 text-[#9CA3AF] mx-auto mb-4" />
         <h1 className="text-2xl font-bold text-[#111827] mb-2">Объявление не найдено</h1>
         <Link href="/profile" className="btn-primary">Вернуться в профиль</Link>
       </div>
     );
   }
 
+  const TypeIcon = getTypeIcon(listing.type);
+
   return (
     <div className="container-custom max-w-3xl py-8">
       <div className="flex items-center gap-3 mb-6">
-        <span className="text-3xl">{getTypeIcon(listing.type)}</span>
+        <TypeIcon className="w-8 h-8 text-[#6366F1]" />
         <div>
-          <h1 className="text-2xl font-bold text-[#111827]">Редактирование объявления</h1>
+          <h1 className="text-2xl font-bold text-[#111827] flex items-center gap-2">
+            <Edit className="w-5 h-5" />
+            Редактирование объявления
+          </h1>
           <p className="text-sm text-[#6B7280]">
             {getTypeLabel(listing.type)} • {listing.title}
           </p>
