@@ -26,7 +26,7 @@
 body {
   background: 
     linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-    url('/images/background.jpg') center / cover fixed no-repeat;
+    url('/images/background1.jpg') center / cover fixed no-repeat;
   color: var(--text);
   min-height: 100vh;
 }
