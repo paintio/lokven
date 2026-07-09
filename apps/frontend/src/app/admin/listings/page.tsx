@@ -2,6 +2,22 @@
 
 import { useState, useEffect } from 'react';
 import { getImageUrl } from '@/lib/api';
+import {
+  ClipboardList,
+  Package,
+  CheckCircle,
+  Clock,
+  Coins,
+  XCircle,
+  User,
+  Store,
+  Eye,
+  Check,
+  ThumbsDown,
+  Archive,
+  RefreshCw,
+  AlertCircle,
+} from 'lucide-react';
 
 interface Listing {
   id: string;
@@ -98,12 +114,20 @@ export default function AdminListings() {
     rejected: 'bg-red-100 text-red-800',
   };
 
+  const statusIcons: Record<string, any> = {
+    pending: Clock,
+    active: CheckCircle,
+    sold: Coins,
+    archived: Archive,
+    rejected: XCircle,
+  };
+
   const statusLabels: Record<string, string> = {
-    pending: '⏳ На модерации',
-    active: '✅ Активно',
-    sold: '💸 Продано',
-    archived: '📦 В архиве',
-    rejected: '❌ Отклонено',
+    pending: 'На модерации',
+    active: 'Активно',
+    sold: 'Продано',
+    archived: 'В архиве',
+    rejected: 'Отклонено',
   };
 
   const typeLabels: Record<string, string> = {
@@ -116,131 +140,156 @@ export default function AdminListings() {
   };
 
   const filterOptions = [
-    { value: 'pending', label: '⏳ На модерации' },
-    { value: 'active', label: '✅ Активные' },
-    { value: 'all', label: 'Все' },
-    { value: 'rejected', label: '❌ Отклонено' },
+    { value: 'pending', label: 'На модерации', icon: Clock },
+    { value: 'active', label: 'Активные', icon: CheckCircle },
+    { value: 'all', label: 'Все', icon: Package },
+    { value: 'rejected', label: 'Отклонено', icon: XCircle },
   ];
 
   if (loading) {
     return <div className="text-[#9CA3AF]">Загрузка...</div>;
   }
 
+  const StatusIcon = ({ status }: { status: string }) => {
+    const Icon = statusIcons[status] || Package;
+    return <Icon className="w-3 h-3 inline-block mr-1" />;
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-[#111827]">📋 Модерация объявлений</h1>
+        <h1 className="text-2xl font-bold text-[#111827] flex items-center gap-2">
+          <ClipboardList className="w-6 h-6 text-[#6366F1]" />
+          Модерация объявлений
+        </h1>
         <div className="flex gap-3">
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className="input-field w-48"
           >
-            {filterOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
+            {filterOptions.map((opt) => {
+              const Icon = opt.icon;
+              return (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              );
+            })}
           </select>
         </div>
       </div>
 
       {listings.length === 0 ? (
         <div className="bg-white rounded-xl p-8 text-center border border-[#E5E7EB]">
+          <Package className="w-12 h-12 text-[#9CA3AF] mx-auto mb-2" />
           <p className="text-[#6B7280]">Объявлений не найдено</p>
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase">Объявление</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase">Тип</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase">Цена</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase">Автор</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase">Статус</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase">Действия</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#F3F4F6]">
-              {listings.map((listing) => (
-                <tr key={listing.id} className="hover:bg-[#F9FAFB]">
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      {listing.images && listing.images.length > 0 ? (
-                        <img
-                          src={getImageUrl(listing.images[0].url)}
-                          alt=""
-                          className="w-12 h-12 object-cover rounded-lg"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 bg-[#F3F4F6] rounded-lg flex items-center justify-center text-xl">
-                          📦
-                        </div>
-                      )}
-                      <div>
-                        <div className="font-medium text-[#111827] text-sm">{listing.title}</div>
-                        <div className="text-xs text-[#9CA3AF]">
-                          {new Date(listing.createdAt).toLocaleDateString('ru-RU')}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-[#6B7280]">{typeLabels[listing.type] || listing.type}</td>
-                  <td className="px-4 py-3 font-medium text-[#111827]">{formatPrice(listing.price)}</td>
-                  <td className="px-4 py-3 text-sm text-[#6B7280]">
-                    {listing.author.name || listing.author.phone}
-                    {listing.author.isSeller && (
-                      <span className="ml-1 text-xs text-[#3B82F6]">(продавец)</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusColors[listing.status]}`}>
-                      {statusLabels[listing.status]}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    {listing.status === 'pending' && (
-                      <div className="space-y-2">
-                        <div>
-                          <input
-                            type="text"
-                            placeholder="Причина отклонения (опционально)"
-                            value={moderating === listing.id ? moderationNote : ''}
-                            onChange={(e) => setModerationNote(e.target.value)}
-                            className="input-field text-xs w-48"
-                            disabled={moderating === listing.id}
-                          />
-                        </div>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => moderateListing(listing.id, 'active')}
-                            disabled={moderating === listing.id}
-                            className="text-xs bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg transition-colors disabled:opacity-50"
-                          >
-                            {moderating === listing.id ? '...' : '✅ Одобрить'}
-                          </button>
-                          <button
-                            onClick={() => moderateListing(listing.id, 'rejected')}
-                            disabled={moderating === listing.id}
-                            className="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg transition-colors disabled:opacity-50"
-                          >
-                            {moderating === listing.id ? '...' : '❌ Отклонить'}
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                    {listing.status === 'active' && (
-                      <button
-                        onClick={() => moderateListing(listing.id, 'archived')}
-                        className="text-xs text-[#6B7280] hover:underline"
-                      >
-                        📦 В архив
-                      </button>
-                    )}
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase">Объявление</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase">Тип</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase">Цена</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase">Автор</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase">Статус</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-[#6B7280] uppercase">Действия</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-[#F3F4F6]">
+                {listings.map((listing) => {
+                  const StatusIconComponent = statusIcons[listing.status] || Package;
+                  return (
+                    <tr key={listing.id} className="hover:bg-[#F9FAFB]">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          {listing.images && listing.images.length > 0 ? (
+                            <img
+                              src={getImageUrl(listing.images[0].url)}
+                              alt=""
+                              className="w-12 h-12 object-cover rounded-lg"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 bg-[#F3F4F6] rounded-lg flex items-center justify-center">
+                              <Package className="w-6 h-6 text-[#6B7280]" />
+                            </div>
+                          )}
+                          <div>
+                            <div className="font-medium text-[#111827] text-sm">{listing.title}</div>
+                            <div className="text-xs text-[#9CA3AF]">
+                              {new Date(listing.createdAt).toLocaleDateString('ru-RU')}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-[#6B7280]">{typeLabels[listing.type] || listing.type}</td>
+                      <td className="px-4 py-3 font-medium text-[#111827]">{formatPrice(listing.price)}</td>
+                      <td className="px-4 py-3 text-sm text-[#6B7280]">
+                        {listing.author.name || listing.author.phone}
+                        {listing.author.isSeller && (
+                          <span className="ml-1 text-xs text-[#3B82F6] flex items-center gap-1">
+                            <Store className="w-3 h-3" />(продавец)
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full flex items-center gap-1 ${statusColors[listing.status]}`}>
+                          <StatusIconComponent className="w-3 h-3" />
+                          {statusLabels[listing.status]}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        {listing.status === 'pending' && (
+                          <div className="space-y-2">
+                            <div>
+                              <input
+                                type="text"
+                                placeholder="Причина отклонения (опционально)"
+                                value={moderating === listing.id ? moderationNote : ''}
+                                onChange={(e) => setModerationNote(e.target.value)}
+                                className="input-field text-xs w-48"
+                                disabled={moderating === listing.id}
+                              />
+                            </div>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => moderateListing(listing.id, 'active')}
+                                disabled={moderating === listing.id}
+                                className="text-xs bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
+                              >
+                                <Check className="w-3 h-3" />
+                                {moderating === listing.id ? '...' : 'Одобрить'}
+                              </button>
+                              <button
+                                onClick={() => moderateListing(listing.id, 'rejected')}
+                                disabled={moderating === listing.id}
+                                className="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
+                              >
+                                <XCircle className="w-3 h-3" />
+                                {moderating === listing.id ? '...' : 'Отклонить'}
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                        {listing.status === 'active' && (
+                          <button
+                            onClick={() => moderateListing(listing.id, 'archived')}
+                            className="text-xs text-[#6B7280] hover:underline flex items-center gap-1"
+                          >
+                            <Archive className="w-3 h-3" />
+                            В архив
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
