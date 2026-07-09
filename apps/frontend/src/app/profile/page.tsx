@@ -3,6 +3,31 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import {
+  User,
+  Users,
+  Package,
+  ShoppingCart,
+  Heart,
+  Star,
+  Wallet,
+  Settings,
+  Edit,
+  Plus,
+  ClipboardList,
+  LogOut,
+  Camera,
+  Briefcase,
+  CheckCircle,
+  Clock,
+  Coins,
+  XCircle,
+  TrendingUp,
+  LayoutDashboard,
+  Mail,
+  Phone,
+  Building,
+} from 'lucide-react';
 import ProfileSidebar from '@/components/profile/ProfileSidebar';
 import StarRating from '@/components/reviews/StarRating';
 
@@ -69,7 +94,7 @@ export default function ProfilePage() {
         totalFavorites: data._count.favorites || 0,
         totalReviews: 0,
         averageRating: 0,
-        balance: 1500, // временно
+        balance: 1500,
       });
     } catch (error) {
       localStorage.removeItem('token');
@@ -108,35 +133,48 @@ export default function ProfilePage() {
 
   const getRoleBadge = () => {
     if (user.role === 'admin') {
-      return <span className="tag bg-purple-100 text-purple-700">Администратор</span>;
-    }
-    if (user.role === 'employer') {
-      return <span className="tag bg-blue-100 text-blue-700">Работодатель</span>;
-    }
-    if (user.role === 'performer') {
-      return <span className="tag bg-green-100 text-green-700">Исполнитель</span>;
-    }
-    if (user.isSeller) {
-      return <span className={`tag ${user.sellerStatus === 'approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-        {user.sellerStatus === 'approved' ? '✅ Продавец' : '⏳ На модерации'}
+      return <span className="tag bg-purple-100 text-purple-700 flex items-center gap-1">
+        <LayoutDashboard className="w-3 h-3" /> Администратор
       </span>;
     }
-    return <span className="tag bg-gray-100 text-gray-700">Покупатель</span>;
+    if (user.role === 'employer') {
+      return <span className="tag bg-blue-100 text-blue-700 flex items-center gap-1">
+        <Briefcase className="w-3 h-3" /> Работодатель
+      </span>;
+    }
+    if (user.role === 'performer') {
+      return <span className="tag bg-green-100 text-green-700 flex items-center gap-1">
+        <CheckCircle className="w-3 h-3" /> Исполнитель
+      </span>;
+    }
+    if (user.isSeller) {
+      return <span className={`tag flex items-center gap-1 ${user.sellerStatus === 'approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+        {user.sellerStatus === 'approved' ? <CheckCircle className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
+        {user.sellerStatus === 'approved' ? ' Продавец' : ' На модерации'}
+      </span>;
+    }
+    return <span className="tag bg-gray-100 text-gray-700 flex items-center gap-1">
+      <User className="w-3 h-3" /> Покупатель
+    </span>;
   };
 
   const statCards = [
-    { label: 'Объявлений', value: stats.totalListings, icon: '📋' },
-    { label: 'Заказов', value: stats.totalOrders, icon: '📦' },
-    { label: 'В избранном', value: stats.totalFavorites, icon: '❤️' },
-    { label: 'Отзывов', value: stats.totalReviews, icon: '⭐' },
-    { label: 'Баланс', value: `${stats.balance} ₽`, icon: '💰' },
+    { label: 'Объявлений', value: stats.totalListings, icon: ClipboardList },
+    { label: 'Заказов', value: stats.totalOrders, icon: ShoppingCart },
+    { label: 'В избранном', value: stats.totalFavorites, icon: Heart },
+    { label: 'Отзывов', value: stats.totalReviews, icon: Star },
+    { label: 'Баланс', value: `${stats.balance} ₽`, icon: Wallet },
   ];
 
   return (
     <div className="container-custom py-8">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-[#111827]">Личный кабинет</h1>
-        <button onClick={handleLogout} className="btn-secondary text-sm">
+        <h1 className="text-2xl font-bold text-[#111827] flex items-center gap-2">
+          <User className="w-6 h-6 text-[#6366F1]" />
+          Личный кабинет
+        </h1>
+        <button onClick={handleLogout} className="btn-secondary text-sm flex items-center gap-1">
+          <LogOut className="w-4 h-4" />
           Выйти
         </button>
       </div>
@@ -152,10 +190,10 @@ export default function ProfilePage() {
                 {user.avatar ? (
                   <img src={user.avatar} alt="" className="w-full h-full rounded-full object-cover" />
                 ) : (
-                  <span className="text-4xl">{user.name?.[0] || '👤'}</span>
+                  <User className="w-10 h-10 text-[#6B7280]" />
                 )}
                 <button className="absolute bottom-0 right-0 bg-[#3B82F6] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-[#2563EB] transition-colors">
-                  📷
+                  <Camera className="w-3 h-3" />
                 </button>
               </div>
               <div className="flex-1">
@@ -165,48 +203,61 @@ export default function ProfilePage() {
                   </h2>
                   {getRoleBadge()}
                 </div>
-                <p className="text-sm text-[#6B7280] mt-1">{user.phone}</p>
-                {user.email && (
-                  <p className="text-sm text-[#6B7280]">{user.email}</p>
-                )}
+                <div className="flex items-center gap-3 text-sm text-[#6B7280] mt-1 flex-wrap">
+                  <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {user.phone}</span>
+                  {user.email && (
+                    <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> {user.email}</span>
+                  )}
+                </div>
                 {user.companyName && (
-                  <p className="text-sm font-medium text-[#111827] mt-1">
-                    {user.companyName}
+                  <p className="text-sm font-medium text-[#111827] mt-1 flex items-center gap-1">
+                    <Building className="w-4 h-4 text-[#6366F1]" /> {user.companyName}
                   </p>
                 )}
               </div>
-              <Link href="/profile/settings" className="btn-secondary text-sm">
-                ✏️ Редактировать
+              <Link href="/profile/settings" className="btn-secondary text-sm flex items-center gap-1">
+                <Edit className="w-4 h-4" />
+                Редактировать
               </Link>
             </div>
           </div>
 
           {/* Статистика */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-            {statCards.map((stat, index) => (
-              <div key={index} className="bg-white rounded-xl p-4 border border-[#E5E7EB] text-center hover:shadow-md transition-shadow">
-                <div className="text-2xl mb-1">{stat.icon}</div>
-                <div className="text-xl font-bold text-[#111827]">{stat.value}</div>
-                <div className="text-xs text-[#6B7280]">{stat.label}</div>
-              </div>
-            ))}
+            {statCards.map((stat, index) => {
+              const Icon = stat.icon;
+              return (
+                <div key={index} className="bg-white rounded-xl p-4 border border-[#E5E7EB] text-center hover:shadow-md transition-shadow">
+                  <Icon className="w-6 h-6 mx-auto mb-1 text-[#6366F1]" />
+                  <div className="text-xl font-bold text-[#111827]">{stat.value}</div>
+                  <div className="text-xs text-[#6B7280]">{stat.label}</div>
+                </div>
+              );
+            })}
           </div>
 
           {/* Быстрые действия */}
           <div className="bg-white rounded-xl p-6 border border-[#E5E7EB]">
-            <h3 className="font-semibold text-[#111827] mb-4">⚡ Быстрые действия</h3>
+            <h3 className="font-semibold text-[#111827] mb-4 flex items-center gap-2">
+              <Settings className="w-5 h-5 text-[#6366F1]" />
+              Быстрые действия
+            </h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <Link href="/listings/create" className="btn-primary text-center text-sm py-2">
-                📝 Создать объявление
+              <Link href="/listings/create" className="btn-primary text-center text-sm py-2 flex items-center justify-center gap-1">
+                <Plus className="w-4 h-4" />
+                Создать объявление
               </Link>
-              <Link href="/profile/listings" className="btn-secondary text-center text-sm py-2">
-                📋 Мои объявления
+              <Link href="/profile/listings" className="btn-secondary text-center text-sm py-2 flex items-center justify-center gap-1">
+                <ClipboardList className="w-4 h-4" />
+                Мои объявления
               </Link>
-              <Link href="/profile/orders" className="btn-secondary text-center text-sm py-2">
-                📦 Заказы
+              <Link href="/profile/orders" className="btn-secondary text-center text-sm py-2 flex items-center justify-center gap-1">
+                <ShoppingCart className="w-4 h-4" />
+                Заказы
               </Link>
-              <Link href="/profile/balance" className="btn-secondary text-center text-sm py-2">
-                💰 Баланс
+              <Link href="/profile/balance" className="btn-secondary text-center text-sm py-2 flex items-center justify-center gap-1">
+                <Wallet className="w-4 h-4" />
+                Баланс
               </Link>
             </div>
           </div>
@@ -214,14 +265,19 @@ export default function ProfilePage() {
           {/* Последние объявления */}
           {user.listings && user.listings.length > 0 && (
             <div className="bg-white rounded-xl p-6 border border-[#E5E7EB]">
-              <h3 className="font-semibold text-[#111827] mb-4">📋 Мои объявления</h3>
+              <h3 className="font-semibold text-[#111827] mb-4 flex items-center gap-2">
+                <ClipboardList className="w-5 h-5 text-[#6366F1]" />
+                Мои объявления
+              </h3>
               <div className="space-y-3">
                 {user.listings.slice(0, 3).map((listing) => (
                   <div key={listing.id} className="flex items-center gap-4 p-3 border border-[#F3F4F6] rounded-lg hover:bg-[#F9FAFB] transition-colors">
                     {listing.images && listing.images.length > 0 ? (
                       <img src={listing.images[0].url} alt="" className="w-16 h-16 object-cover rounded-lg" />
                     ) : (
-                      <div className="w-16 h-16 bg-[#F3F4F6] rounded-lg flex items-center justify-center text-2xl">📦</div>
+                      <div className="w-16 h-16 bg-[#F3F4F6] rounded-lg flex items-center justify-center">
+                        <Package className="w-8 h-8 text-[#6B7280]" />
+                      </div>
                     )}
                     <div className="flex-1">
                       <Link href={`/listings/${listing.id}`} className="font-medium text-[#111827] hover:text-[#3B82F6]">
@@ -231,10 +287,13 @@ export default function ProfilePage() {
                         {listing.price.toLocaleString('ru-RU')} ₽ • {listing.views} просмотров
                       </p>
                     </div>
-                    <span className={`tag ${listing.status === 'active' ? '' : 'tag-gray'}`}>
-                      {listing.status === 'active' ? '✅ Активно' : 
-                       listing.status === 'pending' ? '⏳ На модерации' : 
-                       listing.status === 'sold' ? '💸 Продано' : '📦 В архиве'}
+                    <span className={`tag flex items-center gap-1 ${listing.status === 'active' ? '' : 'tag-gray'}`}>
+                      {listing.status === 'active' ? <CheckCircle className="w-3 h-3" /> :
+                       listing.status === 'pending' ? <Clock className="w-3 h-3" /> :
+                       listing.status === 'sold' ? <Coins className="w-3 h-3" /> : <Package className="w-3 h-3" />}
+                      {listing.status === 'active' ? ' Активно' :
+                       listing.status === 'pending' ? ' На модерации' :
+                       listing.status === 'sold' ? ' Продано' : ' В архиве'}
                     </span>
                   </div>
                 ))}
@@ -249,18 +308,18 @@ export default function ProfilePage() {
 
           {/* Ссылки на другие разделы */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <Link href="/profile/orders" className="bg-white rounded-xl p-4 border border-[#E5E7EB] hover:shadow-md transition-all text-center">
-              <div className="text-2xl mb-1">📦</div>
+            <Link href="/profile/orders" className="bg-white rounded-xl p-4 border border-[#E5E7EB] hover:shadow-md transition-all text-center group">
+              <ShoppingCart className="w-8 h-8 mx-auto mb-1 text-[#6366F1] group-hover:scale-110 transition-transform" />
               <div className="font-medium text-[#111827]">Мои заказы</div>
               <div className="text-xs text-[#6B7280]">История покупок</div>
             </Link>
-            <Link href="/profile/favorites" className="bg-white rounded-xl p-4 border border-[#E5E7EB] hover:shadow-md transition-all text-center">
-              <div className="text-2xl mb-1">❤️</div>
+            <Link href="/profile/favorites" className="bg-white rounded-xl p-4 border border-[#E5E7EB] hover:shadow-md transition-all text-center group">
+              <Heart className="w-8 h-8 mx-auto mb-1 text-[#6366F1] group-hover:scale-110 transition-transform" />
               <div className="font-medium text-[#111827]">Избранное</div>
               <div className="text-xs text-[#6B7280]">Сохраненные товары</div>
             </Link>
-            <Link href="/profile/balance" className="bg-white rounded-xl p-4 border border-[#E5E7EB] hover:shadow-md transition-all text-center">
-              <div className="text-2xl mb-1">💰</div>
+            <Link href="/profile/balance" className="bg-white rounded-xl p-4 border border-[#E5E7EB] hover:shadow-md transition-all text-center group">
+              <Wallet className="w-8 h-8 mx-auto mb-1 text-[#6366F1] group-hover:scale-110 transition-transform" />
               <div className="font-medium text-[#111827]">Баланс</div>
               <div className="text-xs text-[#6B7280]">Пополнить и вывести</div>
             </Link>
