@@ -13,7 +13,6 @@ import {
   HomeIcon,
   Briefcase,
   Pin,
-  Building,
   ShoppingBag,
   Smartphone,
   Shirt,
@@ -27,6 +26,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
+import HeroCarousel from '@/components/HeroCarousel';
 
 interface Listing {
   id: string;
@@ -155,18 +155,8 @@ export default function Home() {
 
   return (
     <div className="container-custom">
-      {/* Хиро-секция */}
-      <div className="hero-block-new py-20 px-6 mb-12">
-        <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold text-[#111827] tracking-tight leading-[1.1] mb-4">
-            Найдите всё,<br />
-            <span className="text-[#3B82F6]">что вам нужно</span>
-          </h1>
-          <p className="text-lg text-[#4B5563] max-w-2xl mx-auto leading-relaxed">
-            Покупайте товары, находите работу, выбирайте автомобили, недвижимость и услуги на одной современной платформе.
-          </p>
-        </div>
-      </div>
+      {/* Карусель вместо старого хероблока */}
+      <HeroCarousel />
 
       {/* Карточки категорий */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7 mb-12">
