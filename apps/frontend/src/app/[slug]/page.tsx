@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import { Search } from 'lucide-react';
 
 interface PageData {
   id: string;
