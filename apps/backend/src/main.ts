@@ -9,16 +9,18 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.enableCors({
-    origin: [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'http://localhost:3002',
-      'https://lokven.onrender.com',
-    ],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Cookie'],
-  });
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'https://lokven.onrender.com',
+    'https://lokven-frontend.onrender.com',  // 👈 ДОБАВЬТЕ ЭТОТ URL
+    /\.onrender\.com$/,  // 👈 ИЛИ РАЗРЕШИТЕ ВСЕ ПОДДОМЕНЫ onrender.com
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Cookie'],
+});
 
   app.use(cookieParser());
 
