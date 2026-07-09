@@ -121,21 +121,17 @@ export default function RootLayout({
                 </nav>
               </div>
 
+              {/* =========================
+                  🔹 ПОЛЕ ПОИСКА (ОБНОВЛЕНО)
+                  ========================= */}
               <form onSubmit={handleSearch} className="flex-1 max-w-md mx-4">
-                <div className="relative">
-                  <input
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Поиск..."
-                    className="w-full px-4 py-1.5 text-sm rounded-full border"
-                  />
-                  <button
-                    type="submit"
-                    className="absolute right-2 top-1/2 -translate-y-1/2"
-                  >
-                    🔍
-                  </button>
-                </div>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Поиск..."
+                  className="w-full px-4 py-2 text-sm text-[#111827] bg-[#F3F4F6] border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6366F1] focus:border-transparent transition-all placeholder:text-[#9CA3AF]"
+                />
               </form>
 
               <ClientOnly>
