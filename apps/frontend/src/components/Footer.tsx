@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Send,
-  Youtube,
-  Instagram,
   Phone,
   Mail,
   MapPin,
@@ -22,7 +20,6 @@ interface FooterLink {
   isActive: boolean;
 }
 
-// Карта групп
 const GROUP_LABELS: Record<string, string> = {
   about: 'О компании',
   buyers: 'Покупателям',
@@ -37,19 +34,17 @@ const GROUP_LABELS: Record<string, string> = {
   'social': 'Социальные сети',
 };
 
-// Карта иконок
 const iconMap: Record<string, any> = {
   vk: Send,
   telegram: Send,
-  youtube: Youtube,
-  instagram: Instagram,
+  youtube: Send,
+  instagram: Send,
   phone: Phone,
   mail: Mail,
   map: MapPin,
   globe: Globe,
 };
 
-// Порядок групп
 const GROUP_ORDER = [
   'Компании',
   'О компании',
@@ -88,12 +83,10 @@ export default function Footer() {
     return acc;
   }, {} as Record<string, FooterLink[]>);
 
-  // Фильтруем группы, которые есть в ORDER или имеют ссылки
   const visibleGroups = GROUP_ORDER.filter(group => 
     groupedLinks[group] && groupedLinks[group].some(link => link.isActive)
   );
 
-  // Добавляем группы, которых нет в ORDER, но есть ссылки
   Object.keys(groupedLinks).forEach(group => {
     if (!visibleGroups.includes(group) && groupedLinks[group].some(link => link.isActive)) {
       visibleGroups.push(group);
@@ -145,7 +138,6 @@ export default function Footer() {
                       .map((link) => {
                         const Icon = link.icon ? iconMap[link.icon] : null;
                         
-                        // Социальные сети — иконки
                         if (isSocial && Icon) {
                           return (
                             <li key={link.id}>
@@ -162,7 +154,6 @@ export default function Footer() {
                           );
                         }
                         
-                        // Обычные ссылки
                         return (
                           <li key={link.id}>
                             <Link
