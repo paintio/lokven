@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { CmsModule } from './cms/cms.module';
 import { MailModule } from './mail/mail.module';
+import { CategoriesModule } from './categories/categories.module'; // 👈 ДОБАВИТЬ
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { MailModule } from './mail/mail.module';
     UploadsModule,
     CmsModule,
     MailModule,
+    CategoriesModule, // 👈 ДОБАВИТЬ
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
