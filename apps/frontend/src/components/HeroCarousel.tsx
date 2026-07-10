@@ -167,114 +167,117 @@ export default function HeroCarousel() {
               " />
 
               {/* Контент */}
-              <div className="relative h-full flex items-center">
-                <div className="container-custom">
-                  <div className="
-                    max-w-xl
-                    bg-white/95
-                    backdrop-blur-sm
-                    rounded-3xl
-                    p-6
-                    md:p-8
-                    shadow-xl
-                  ">
-                    <h1 className="
-                      text-3xl
-                      md:text-5xl
-                      font-bold
-                      text-[#111827]
-                      leading-tight
-                      mb-4
-                    ">
-                      {slide.title}
-                    </h1>
+<div className="relative h-full flex items-center">
+  <div className="container-custom">
+    <div className="
+      max-w-xl
+      bg-white/10
+      backdrop-blur-md
+      rounded-3xl
+      p-6
+      md:p-8
+      shadow-xl
+      border
+      border-white/10
+    ">
+      <h1 className="
+        text-3xl
+        md:text-5xl
+        font-bold
+        text-white
+        leading-tight
+        mb-4
+      ">
+        {slide.title}
+      </h1>
 
-                    <p className="
-                      text-[#6B7280]
-                      text-base
-                      md:text-lg
-                      leading-relaxed
-                      mb-6
-                    ">
-                      {slide.description}
-                    </p>
+      <p className="
+        text-white/80
+        text-base
+        md:text-lg
+        leading-relaxed
+        mb-6
+      ">
+        {slide.description}
+      </p>
 
-                    <div className="flex flex-wrap gap-3 mb-7">
-                      <Link
-                        href={slide.primaryLink}
-                        className="
-                          px-6
-                          py-3
-                          bg-[#3B82F6]
-                          text-white
-                          rounded-xl
-                          font-medium
-                          hover:bg-[#2563EB]
-                          transition
-                        "
-                      >
-                        {slide.primaryText}
-                      </Link>
+      <div className="flex flex-wrap gap-3 mb-7">
+        <Link
+          href={slide.primaryLink}
+          className="
+            px-6
+            py-3
+            bg-white
+            text-[#111827]
+            rounded-xl
+            font-medium
+            hover:bg-white/90
+            transition
+          "
+        >
+          {slide.primaryText}
+        </Link>
 
-                      <Link
-                        href={slide.secondaryLink}
-                        className="
-                          px-6
-                          py-3
-                          bg-[#F3F4F6]
-                          text-[#111827]
-                          rounded-xl
-                          font-medium
-                          hover:bg-[#E5E7EB]
-                          transition
-                        "
-                      >
-                        {slide.secondaryText}
-                      </Link>
-                    </div>
+        <Link
+          href={slide.secondaryLink}
+          className="
+            px-6
+            py-3
+            bg-white/20
+            text-white
+            rounded-xl
+            font-medium
+            hover:bg-white/30
+            transition
+            border
+            border-white/20
+          "
+        >
+          {slide.secondaryText}
+        </Link>
+      </div>
 
-                    {/* Статистика */}
-                    <div className="
-                      flex
-                      flex-wrap
-                      gap-5
-                      pt-5
-                      border-t
-                      border-[#E5E7EB]
-                    ">
-                      {slide.stats.map((stat, index) => {
-                        const Icon = stat.icon;
-                        return (
-                          <div
-                            key={index}
-                            className="
-                              flex
-                              items-center
-                              gap-2
-                              text-sm
-                              text-[#4B5563]
-                            "
-                          >
-                            <div className="
-                              w-8
-                              h-8
-                              rounded-lg
-                              bg-[#EFF6FF]
-                              flex
-                              items-center
-                              justify-center
-                            ">
-                              <Icon className="w-4 h-4 text-[#3B82F6]" />
-                            </div>
-                            <span>{stat.value}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
+      {/* Статистика */}
+      <div className="
+        flex
+        flex-wrap
+        gap-5
+        pt-5
+        border-t
+        border-white/20
+      ">
+        {slide.stats.map((stat, index) => {
+          const Icon = stat.icon;
+          return (
+            <div
+              key={index}
+              className="
+                flex
+                items-center
+                gap-2
+                text-sm
+                text-white/80
+              "
+            >
+              <div className="
+                w-8
+                h-8
+                rounded-lg
+                bg-white/20
+                flex
+                items-center
+                justify-center
+              ">
+                <Icon className="w-4 h-4 text-white" />
               </div>
+              <span>{stat.value}</span>
             </div>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+</div>
           </SwiperSlide>
         ))}
       </Swiper>
