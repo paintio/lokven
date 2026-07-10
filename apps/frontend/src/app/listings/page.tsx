@@ -3,6 +3,30 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { getImageUrl } from '@/lib/api';
+import {
+  Search,
+  Filter,
+  Package,
+  Car,
+  Wrench,
+  Megaphone,
+  HomeIcon,
+  Briefcase,
+  Pin,
+  X,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  MapPin,
+  Calendar,
+  DollarSign,
+  Grid,
+  List,
+  Sliders,
+  Inbox,
+  ArrowLeft,
+  ArrowRight,
+} from 'lucide-react';
 
 interface Listing {
   id: string;
@@ -100,16 +124,16 @@ function ListingsContent() {
     return price.toLocaleString('ru-RU') + ' ₽';
   };
 
-  const getTypeEmoji = (type: string) => {
-    const types: Record<string, string> = {
-      product: '📦',
-      ads: '📋',
-      auto: '🚗',
-      realty: '🏠',
-      job: '💼',
-      service: '🔧',
+  const getTypeIcon = (type: string) => {
+    const icons: Record<string, any> = {
+      product: Package,
+      ads: Megaphone,
+      auto: Car,
+      realty: HomeIcon,
+      job: Briefcase,
+      service: Wrench,
     };
-    return types[type] || '📌';
+    return icons[type] || Pin;
   };
 
   const getCategoryTitle = () => {
@@ -157,14 +181,17 @@ function ListingsContent() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           <div>
             <label className="block text-xs font-medium text-[#6B7280] mb-1">Поиск</label>
-            <input
-              type="text"
-              name="search"
-              value={filters.search}
-              onChange={handleFilterChange}
-              className="input-field"
-              placeholder="Поиск..."
-            />
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
+              <input
+                type="text"
+                name="search"
+                value={filters.search}
+                onChange={handleFilterChange}
+                className="input-field pl-9"
+                placeholder="Поиск..."
+              />
+            </div>
           </div>
           <div>
             <label className="block text-xs font-medium text-[#6B7280] mb-1">Категория</label>
@@ -185,36 +212,45 @@ function ListingsContent() {
           </div>
           <div>
             <label className="block text-xs font-medium text-[#6B7280] mb-1">Цена от</label>
-            <input
-              type="number"
-              name="minPrice"
-              value={filters.minPrice}
-              onChange={handleFilterChange}
-              className="input-field"
-              placeholder="0"
-            />
+            <div className="relative">
+              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
+              <input
+                type="number"
+                name="minPrice"
+                value={filters.minPrice}
+                onChange={handleFilterChange}
+                className="input-field pl-9"
+                placeholder="0"
+              />
+            </div>
           </div>
           <div>
             <label className="block text-xs font-medium text-[#6B7280] mb-1">Цена до</label>
-            <input
-              type="number"
-              name="maxPrice"
-              value={filters.maxPrice}
-              onChange={handleFilterChange}
-              className="input-field"
-              placeholder="999999"
-            />
+            <div className="relative">
+              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
+              <input
+                type="number"
+                name="maxPrice"
+                value={filters.maxPrice}
+                onChange={handleFilterChange}
+                className="input-field pl-9"
+                placeholder="999999"
+              />
+            </div>
           </div>
           <div>
             <label className="block text-xs font-medium text-[#6B7280] mb-1">Город</label>
-            <input
-              type="text"
-              name="address"
-              value={filters.address}
-              onChange={handleFilterChange}
-              className="input-field"
-              placeholder="Москва"
-            />
+            <div className="relative">
+              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
+              <input
+                type="text"
+                name="address"
+                value={filters.address}
+                onChange={handleFilterChange}
+                className="input-field pl-9"
+                placeholder="Москва"
+              />
+            </div>
           </div>
           <div>
             <label className="block text-xs font-medium text-[#6B7280] mb-1">Сортировка</label>
@@ -232,10 +268,12 @@ function ListingsContent() {
           </div>
         </div>
         <div className="flex gap-3 mt-3">
-          <button onClick={applyFilters} className="btn-primary">
+          <button onClick={applyFilters} className="btn-primary flex items-center gap-2">
+            <Search className="w-4 h-4" />
             Применить
           </button>
-          <button onClick={clearFilters} className="btn-secondary">
+          <button onClick={clearFilters} className="btn-secondary flex items-center gap-2">
+            <X className="w-4 h-4" />
             Сбросить
           </button>
         </div>
@@ -246,7 +284,7 @@ function ListingsContent() {
         <div className="text-center py-12 text-[#9CA3AF] text-sm">Загрузка...</div>
       ) : listings.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-[24px] border border-[#E5E7EB]">
-          <div className="text-3xl mb-2">📭</div>
+          <Inbox className="w-16 h-16 text-[#9CA3AF] mx-auto mb-3" />
           <p className="text-[#6B7280] text-sm">Объявлений не найдено</p>
           <p className="text-[#9CA3AF] text-xs mt-1">Попробуйте изменить параметры поиска</p>
           <button onClick={clearFilters} className="btn-primary mt-4 inline-block">
@@ -255,34 +293,37 @@ function ListingsContent() {
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-          {listings.map((listing) => (
-            <a href={`/listings/${listing.id}`} key={listing.id} className="card group">
-              {listing.images && listing.images.length > 0 ? (
-                <img
-                  src={getImageUrl(listing.images[0].url)}
-                  alt={listing.title}
-                  className="w-full h-40 object-cover bg-[#F3F4F6]"
-                />
-              ) : (
-                <div className="w-full h-40 bg-[#F3F4F6] flex items-center justify-center text-4xl">
-                  {getTypeEmoji(listing.type)}
+          {listings.map((listing) => {
+            const Icon = getTypeIcon(listing.type);
+            return (
+              <a href={`/listings/${listing.id}`} key={listing.id} className="card group">
+                {listing.images && listing.images.length > 0 ? (
+                  <img
+                    src={getImageUrl(listing.images[0].url)}
+                    alt={listing.title}
+                    className="w-full h-40 object-cover bg-[#F3F4F6]"
+                  />
+                ) : (
+                  <div className="w-full h-40 bg-[#F3F4F6] flex items-center justify-center">
+                    <Icon className="w-12 h-12 text-[#6B7280]" />
+                  </div>
+                )}
+                <div className="p-3">
+                  <h3 className="text-sm font-medium text-[#111827] line-clamp-2">
+                    {listing.title}
+                  </h3>
+                  <div className="mt-1">
+                    <span className="text-base font-bold text-[#111827]">
+                      {formatPrice(listing.price)}
+                    </span>
+                  </div>
+                  <div className="mt-2 text-xs text-[#6B7280]">
+                    {listing.author.name || listing.author.phone}
+                  </div>
                 </div>
-              )}
-              <div className="p-3">
-                <h3 className="text-sm font-medium text-[#111827] line-clamp-2">
-                  {listing.title}
-                </h3>
-                <div className="mt-1">
-                  <span className="text-base font-bold text-[#111827]">
-                    {formatPrice(listing.price)}
-                  </span>
-                </div>
-                <div className="mt-2 text-xs text-[#6B7280]">
-                  {listing.author.name || listing.author.phone}
-                </div>
-              </div>
-            </a>
-          ))}
+              </a>
+            );
+          })}
         </div>
       )}
 
@@ -292,9 +333,9 @@ function ListingsContent() {
           <button
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="btn-outline px-3.5 py-1.5 disabled:opacity-50"
+            className="btn-outline px-3.5 py-1.5 disabled:opacity-50 flex items-center gap-1"
           >
-            ←
+            <ArrowLeft className="w-4 h-4" />
           </button>
           {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
             let pageNum;
@@ -320,9 +361,9 @@ function ListingsContent() {
           <button
             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="btn-outline px-3.5 py-1.5 disabled:opacity-50"
+            className="btn-outline px-3.5 py-1.5 disabled:opacity-50 flex items-center gap-1"
           >
-            →
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       )}

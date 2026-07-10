@@ -44,6 +44,8 @@ model User {
   notifications   Notification[]
   reviewsAsSeller Review[]       @relation("SellerReviews")
   reviewsAsBuyer  Review[]       @relation("BuyerReviews")
+
+  @@map("users")
 }
 
 model Session {
@@ -55,6 +57,8 @@ model Session {
   ip        String?
   expiresAt DateTime
   createdAt DateTime @default(now())
+
+  @@map("sessions")
 }
 
 model Notification {
@@ -67,6 +71,8 @@ model Notification {
   link      String?
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
+
+  @@map("notifications")
 }
 
 model Review {
@@ -87,6 +93,8 @@ model Review {
 
   orderId String @unique
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
 }
 
 model Listing {
@@ -113,11 +121,19 @@ model Listing {
   authorId String
   author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
+  // =========================
+  // 🔹 СВЯЗЬ С КАТЕГОРИЕЙ
+  // =========================
+  categoryId   String?   @map("category_id")
+  category     Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
   images    Image[]
   favorites Favorite[]
   messages  Message[]
   orders    Order[]
   reviews   Review[]
+
+  @@map("listings")
 }
 
 model Image {
@@ -126,6 +142,8 @@ model Image {
   listingId String
   listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+
+  @@map("images")
 }
 
 model Favorite {
@@ -136,6 +154,7 @@ model Favorite {
   listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
   @@unique([userId, listingId])
+  @@map("favorites")
 }
 
 model Message {
@@ -152,6 +171,8 @@ model Message {
 
   listingId String
   listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
 }
 
 model Category {
@@ -169,6 +190,13 @@ model Category {
 
   parent   Category?  @relation("CategoryParent", fields: [parentId], references: [id], onDelete: SetNull)
   children Category[] @relation("CategoryParent")
+  
+  // =========================
+  // 🔹 СВЯЗЬ С ОБЪЯВЛЕНИЯМИ
+  // =========================
+  listings Listing[]
+
+  @@map("categories")
 }
 
 model Tax {
@@ -179,6 +207,8 @@ model Tax {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+
+  @@map("taxes")
 }
 
 model Order {
@@ -201,6 +231,8 @@ model Order {
   review    Review?
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+
+  @@map("orders")
 }
 
 model Payment {
@@ -217,6 +249,8 @@ model Payment {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+
+  @@map("payments")
 }
 
 model ActivityLog {
@@ -229,6 +263,8 @@ model ActivityLog {
   ip        String?
   userAgent String?
   createdAt DateTime @default(now())
+
+  @@map("activity_logs")
 }
 
 model SiteSettings {
@@ -238,6 +274,8 @@ model SiteSettings {
   group       String
   description String?
   updatedAt   DateTime @default(now()) @updatedAt
+
+  @@map("site_settings")
 }
 
 model Page {
@@ -250,6 +288,8 @@ model Page {
   isActive        Boolean  @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now()) @updatedAt
+
+  @@map("pages")
 }
 
 model FooterLink {
@@ -264,6 +304,7 @@ model FooterLink {
   updatedAt DateTime @default(now()) @updatedAt
 
   @@unique([group, label])
+  @@map("footer_links")
 }
 
 model Setting {
@@ -275,33 +316,37 @@ model Setting {
   label       String?
   description String?
   updatedAt   DateTime @default(now()) @updatedAt
+
+  @@map("settings")
 }
+
 enum TokenStatus {
   PENDING
   APPROVED
   REJECTED
 }
+
 model AdminUsbToken {
   id         String      @id @default(cuid())
-
-  tokenHash  String      @unique   // НЕ хранить сырой токен
+  tokenHash  String      @unique
   status     TokenStatus @default(PENDING)
-
-  deviceId   String?     // fingerprint устройства
-  usedAt     DateTime?   // одноразовое использование
-
+  deviceId   String?
+  usedAt     DateTime?
   expiresAt  DateTime
   createdAt  DateTime    @default(now())
+
+  @@map("admin_usb_tokens")
 }
+
 model AdminSession {
   id        String   @id @default(cuid())
   userId    String?
   deviceId  String
-
   token     String   @unique
   ip        String?
   userAgent String?
-
   createdAt DateTime @default(now())
   expiresAt DateTime
+
+  @@map("admin_sessions")
 }
