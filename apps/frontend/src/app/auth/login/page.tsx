@@ -67,11 +67,8 @@ export default function LoginPage() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
 
-      // 👈 ОБНОВЛЯЕМ СОСТОЯНИЕ
       refreshUser();
-
-      // 👈 ФОРСИРУЕМ РЕДИРЕКТ
-      window.location.href = redirect;
+      router.push(redirect);
     } catch (error: any) {
       setError(error.message || 'Ошибка входа');
     } finally {
@@ -80,6 +77,66 @@ export default function LoginPage() {
   };
 
   return (
-    // ... остальной JSX без изменений
+    <div className="container-custom max-w-md py-12">
+      <div className="bg-white rounded-xl p-8 border border-[#E5E7EB]">
+        <h1 className="text-2xl font-bold text-[#111827] mb-2">Вход</h1>
+        <p className="text-[#6B7280] text-sm mb-6">
+          Войдите, чтобы размещать объявления
+        </p>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-[#6B7280] mb-1">
+              Телефон
+            </label>
+            <input
+              type="tel"
+              name="phone"
+              required
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="+7 (XXX) XXX-XX-XX"
+              className="input-field w-full"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[#6B7280] mb-1">
+              Пароль
+            </label>
+            <input
+              type="password"
+              name="password"
+              required
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="••••••••"
+              className="input-field w-full"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn-primary w-full"
+          >
+            {loading ? 'Вход...' : 'Войти'}
+          </button>
+        </form>
+
+        <div className="mt-4 text-center text-sm text-[#6B7280]">
+          Нет аккаунта?{' '}
+          <Link href="/auth/register" className="text-[#6366F1] hover:underline">
+            Зарегистрироваться
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }
