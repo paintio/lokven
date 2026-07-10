@@ -15,6 +15,7 @@
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
     "recharts": "^2.12.7",
+    "sharp": "^0.35.3",
     "swiper": "^14.0.5"
   },
   "devDependencies": {
