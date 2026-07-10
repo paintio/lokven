@@ -2,13 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import {
-  Send,
-  Phone,
-  Mail,
-  MapPin,
-  Globe,
-} from 'lucide-react';
+import { Send, Phone, Mail, MapPin, Globe } from 'lucide-react';
 
 interface FooterLink {
   id: string;
@@ -20,20 +14,34 @@ interface FooterLink {
   isActive: boolean;
 }
 
+// 👈 НОРМАЛИЗАЦИЯ НАЗВАНИЙ ГРУПП
 const GROUP_LABELS: Record<string, string> = {
-  about: 'О компании',
-  buyers: 'Покупателям',
-  sellers: 'Продавцам',
-  help: 'Помощь',
+  // Правильные названия
   'Компании': 'Компании',
   'О компании': 'О компании',
   'Покупателям': 'Покупателям',
   'Продавцам': 'Продавцам',
   'Помощь': 'Помощь',
   'Социальные сети': 'Социальные сети',
+  'Социальные сети': 'Социальные сети',
   'social': 'Социальные сети',
+  'about': 'О компании',
+  'buyers': 'Покупателям',
+  'sellers': 'Продавцам',
+  'help': 'Помощь',
 };
 
+// 👈 ПОРЯДОК ГРУПП
+const GROUP_ORDER = [
+  'Компании',
+  'О компании',
+  'Покупателям',
+  'Продавцам',
+  'Помощь',
+  'Социальные сети',
+];
+
+// 👈 ИКОНКИ ДЛЯ СОЦСЕТЕЙ
 const iconMap: Record<string, any> = {
   vk: Send,
   telegram: Send,
@@ -44,16 +52,6 @@ const iconMap: Record<string, any> = {
   map: MapPin,
   globe: Globe,
 };
-
-const GROUP_ORDER = [
-  'Компании',
-  'О компании',
-  'Покупателям',
-  'Продавцам',
-  'Помощь',
-  'Социальные сети',
-  'social',
-];
 
 export default function Footer() {
   const [links, setLinks] = useState<FooterLink[]>([]);
@@ -76,17 +74,37 @@ export default function Footer() {
     }
   };
 
+  // Группируем ссылки
   const groupedLinks = links.reduce((acc, link) => {
-    const groupKey = link.group || 'other';
+    // 👈 НОРМАЛИЗУЕМ НАЗВАНИЕ ГРУППЫ
+    let groupKey = link.group || 'other';
+    
+    // Исправляем кодировку, если название содержит кракозябры
+    if (groupKey.includes('Рћ') || groupKey.includes('Рџ') || groupKey.includes('РЎ')) {
+      // Переопределяем по ключевым словам
+      if (groupKey.includes('Рћ')) groupKey = 'О компании';
+      else if (groupKey.includes('РџРѕРє')) groupKey = 'Покупателям';
+      else if (groupKey.includes('РџСЂРѕ')) groupKey = 'Продавцам';
+      else if (groupKey.includes('РџРѕРј')) groupKey = 'Помощь';
+      else if (groupKey.includes('РЎРѕС†')) groupKey = 'Социальные сети';
+    }
+    
+    // Если группа есть в GROUP_LABELS — используем её
+    if (GROUP_LABELS[groupKey]) {
+      groupKey = GROUP_LABELS[groupKey];
+    }
+    
     if (!acc[groupKey]) acc[groupKey] = [];
     acc[groupKey].push(link);
     return acc;
   }, {} as Record<string, FooterLink[]>);
 
+  // Фильтруем только активные группы
   const visibleGroups = GROUP_ORDER.filter(group => 
     groupedLinks[group] && groupedLinks[group].some(link => link.isActive)
   );
 
+  // Добавляем группы, которых нет в ORDER
   Object.keys(groupedLinks).forEach(group => {
     if (!visibleGroups.includes(group) && groupedLinks[group].some(link => link.isActive)) {
       visibleGroups.push(group);
@@ -117,7 +135,8 @@ export default function Footer() {
   return (
     <footer className="bg-white border-t border-[#E5E7EB] py-8 mt-8">
       <div className="container-custom">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 pb-8 border-b border-[#E5E7EB]">
+        {/* 👈 РАВНОМЕРНОЕ РАСПРЕДЕЛЕНИЕ КОЛОНОК */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 pb-8 border-b border-[#E5E7EB]">
           {visibleGroups.map((groupKey) => {
             const groupLinks = groupedLinks[groupKey] || [];
             const isSocial = groupKey === 'Социальные сети' || groupKey === 'social';

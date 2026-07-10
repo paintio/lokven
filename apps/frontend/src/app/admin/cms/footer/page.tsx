@@ -1,28 +1,55 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import {
+  Plus,
+  Edit,
+  Trash2,
+  CheckCircle,
+  XCircle,
+  Save,
+  X,
+} from 'lucide-react';
 
 interface FooterLink {
   id: string;
   group: string;
   label: string;
   url: string;
+  icon?: string;
   order: number;
   isActive: boolean;
 }
 
+// 👈 РАСШИРЕННЫЙ СПИСОК ГРУПП
 const GROUP_LABELS: Record<string, string> = {
+  // Русские названия
+  'Компании': 'Компании',
+  'О компании': 'О компании',
+  'Покупателям': 'Покупателям',
+  'Продавцам': 'Продавцам',
+  'Помощь': 'Помощь',
+  'Социальные сети': 'Социальные сети',
+  // Английские ключи
   about: 'О компании',
   buyers: 'Покупателям',
   sellers: 'Продавцам',
   help: 'Помощь',
+  social: 'Социальные сети',
 };
 
 const GROUP_COLORS: Record<string, string> = {
+  'Компании': 'bg-blue-50 text-blue-700',
+  'О компании': 'bg-blue-50 text-blue-700',
+  'Покупателям': 'bg-green-50 text-green-700',
+  'Продавцам': 'bg-purple-50 text-purple-700',
+  'Помощь': 'bg-orange-50 text-orange-700',
+  'Социальные сети': 'bg-pink-50 text-pink-700',
   about: 'bg-blue-50 text-blue-700',
   buyers: 'bg-green-50 text-green-700',
   sellers: 'bg-purple-50 text-purple-700',
   help: 'bg-orange-50 text-orange-700',
+  social: 'bg-pink-50 text-pink-700',
 };
 
 export default function AdminFooter() {
@@ -35,6 +62,7 @@ export default function AdminFooter() {
     group: 'about',
     label: '',
     url: '',
+    icon: '',
     order: 0,
     isActive: true,
   });
@@ -111,6 +139,7 @@ export default function AdminFooter() {
       group: 'about',
       label: '',
       url: '',
+      icon: '',
       order: 0,
       isActive: true,
     });
@@ -124,38 +153,50 @@ export default function AdminFooter() {
       group: link.group,
       label: link.label,
       url: link.url,
+      icon: link.icon || '',
       order: link.order,
       isActive: link.isActive,
     });
     setIsAdding(true);
   };
 
+  // 👈 ГРУППИРУЕМ ССЫЛКИ
   const groupedLinks = links.reduce((acc, link) => {
-    if (!acc[link.group]) acc[link.group] = [];
-    acc[link.group].push(link);
+    let groupKey = link.group || 'other';
+    
+    // Нормализация названий групп
+    if (GROUP_LABELS[groupKey]) {
+      groupKey = GROUP_LABELS[groupKey];
+    }
+    
+    if (!acc[groupKey]) acc[groupKey] = [];
+    acc[groupKey].push(link);
     return acc;
   }, {} as Record<string, FooterLink[]>);
 
-  if (!mounted) {
-    return <div className="text-[#9CA3AF]">Загрузка...</div>;
-  }
+  // 👈 ПОЛУЧАЕМ СПИСОК ВСЕХ ГРУПП
+  const allGroups = Object.keys(groupedLinks).sort();
 
-  if (loading) {
+  if (!mounted || loading) {
     return <div className="text-[#9CA3AF]">Загрузка...</div>;
   }
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-[#111827]">🔗 Футер ссылки</h1>
-        <button onClick={() => setIsAdding(true)} className="btn-primary">
-          + Добавить ссылку
+        <h1 className="text-2xl font-bold text-[#111827] flex items-center gap-2">
+          <span>Футер ссылки</span>
+        </h1>
+        <button onClick={() => setIsAdding(true)} className="btn-primary flex items-center gap-2">
+          <Plus className="w-4 h-4" />
+          Добавить ссылку
         </button>
       </div>
 
       {isAdding && (
         <div className="bg-white rounded-xl p-6 border border-[#E5E7EB] mb-6">
-          <h3 className="font-semibold text-[#111827] mb-4">
+          <h3 className="font-semibold text-[#111827] mb-4 flex items-center gap-2">
+            {editing ? <Edit className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
             {editing ? 'Редактировать ссылку' : 'Новая ссылка'}
           </h3>
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -202,7 +243,17 @@ export default function AdminFooter() {
                 placeholder="/about"
               />
             </div>
-            <div className="col-span-2 flex items-center gap-4">
+            <div>
+              <label className="block text-sm font-medium text-[#6B7280] mb-1">Иконка (опционально)</label>
+              <input
+                type="text"
+                value={formData.icon}
+                onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                className="input-field"
+                placeholder="vk, telegram, youtube..."
+              />
+            </div>
+            <div className="flex items-center gap-4">
               <label className="flex items-center gap-2 text-sm text-[#6B7280]">
                 <input
                   type="checkbox"
@@ -214,10 +265,12 @@ export default function AdminFooter() {
               </label>
             </div>
             <div className="col-span-2 flex gap-3">
-              <button type="submit" className="btn-primary">
+              <button type="submit" className="btn-primary flex items-center gap-2">
+                <Save className="w-4 h-4" />
                 {editing ? 'Сохранить' : 'Создать'}
               </button>
-              <button type="button" onClick={resetForm} className="btn-secondary">
+              <button type="button" onClick={resetForm} className="btn-secondary flex items-center gap-2">
+                <X className="w-4 h-4" />
                 Отмена
               </button>
             </div>
@@ -231,11 +284,14 @@ export default function AdminFooter() {
         </div>
       ) : (
         <div className="space-y-6">
-          {Object.entries(GROUP_LABELS).map(([groupKey, groupLabel]) => {
+          {allGroups.map((groupKey) => {
             const groupLinks = groupedLinks[groupKey] || [];
+            const groupLabel = GROUP_LABELS[groupKey] || groupKey;
+            const colorClass = GROUP_COLORS[groupKey] || 'bg-gray-50 text-gray-700';
+
             return (
               <div key={groupKey} className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden">
-                <div className={`px-4 py-3 ${GROUP_COLORS[groupKey] || 'bg-gray-50'}`}>
+                <div className={`px-4 py-3 ${colorClass}`}>
                   <h3 className="font-semibold">{groupLabel}</h3>
                   <span className="text-xs opacity-75">{groupLinks.length} ссылок</span>
                 </div>
@@ -249,6 +305,7 @@ export default function AdminFooter() {
                       <tr>
                         <th className="px-4 py-2 text-left text-xs font-medium text-[#6B7280] uppercase">Название</th>
                         <th className="px-4 py-2 text-left text-xs font-medium text-[#6B7280] uppercase">URL</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-[#6B7280] uppercase">Иконка</th>
                         <th className="px-4 py-2 text-left text-xs font-medium text-[#6B7280] uppercase">Статус</th>
                         <th className="px-4 py-2 text-left text-xs font-medium text-[#6B7280] uppercase">Действия</th>
                       </tr>
@@ -258,6 +315,7 @@ export default function AdminFooter() {
                         <tr key={link.id} className="hover:bg-[#F9FAFB]">
                           <td className="px-4 py-2 text-sm text-[#111827]">{link.label}</td>
                           <td className="px-4 py-2 text-sm text-[#6B7280]">{link.url}</td>
+                          <td className="px-4 py-2 text-sm text-[#6B7280]">{link.icon || '—'}</td>
                           <td className="px-4 py-2">
                             <span className={`tag ${link.isActive ? '' : 'tag-gray'}`}>
                               {link.isActive ? '✅ Активно' : '⛔ Неактивно'}
@@ -265,11 +323,17 @@ export default function AdminFooter() {
                           </td>
                           <td className="px-4 py-2">
                             <div className="flex gap-2">
-                              <button onClick={() => editLink(link)} className="text-sm text-[#3B82F6] hover:underline">
-                                ✏️
+                              <button
+                                onClick={() => editLink(link)}
+                                className="text-sm text-[#3B82F6] hover:underline flex items-center gap-1"
+                              >
+                                <Edit className="w-3 h-3" />
                               </button>
-                              <button onClick={() => deleteLink(link.id)} className="text-sm text-[#EF4444] hover:underline">
-                                🗑️
+                              <button
+                                onClick={() => deleteLink(link.id)}
+                                className="text-sm text-[#EF4444] hover:underline flex items-center gap-1"
+                              >
+                                <Trash2 className="w-3 h-3" />
                               </button>
                             </div>
                           </td>
