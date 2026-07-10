@@ -6,22 +6,16 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Home,
-  Search,
   User,
   LogOut,
   Plus,
-  LayoutDashboard,
+  Shield,
   Lock,
   Menu,
   X,
-  Shield,
-  ChevronDown,
   LogIn,
   UserPlus,
   FileText,
-  ShoppingBag,
-  Settings,
-  HelpCircle,
 } from 'lucide-react';
 
 export function Navigation() {
@@ -32,28 +26,31 @@ export function Navigation() {
   const [usbError, setUsbError] = useState('');
   const [usbLoading, setUsbLoading] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [navKey, setNavKey] = useState(0); // 👈 ДОБАВЛЯЕМ ДЛЯ ФОРСИРОВАННОГО ОБНОВЛЕНИЯ
 
-  // При монтировании — обновляем состояние
+  // При монтировании и при изменении авторизации — обновляем
   useEffect(() => {
     refreshUser();
   }, []);
 
-  // Слушаем изменения в localStorage (для синхронизации между вкладками)
+  // Слушаем изменения в localStorage
   useEffect(() => {
     const handleStorageChange = () => {
       refreshUser();
+      setNavKey(prev => prev + 1); // 👈 ФОРСИРУЕМ ПЕРЕРЕНДЕР
     };
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // 👈 ДОБАВЛЯЕМ: периодическая проверка cookies (для обновления после входа)
+  // Периодическая проверка cookies
   useEffect(() => {
     let lastCookie = document.cookie;
     const interval = setInterval(() => {
       if (document.cookie !== lastCookie) {
         lastCookie = document.cookie;
         refreshUser();
+        setNavKey(prev => prev + 1); // 👈 ФОРСИРУЕМ ПЕРЕРЕНДЕР
       }
     }, 500);
 
@@ -62,6 +59,7 @@ export function Navigation() {
 
   const handleLogout = () => {
     logout();
+    setNavKey(prev => prev + 1); // 👈 ФОРСИРУЕМ ПЕРЕРЕНДЕР
     router.push('/');
     setIsMobileMenuOpen(false);
   };
@@ -105,7 +103,8 @@ export function Navigation() {
 
       setShowUsbModal(false);
       setUsbToken('');
-      refreshUser(); // 👈 ОБНОВЛЯЕМ ПОСЛЕ УСПЕШНОГО ВХОДА
+      refreshUser();
+      setNavKey(prev => prev + 1); // 👈 ФОРСИРУЕМ ПЕРЕРЕНДЕР
       router.push('/admin');
     } catch (error: any) {
       setUsbError(error.message || 'Ошибка проверки USB-токена');
@@ -124,72 +123,47 @@ export function Navigation() {
   }
 
   return (
-    <>
+    <div key={navKey}> {/* 👈 ОБЁРТЫВАЕМ В DIV С KEY ДЛЯ ФОРСИРОВАННОГО ОБНОВЛЕНИЯ */}
       <nav className="flex items-center justify-between p-4 bg-white border-b border-[#E5E7EB] sticky top-0 z-50">
-        {/* Логотип */}
         <Link href="/" className="flex items-center gap-2 text-2xl font-bold text-[#6366F1]">
           <Home className="w-6 h-6" />
           <span>Lokven</span>
         </Link>
 
-        {/* Десктопное меню */}
         <div className="hidden md:flex items-center gap-6">
-          <Link
-            href="/listings"
-            className="flex items-center gap-1 text-[#4B5563] hover:text-[#6366F1] transition-colors text-sm font-medium"
-          >
+          <Link href="/listings" className="flex items-center gap-1 text-[#4B5563] hover:text-[#6366F1] transition-colors text-sm font-medium">
             <FileText className="w-4 h-4" />
             Объявления
           </Link>
 
           {isAuthenticated ? (
             <>
-              <Link
-                href="/listings/create"
-                className="flex items-center gap-1 text-[#4B5563] hover:text-[#6366F1] transition-colors text-sm font-medium"
-              >
+              <Link href="/listings/create" className="flex items-center gap-1 text-[#4B5563] hover:text-[#6366F1] transition-colors text-sm font-medium">
                 <Plus className="w-4 h-4" />
                 Подать
               </Link>
-              
               {(user?.role === 'admin' || user?.role === 'moderator') && (
-                <button
-                  onClick={handleAdminAccess}
-                  className="flex items-center gap-1 text-[#4B5563] hover:text-[#6366F1] transition-colors text-sm font-medium"
-                >
+                <button onClick={handleAdminAccess} className="flex items-center gap-1 text-[#4B5563] hover:text-[#6366F1] transition-colors text-sm font-medium">
                   <Shield className="w-4 h-4" />
                   Админка
                 </button>
               )}
-              
-              <Link
-                href="/profile"
-                className="flex items-center gap-1 text-[#4B5563] hover:text-[#6366F1] transition-colors text-sm font-medium"
-              >
+              <Link href="/profile" className="flex items-center gap-1 text-[#4B5563] hover:text-[#6366F1] transition-colors text-sm font-medium">
                 <User className="w-4 h-4" />
                 {user?.name || 'Профиль'}
               </Link>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-1 text-red-500 hover:text-red-700 transition-colors text-sm font-medium"
-              >
+              <button onClick={handleLogout} className="flex items-center gap-1 text-red-500 hover:text-red-700 transition-colors text-sm font-medium">
                 <LogOut className="w-4 h-4" />
                 Выйти
               </button>
             </>
           ) : (
             <>
-              <Link
-                href="/auth/login"
-                className="flex items-center gap-1 text-[#4B5563] hover:text-[#6366F1] transition-colors text-sm font-medium"
-              >
+              <Link href="/auth/login" className="flex items-center gap-1 text-[#4B5563] hover:text-[#6366F1] transition-colors text-sm font-medium">
                 <LogIn className="w-4 h-4" />
                 Войти
               </Link>
-              <Link
-                href="/auth/register"
-                className="flex items-center gap-1 px-4 py-2 bg-[#6366F1] text-white rounded-lg hover:bg-[#4F46E5] transition-colors text-sm font-medium"
-              >
+              <Link href="/auth/register" className="flex items-center gap-1 px-4 py-2 bg-[#6366F1] text-white rounded-lg hover:bg-[#4F46E5] transition-colors text-sm font-medium">
                 <UserPlus className="w-4 h-4" />
                 Регистрация
               </Link>
@@ -197,83 +171,46 @@ export function Navigation() {
           )}
         </div>
 
-        {/* Мобильная кнопка меню */}
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="md:hidden p-2 rounded-lg hover:bg-[#F3F4F6] transition-colors"
-        >
-          {isMobileMenuOpen ? (
-            <X className="w-6 h-6 text-[#4B5563]" />
-          ) : (
-            <Menu className="w-6 h-6 text-[#4B5563]" />
-          )}
+        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden p-2 rounded-lg hover:bg-[#F3F4F6] transition-colors">
+          {isMobileMenuOpen ? <X className="w-6 h-6 text-[#4B5563]" /> : <Menu className="w-6 h-6 text-[#4B5563]" />}
         </button>
       </nav>
 
       {/* Мобильное меню */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white border-b border-[#E5E7EB] p-4 space-y-3">
-          <Link
-            href="/listings"
-            className="flex items-center gap-2 text-[#4B5563] hover:text-[#6366F1] transition-colors text-sm font-medium"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
+          <Link href="/listings" className="flex items-center gap-2 text-[#4B5563] hover:text-[#6366F1] transition-colors text-sm font-medium" onClick={() => setIsMobileMenuOpen(false)}>
             <FileText className="w-4 h-4" />
             Объявления
           </Link>
-
           {isAuthenticated ? (
             <>
-              <Link
-                href="/listings/create"
-                className="flex items-center gap-2 text-[#4B5563] hover:text-[#6366F1] transition-colors text-sm font-medium"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
+              <Link href="/listings/create" className="flex items-center gap-2 text-[#4B5563] hover:text-[#6366F1] transition-colors text-sm font-medium" onClick={() => setIsMobileMenuOpen(false)}>
                 <Plus className="w-4 h-4" />
                 Подать
               </Link>
-              
               {(user?.role === 'admin' || user?.role === 'moderator') && (
-                <button
-                  onClick={handleAdminAccess}
-                  className="flex items-center gap-2 text-[#4B5563] hover:text-[#6366F1] transition-colors text-sm font-medium w-full"
-                >
+                <button onClick={handleAdminAccess} className="flex items-center gap-2 text-[#4B5563] hover:text-[#6366F1] transition-colors text-sm font-medium w-full">
                   <Shield className="w-4 h-4" />
                   Админка
                 </button>
               )}
-              
-              <Link
-                href="/profile"
-                className="flex items-center gap-2 text-[#4B5563] hover:text-[#6366F1] transition-colors text-sm font-medium"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
+              <Link href="/profile" className="flex items-center gap-2 text-[#4B5563] hover:text-[#6366F1] transition-colors text-sm font-medium" onClick={() => setIsMobileMenuOpen(false)}>
                 <User className="w-4 h-4" />
                 {user?.name || 'Профиль'}
               </Link>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 text-red-500 hover:text-red-700 transition-colors text-sm font-medium w-full"
-              >
+              <button onClick={handleLogout} className="flex items-center gap-2 text-red-500 hover:text-red-700 transition-colors text-sm font-medium w-full">
                 <LogOut className="w-4 h-4" />
                 Выйти
               </button>
             </>
           ) : (
             <>
-              <Link
-                href="/auth/login"
-                className="flex items-center gap-2 text-[#4B5563] hover:text-[#6366F1] transition-colors text-sm font-medium"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
+              <Link href="/auth/login" className="flex items-center gap-2 text-[#4B5563] hover:text-[#6366F1] transition-colors text-sm font-medium" onClick={() => setIsMobileMenuOpen(false)}>
                 <LogIn className="w-4 h-4" />
                 Войти
               </Link>
-              <Link
-                href="/auth/register"
-                className="flex items-center gap-2 px-4 py-2 bg-[#6366F1] text-white rounded-lg hover:bg-[#4F46E5] transition-colors text-sm font-medium text-center"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
+              <Link href="/auth/register" className="flex items-center gap-2 px-4 py-2 bg-[#6366F1] text-white rounded-lg hover:bg-[#4F46E5] transition-colors text-sm font-medium text-center" onClick={() => setIsMobileMenuOpen(false)}>
                 <UserPlus className="w-4 h-4" />
                 Регистрация
               </Link>
@@ -290,56 +227,20 @@ export function Navigation() {
               <Lock className="w-6 h-6 text-[#6366F1]" />
               <h2 className="text-2xl font-bold text-[#111827]">Требуется USB-токен</h2>
             </div>
-            <p className="text-[#6B7280] text-sm mb-6">
-              Для доступа к админ-панели вставьте USB-носитель и введите токен
-            </p>
-
-            {usbError && (
-              <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
-                {usbError}
-              </div>
-            )}
-
+            <p className="text-[#6B7280] text-sm mb-6">Для доступа к админ-панели вставьте USB-носитель и введите токен</p>
+            {usbError && <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">{usbError}</div>}
             <div className="mb-4">
-              <label className="block text-sm font-medium text-[#6B7280] mb-1">
-                USB-токен
-              </label>
-              <input
-                type="text"
-                value={usbToken}
-                onChange={(e) => setUsbToken(e.target.value)}
-                placeholder="Введите USB-токен"
-                className="input-field w-full"
-                onKeyDown={(e) => e.key === 'Enter' && verifyUsbToken()}
-                autoFocus
-              />
-              <p className="text-xs text-[#9CA3AF] mt-1">
-                Вставьте USB-носитель с токеном или введите вручную
-              </p>
+              <label className="block text-sm font-medium text-[#6B7280] mb-1">USB-токен</label>
+              <input type="text" value={usbToken} onChange={(e) => setUsbToken(e.target.value)} placeholder="Введите USB-токен" className="input-field w-full" onKeyDown={(e) => e.key === 'Enter' && verifyUsbToken()} autoFocus />
+              <p className="text-xs text-[#9CA3AF] mt-1">Вставьте USB-носитель с токеном или введите вручную</p>
             </div>
-
             <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  setShowUsbModal(false);
-                  setUsbToken('');
-                  setUsbError('');
-                }}
-                className="btn-secondary flex-1"
-              >
-                Отмена
-              </button>
-              <button
-                onClick={verifyUsbToken}
-                disabled={usbLoading}
-                className="btn-primary flex-1"
-              >
-                {usbLoading ? 'Проверка...' : 'Подтвердить'}
-              </button>
+              <button onClick={() => { setShowUsbModal(false); setUsbToken(''); setUsbError(''); }} className="btn-secondary flex-1">Отмена</button>
+              <button onClick={verifyUsbToken} disabled={usbLoading} className="btn-primary flex-1">{usbLoading ? 'Проверка...' : 'Подтвердить'}</button>
             </div>
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

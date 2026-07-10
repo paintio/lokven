@@ -15,6 +15,7 @@ function getCookie(name: string) {
 export function useAuth() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshTrigger, setRefreshTrigger] = useState(0); // 👈 ДОБАВЛЯЕМ
 
   const checkAuth = () => {
     try {
@@ -37,7 +38,7 @@ export function useAuth() {
 
   useEffect(() => {
     checkAuth();
-  }, []);
+  }, [refreshTrigger]); // 👈 ЗАВИСИМ ОТ ТРИГГЕРА
 
   const logout = () => {
     localStorage.removeItem('token');
@@ -45,10 +46,11 @@ export function useAuth() {
     document.cookie = 'token=; path=/; max-age=0';
     document.cookie = 'user=; path=/; max-age=0';
     setUser(null);
+    setRefreshTrigger(prev => prev + 1); // 👈 ТРИГГЕРИМ ОБНОВЛЕНИЕ
   };
 
   const refreshUser = () => {
-    checkAuth();
+    setRefreshTrigger(prev => prev + 1); // 👈 ТРИГГЕРИМ ОБНОВЛЕНИЕ
   };
 
   return { 
