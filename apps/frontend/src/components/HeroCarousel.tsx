@@ -14,10 +14,9 @@ import 'swiper/css/navigation';
 const slides = [
   {
     id: 1,
-    number: '01',
     title: 'Покупайте товары',
     description: 'Миллионы товаров для дома, электроники, красоты, спорта и многое другое.',
-    gradient: 'from-[#6366F1] to-[#8B5CF6]',
+    image: '/images/hero/hero-shopping.png',
     primaryLink: '/listings?category=marketplace',
     primaryText: 'Смотреть товары →',
     secondaryLink: '/listings/create',
@@ -30,10 +29,9 @@ const slides = [
   },
   {
     id: 2,
-    number: '02',
     title: 'Находите работу',
     description: 'Тысячи вакансий от проверенных работодателей по всей стране.',
-    gradient: 'from-[#3B82F6] to-[#60A5FA]',
+    image: '/images/hero/hero-career.png',
     primaryLink: '/listings?category=jobs',
     primaryText: 'Найти работу →',
     secondaryLink: '/listings/create',
@@ -46,10 +44,9 @@ const slides = [
   },
   {
     id: 3,
-    number: '03',
     title: 'Выбирайте автомобили',
     description: 'Новые и автомобили с пробегом от частных продавцов и дилеров.',
-    gradient: 'from-[#10B981] to-[#34D399]',
+    image: '/images/hero/hero-driving.png',
     primaryLink: '/listings?category=auto',
     primaryText: 'Смотреть авто →',
     secondaryLink: '/listings/create',
@@ -62,10 +59,9 @@ const slides = [
   },
   {
     id: 4,
-    number: '04',
     title: 'Покупайте и арендуйте недвижимость',
     description: 'Квартиры, дома, коммерческие помещения и земельные участки.',
-    gradient: 'from-[#8B5CF6] to-[#A78BFA]',
+    image: '/images/hero/hero-realty.jpg',
     primaryLink: '/listings?category=realty',
     primaryText: 'Смотреть объекты →',
     secondaryLink: '/listings/create',
@@ -78,10 +74,9 @@ const slides = [
   },
   {
     id: 5,
-    number: '05',
     title: 'Находите специалистов',
     description: 'Ремонт, строительство, перевозки, обучение и сотни других услуг.',
-    gradient: 'from-[#F59E0B] to-[#FBBF24]',
+    image: '/images/hero/hero-services.jpg',
     primaryLink: '/listings?category=services',
     primaryText: 'Найти специалиста →',
     secondaryLink: '/listings/create',
@@ -103,14 +98,29 @@ export default function HeroCarousel() {
 
   if (!mounted) {
     return (
-      <div className="relative rounded-2xl overflow-hidden bg-[#F3F4F6] h-[400px] md:h-[500px] flex items-center justify-center mb-12">
-        <div className="text-[#9CA3AF]">Загрузка...</div>
+      <div className="
+        h-[420px]
+        md:h-[520px]
+        rounded-2xl
+        bg-[#F3F4F6]
+        flex
+        items-center
+        justify-center
+        mb-12
+      ">
+        <span className="text-[#9CA3AF]">Загрузка...</span>
       </div>
     );
   }
 
   return (
-    <div className="relative rounded-2xl overflow-hidden mb-12">
+    <section className="
+      relative
+      rounded-3xl
+      overflow-hidden
+      mb-12
+      shadow-sm
+    ">
       <Swiper
         modules={[Autoplay, Pagination, Navigation, EffectFade]}
         effect="fade"
@@ -121,71 +131,141 @@ export default function HeroCarousel() {
         }}
         pagination={{
           clickable: true,
-          bulletActiveClass: 'swiper-pagination-bullet-active',
         }}
         navigation={{
-          nextEl: '.swiper-button-next',
-          prevEl: '.swiper-button-prev',
+          nextEl: '.hero-next',
+          prevEl: '.hero-prev',
         }}
         loop={true}
-        speed={800}
+        speed={700}
         className="h-[420px] md:h-[520px]"
       >
         {slides.map((slide) => (
           <SwiperSlide key={slide.id}>
-            <div className="relative w-full h-full">
-              {/* Градиентный фон */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${slide.gradient}`} />
-              
-              {/* Декоративные круги */}
-              <div className="absolute inset-0 opacity-10">
-                <div className="absolute top-10 right-10 w-64 h-64 bg-white rounded-full blur-3xl" />
-                <div className="absolute bottom-10 left-10 w-48 h-48 bg-white rounded-full blur-3xl" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/20 rounded-full blur-2xl" />
-              </div>
+            <div className="relative w-full h-full bg-[#111827]">
+              {/* Фоновое изображение */}
+              <img
+                src={slide.image}
+                alt={slide.title}
+                className="
+                  absolute
+                  inset-0
+                  w-full
+                  h-full
+                  object-cover
+                "
+              />
+
+              {/* Затемнение для текста */}
+              <div className="
+                absolute
+                inset-0
+                bg-gradient-to-r
+                from-black/70
+                via-black/40
+                to-black/10
+              " />
 
               {/* Контент */}
               <div className="relative h-full flex items-center">
                 <div className="container-custom">
-                  <div className="max-w-3xl text-white">
-                    {/* Номер */}
-                    <span className="text-4xl md:text-5xl font-bold text-white/20 mb-2 block">
-                      {slide.number}
-                    </span>
-
-                    {/* Заголовок */}
-                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-3">
+                  <div className="
+                    max-w-xl
+                    bg-white/95
+                    backdrop-blur-sm
+                    rounded-3xl
+                    p-6
+                    md:p-8
+                    shadow-xl
+                  ">
+                    <h1 className="
+                      text-3xl
+                      md:text-5xl
+                      font-bold
+                      text-[#111827]
+                      leading-tight
+                      mb-4
+                    ">
                       {slide.title}
                     </h1>
 
-                    {/* Описание */}
-                    <p className="text-base md:text-lg text-white/90 mb-6 leading-relaxed max-w-xl">
+                    <p className="
+                      text-[#6B7280]
+                      text-base
+                      md:text-lg
+                      leading-relaxed
+                      mb-6
+                    ">
                       {slide.description}
                     </p>
 
-                    {/* Кнопки */}
-                    <div className="flex flex-wrap gap-4 mb-8">
+                    <div className="flex flex-wrap gap-3 mb-7">
                       <Link
                         href={slide.primaryLink}
-                        className="px-6 py-2.5 bg-white text-[#6366F1] font-medium rounded-lg hover:shadow-lg hover:scale-[1.02] transition-all duration-300 text-sm md:text-base"
+                        className="
+                          px-6
+                          py-3
+                          bg-[#3B82F6]
+                          text-white
+                          rounded-xl
+                          font-medium
+                          hover:bg-[#2563EB]
+                          transition
+                        "
                       >
                         {slide.primaryText}
                       </Link>
+
                       <Link
                         href={slide.secondaryLink}
-                        className="px-6 py-2.5 bg-white/20 backdrop-blur-sm text-white font-medium rounded-lg hover:bg-white/30 transition-all duration-300 text-sm md:text-base border border-white/10"
+                        className="
+                          px-6
+                          py-3
+                          bg-[#F3F4F6]
+                          text-[#111827]
+                          rounded-xl
+                          font-medium
+                          hover:bg-[#E5E7EB]
+                          transition
+                        "
                       >
                         {slide.secondaryText}
                       </Link>
                     </div>
 
                     {/* Статистика */}
-                    <div className="flex flex-wrap gap-6 md:gap-8 pt-4 border-t border-white/20">
+                    <div className="
+                      flex
+                      flex-wrap
+                      gap-5
+                      pt-5
+                      border-t
+                      border-[#E5E7EB]
+                    ">
                       {slide.stats.map((stat, index) => {
                         const Icon = stat.icon;
                         return (
-                          <div key={index} className="flex items-center gap-2 text-sm md:text-base text-white/80">
-                            <Icon className="w-4 h-4 text-white/60" />
+                          <div
+                            key={index}
+                            className="
+                              flex
+                              items-center
+                              gap-2
+                              text-sm
+                              text-[#4B5563]
+                            "
+                          >
+                            <div className="
+                              w-8
+                              h-8
+                              rounded-lg
+                              bg-[#EFF6FF]
+                              flex
+                              items-center
+                              justify-center
+                            ">
+                              <Icon className="w-4 h-4 text-[#3B82F6]" />
+                            </div>
                             <span>{stat.value}</span>
                           </div>
                         );
@@ -199,45 +279,107 @@ export default function HeroCarousel() {
         ))}
       </Swiper>
 
-      {/* Кнопки навигации */}
-      <button className="swiper-button-prev absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/20 backdrop-blur-sm text-white rounded-full flex items-center justify-center hover:bg-white/30 transition-all duration-300 border border-white/10">
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
-      <button className="swiper-button-next absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/20 backdrop-blur-sm text-white rounded-full flex items-center justify-center hover:bg-white/30 transition-all duration-300 border border-white/10">
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+      {/* Левая кнопка */}
+      <button
+        className="
+          hero-prev
+          absolute
+          left-5
+          top-1/2
+          -translate-y-1/2
+          z-10
+          w-11
+          h-11
+          rounded-full
+          bg-white/80
+          backdrop-blur
+          shadow-md
+          flex
+          items-center
+          justify-center
+          hover:bg-white
+          transition
+        "
+      >
+        <svg className="w-5 h-5 text-[#111827]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
         </svg>
       </button>
 
+      {/* Правая кнопка */}
+      <button
+        className="
+          hero-next
+          absolute
+          right-5
+          top-1/2
+          -translate-y-1/2
+          z-10
+          w-11
+          h-11
+          rounded-full
+          bg-white/80
+          backdrop-blur
+          shadow-md
+          flex
+          items-center
+          justify-center
+          hover:bg-white
+          transition
+        "
+      >
+        <svg className="w-5 h-5 text-[#111827]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+
+      {/* Кастомные стили для Swiper */}
       <style jsx global>{`
-        .swiper-pagination-bullet {
-          background: rgba(255, 255, 255, 0.5);
-          opacity: 1;
-          width: 10px;
-          height: 10px;
-          transition: all 0.3s ease;
-        }
-        .swiper-pagination-bullet-active {
-          background: #ffffff;
-          width: 24px;
-          border-radius: 5px;
-        }
         .swiper-pagination {
           bottom: 24px !important;
+          z-index: 20 !important;
         }
-        .swiper-button-prev,
-        .swiper-button-next {
-          display: flex !important;
+
+        .swiper-pagination-bullet {
+          background: rgba(255, 255, 255, 0.4) !important;
+          opacity: 1 !important;
+          width: 10px !important;
+          height: 10px !important;
+          border-radius: 50% !important;
+          transition: all 0.3s ease !important;
+          backdrop-filter: blur(4px);
         }
+
+        .swiper-pagination-bullet-active {
+          background: #ffffff !important;
+          width: 28px !important;
+          border-radius: 6px !important;
+        }
+
+        .swiper-pagination-bullet:hover {
+          transform: scale(1.15);
+        }
+
         @media (max-width: 768px) {
-          .swiper-button-prev,
-          .swiper-button-next {
+          .hero-prev,
+          .hero-next {
             display: none !important;
           }
         }
+
+        .swiper-fade .swiper-slide {
+          transition: opacity 0.7s ease-in-out !important;
+        }
+
+        .swiper-fade .swiper-slide-prev,
+        .swiper-fade .swiper-slide-next {
+          opacity: 0 !important;
+        }
+
+        .swiper-fade .swiper-slide-active {
+          opacity: 1 !important;
+        }
       `}</style>
-    </div>
+    </section>
   );
 }
