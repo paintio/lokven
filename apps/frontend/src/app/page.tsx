@@ -155,44 +155,42 @@ export default function Home() {
 
   return (
     <div className="container-custom">
-      {/* Карусель вместо старого хероблока */}
+      {/* Херо-карусель */}
       <HeroCarousel />
 
       {/* Карточки категорий */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7 mb-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         {heroCards.map((card) => {
           const Icon = card.icon;
           return (
             <Link
               key={card.id}
               href={card.href}
-              className="group relative block rounded-[32px] overflow-hidden transition-all duration-500 ease-[cubic-bezier(.22,.61,.36,1)] hover:-translate-y-2 hover:scale-[1.01] hover:shadow-[0_30px_70px_rgba(15,23,42,.15)] h-[340px]"
+              className="group relative block rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl h-[340px]"
             >
               <Image
                 src={card.image}
                 alt={card.title}
                 fill
-                className="object-cover transition-transform duration-700 ease-[cubic-bezier(.22,.61,.36,1)] group-hover:scale-[1.06]"
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               />
               
-              <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/30 group-hover:to-black/40 transition-all duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/50 group-hover:to-black/60 transition-all duration-500" />
               
-              <div className="absolute bottom-0 left-0 right-0 p-6 backdrop-blur-[18px] bg-white/75 rounded-b-[32px] transition-all duration-500 group-hover:bg-white/85">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <Icon className="w-5 h-5 text-[#6366F1]" />
-                      <h3 className="text-xl font-semibold text-[#111827] tracking-tight">
-                        {card.title}
-                      </h3>
-                    </div>
-                    <p className="text-sm text-[#6B7280] mt-0.5">
-                      {card.description}
-                    </p>
-                  </div>
-                  <ArrowRight className="w-5 h-5 text-[#3B82F6] group-hover:translate-x-1 transition-transform duration-300" />
+              <div className="absolute bottom-0 left-0 right-0 p-6">
+                <div className="flex items-center gap-2 mb-1">
+                  <Icon className="w-5 h-5 text-white/80" />
+                  <h3 className="text-xl font-semibold text-white tracking-tight">
+                    {card.title}
+                  </h3>
                 </div>
+                <p className="text-sm text-white/80">
+                  {card.description}
+                </p>
+                <span className="inline-block mt-3 text-sm font-medium text-white group-hover:translate-x-1 transition-transform duration-300">
+                  Смотреть →
+                </span>
               </div>
             </Link>
           );
@@ -200,14 +198,14 @@ export default function Home() {
       </div>
 
       {/* Статистика */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <div key={index} className="stat-card text-center">
-              <Icon className="w-6 h-6 mx-auto mb-1 text-[#6366F1]" />
-              <div className="text-xl font-bold text-[#111827]">{stat.value}</div>
-              <div className="text-xs text-[#6B7280] font-medium">{stat.label}</div>
+            <div key={index} className="bg-white rounded-2xl p-6 text-center border border-[#E5E7EB] hover:shadow-md transition-shadow">
+              <Icon className="w-8 h-8 mx-auto mb-2 text-[#6366F1]" />
+              <div className="text-2xl font-bold text-[#111827]">{stat.value}</div>
+              <div className="text-sm text-[#6B7280]">{stat.label}</div>
             </div>
           );
         })}
@@ -215,21 +213,21 @@ export default function Home() {
 
       {/* Популярные категории */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-[#111827]">Популярные категории</h2>
-        <Link href="/listings" className="btn-link flex items-center gap-1">
+        <h2 className="text-xl font-semibold text-[#111827]">Популярные категории</h2>
+        <Link href="/listings" className="text-sm text-[#3B82F6] hover:underline flex items-center gap-1">
           Смотреть все <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-12">
         {categories.map((cat, index) => {
           const Icon = cat.icon;
           return (
             <Link 
               key={index} 
               href={`/listings?category=${cat.slug}`}
-              className="category-item text-center"
+              className="bg-white rounded-2xl p-4 text-center border border-[#E5E7EB] hover:shadow-md transition-all hover:-translate-y-1"
             >
-              <Icon className="w-8 h-8 mx-auto mb-1 text-[#6366F1]" />
+              <Icon className="w-8 h-8 mx-auto mb-2 text-[#6366F1]" />
               <div className="text-sm font-semibold text-[#111827]">{cat.name}</div>
               <div className="text-xs text-[#6B7280]">{cat.count}</div>
             </Link>
@@ -239,8 +237,8 @@ export default function Home() {
 
       {/* Рекомендуемые объявления */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-[#111827]">Рекомендуем для вас</h2>
-        <Link href="/listings" className="btn-link flex items-center gap-1">
+        <h2 className="text-xl font-semibold text-[#111827]">Рекомендуем для вас</h2>
+        <Link href="/listings" className="text-sm text-[#3B82F6] hover:underline flex items-center gap-1">
           Смотреть все <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
@@ -254,33 +252,33 @@ export default function Home() {
       {loading ? (
         <div className="text-center py-12 text-[#9CA3AF] text-sm">Загрузка...</div>
       ) : listings.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-[24px] border border-[#E5E7EB]">
+        <div className="text-center py-12 bg-white rounded-3xl border border-[#E5E7EB]">
           <Package className="w-12 h-12 text-[#9CA3AF] mx-auto mb-2" />
           <p className="text-[#6B7280] text-sm">Пока нет объявлений</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {listings.map((listing) => {
             const Icon = getTypeIcon(listing.type);
             return (
-              <Link href={`/listings/${listing.id}`} key={listing.id} className="card group">
+              <Link href={`/listings/${listing.id}`} key={listing.id} className="group bg-white rounded-2xl overflow-hidden border border-[#E5E7EB] hover:shadow-lg transition-all hover:-translate-y-1">
                 {listing.images && listing.images.length > 0 ? (
                   <img
                     src={getImageUrl(listing.images[0].url)}
                     alt={listing.title}
-                    className="w-full h-40 object-cover bg-[#F3F4F6]"
+                    className="w-full h-44 object-cover bg-[#F3F4F6] group-hover:scale-105 transition-transform duration-500"
                   />
                 ) : (
-                  <div className="w-full h-40 bg-[#F3F4F6] flex items-center justify-center">
-                    <Icon className="w-10 h-10 text-[#6B7280]" />
+                  <div className="w-full h-44 bg-[#F3F4F6] flex items-center justify-center">
+                    <Icon className="w-12 h-12 text-[#6B7280]" />
                   </div>
                 )}
-                <div className="p-3">
+                <div className="p-4">
                   <h3 className="text-sm font-medium text-[#111827] line-clamp-2">
                     {listing.title}
                   </h3>
                   <div className="mt-1">
-                    <span className="text-base font-bold text-[#111827]">
+                    <span className="text-lg font-bold text-[#111827]">
                       {formatPrice(listing.price)}
                     </span>
                   </div>
@@ -295,16 +293,16 @@ export default function Home() {
       )}
 
       {listings.length > 0 && (
-        <div className="flex justify-center gap-1.5 mt-8">
-          <button className="btn-outline px-3.5 py-1.5 flex items-center gap-1">
+        <div className="flex justify-center gap-2 mt-8">
+          <button className="px-4 py-2 border border-[#E5E7EB] rounded-lg hover:bg-[#F3F4F6] transition flex items-center gap-1">
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <button className="btn-primary px-3.5 py-1.5 text-sm">1</button>
-          <button className="btn-outline px-3.5 py-1.5">2</button>
-          <button className="btn-outline px-3.5 py-1.5">3</button>
-          <button className="btn-outline px-3.5 py-1.5">4</button>
-          <button className="btn-outline px-3.5 py-1.5">5</button>
-          <button className="btn-outline px-3.5 py-1.5 flex items-center gap-1">
+          <button className="px-4 py-2 bg-[#3B82F6] text-white rounded-lg text-sm font-medium">1</button>
+          <button className="px-4 py-2 border border-[#E5E7EB] rounded-lg hover:bg-[#F3F4F6] transition text-sm">2</button>
+          <button className="px-4 py-2 border border-[#E5E7EB] rounded-lg hover:bg-[#F3F4F6] transition text-sm">3</button>
+          <button className="px-4 py-2 border border-[#E5E7EB] rounded-lg hover:bg-[#F3F4F6] transition text-sm">4</button>
+          <button className="px-4 py-2 border border-[#E5E7EB] rounded-lg hover:bg-[#F3F4F6] transition text-sm">5</button>
+          <button className="px-4 py-2 border border-[#E5E7EB] rounded-lg hover:bg-[#F3F4F6] transition flex items-center gap-1">
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
