@@ -19,43 +19,21 @@ interface FooterLink {
   isActive: boolean;
 }
 
-// 👈 ВСЕ ГРУППЫ (включая существующие)
+// 👈 ТОЛЬКО ПРЕДОПРЕДЕЛЁННЫЕ ГРУППЫ (БЕЗ ИЗМЕНЕНИЙ)
 const GROUP_LABELS: Record<string, string> = {
-  // Русские названия (существующие)
-  'Компании': 'Компании',
-  'О компании': 'О компании',
-  'Покупателям': 'Покупателям',
-  'Продавцам': 'Продавцам',
-  'Помощь': 'Помощь',
-  'Социальные сети': 'Социальные сети',
-  // Английские ключи
   about: 'О компании',
   buyers: 'Покупателям',
   sellers: 'Продавцам',
   help: 'Помощь',
   social: 'Социальные сети',
-  // Дополнительные
-  company: 'Компании',
-  customers: 'Покупателям',
-  support: 'Помощь',
 };
 
-// 👈 ЦВЕТА ДЛЯ ВСЕХ ГРУПП
 const GROUP_COLORS: Record<string, string> = {
-  'Компании': 'bg-blue-50 text-blue-700',
-  'О компании': 'bg-blue-50 text-blue-700',
-  'Покупателям': 'bg-green-50 text-green-700',
-  'Продавцам': 'bg-purple-50 text-purple-700',
-  'Помощь': 'bg-orange-50 text-orange-700',
-  'Социальные сети': 'bg-pink-50 text-pink-700',
   about: 'bg-blue-50 text-blue-700',
   buyers: 'bg-green-50 text-green-700',
   sellers: 'bg-purple-50 text-purple-700',
   help: 'bg-orange-50 text-orange-700',
   social: 'bg-pink-50 text-pink-700',
-  company: 'bg-blue-50 text-blue-700',
-  customers: 'bg-green-50 text-green-700',
-  support: 'bg-orange-50 text-orange-700',
 };
 
 export default function AdminFooter() {
@@ -166,21 +144,15 @@ export default function AdminFooter() {
     setIsAdding(true);
   };
 
-  // 👈 ГРУППИРУЕМ ВСЕ ССЫЛКИ ИЗ БД
+  // Группируем ссылки
   const groupedLinks = links.reduce((acc, link) => {
-    let groupKey = link.group || 'other';
-    
-    // Нормализация названий групп
-    if (GROUP_LABELS[groupKey]) {
-      groupKey = GROUP_LABELS[groupKey];
-    }
-    
+    const groupKey = link.group || 'other';
     if (!acc[groupKey]) acc[groupKey] = [];
     acc[groupKey].push(link);
     return acc;
   }, {} as Record<string, FooterLink[]>);
 
-  // 👈 ПОЛУЧАЕМ ВСЕ ГРУППЫ ИЗ БД + ПРЕДОПРЕДЕЛЁННЫЕ
+  // Получаем все группы из БД + предопределённые
   const allGroups = [...new Set([
     ...Object.keys(groupedLinks),
     ...Object.keys(GROUP_LABELS),
