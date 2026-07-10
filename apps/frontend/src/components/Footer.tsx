@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Send,
-  YouTube,
+  Youtube,
   Instagram,
   Phone,
   Mail,
@@ -41,7 +41,7 @@ const GROUP_LABELS: Record<string, string> = {
 const iconMap: Record<string, any> = {
   vk: Send,
   telegram: Send,
-  youtube: YouTube,
+  youtube: Youtube,
   instagram: Instagram,
   phone: Phone,
   mail: Mail,
