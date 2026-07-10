@@ -5,8 +5,6 @@ import {
   Plus,
   Edit,
   Trash2,
-  CheckCircle,
-  XCircle,
   Save,
   X,
 } from 'lucide-react';
@@ -21,9 +19,9 @@ interface FooterLink {
   isActive: boolean;
 }
 
-// 👈 РАСШИРЕННЫЙ СПИСОК ГРУПП
+// 👈 ВСЕ ГРУППЫ (включая существующие)
 const GROUP_LABELS: Record<string, string> = {
-  // Русские названия
+  // Русские названия (существующие)
   'Компании': 'Компании',
   'О компании': 'О компании',
   'Покупателям': 'Покупателям',
@@ -36,8 +34,13 @@ const GROUP_LABELS: Record<string, string> = {
   sellers: 'Продавцам',
   help: 'Помощь',
   social: 'Социальные сети',
+  // Дополнительные
+  company: 'Компании',
+  customers: 'Покупателям',
+  support: 'Помощь',
 };
 
+// 👈 ЦВЕТА ДЛЯ ВСЕХ ГРУПП
 const GROUP_COLORS: Record<string, string> = {
   'Компании': 'bg-blue-50 text-blue-700',
   'О компании': 'bg-blue-50 text-blue-700',
@@ -50,6 +53,9 @@ const GROUP_COLORS: Record<string, string> = {
   sellers: 'bg-purple-50 text-purple-700',
   help: 'bg-orange-50 text-orange-700',
   social: 'bg-pink-50 text-pink-700',
+  company: 'bg-blue-50 text-blue-700',
+  customers: 'bg-green-50 text-green-700',
+  support: 'bg-orange-50 text-orange-700',
 };
 
 export default function AdminFooter() {
@@ -160,7 +166,7 @@ export default function AdminFooter() {
     setIsAdding(true);
   };
 
-  // 👈 ГРУППИРУЕМ ССЫЛКИ
+  // 👈 ГРУППИРУЕМ ВСЕ ССЫЛКИ ИЗ БД
   const groupedLinks = links.reduce((acc, link) => {
     let groupKey = link.group || 'other';
     
@@ -174,8 +180,11 @@ export default function AdminFooter() {
     return acc;
   }, {} as Record<string, FooterLink[]>);
 
-  // 👈 ПОЛУЧАЕМ СПИСОК ВСЕХ ГРУПП
-  const allGroups = Object.keys(groupedLinks).sort();
+  // 👈 ПОЛУЧАЕМ ВСЕ ГРУППЫ ИЗ БД + ПРЕДОПРЕДЕЛЁННЫЕ
+  const allGroups = [...new Set([
+    ...Object.keys(groupedLinks),
+    ...Object.keys(GROUP_LABELS),
+  ])].sort();
 
   if (!mounted || loading) {
     return <div className="text-[#9CA3AF]">Загрузка...</div>;
@@ -184,9 +193,7 @@ export default function AdminFooter() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-[#111827] flex items-center gap-2">
-          <span>Футер ссылки</span>
-        </h1>
+        <h1 className="text-2xl font-bold text-[#111827]">Футер ссылки</h1>
         <button onClick={() => setIsAdding(true)} className="btn-primary flex items-center gap-2">
           <Plus className="w-4 h-4" />
           Добавить ссылку
@@ -195,8 +202,7 @@ export default function AdminFooter() {
 
       {isAdding && (
         <div className="bg-white rounded-xl p-6 border border-[#E5E7EB] mb-6">
-          <h3 className="font-semibold text-[#111827] mb-4 flex items-center gap-2">
-            {editing ? <Edit className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+          <h3 className="font-semibold text-[#111827] mb-4">
             {editing ? 'Редактировать ссылку' : 'Новая ссылка'}
           </h3>
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -207,8 +213,10 @@ export default function AdminFooter() {
                 onChange={(e) => setFormData({ ...formData, group: e.target.value })}
                 className="input-field"
               >
-                {Object.entries(GROUP_LABELS).map(([key, label]) => (
-                  <option key={key} value={key}>{label}</option>
+                {allGroups.map((group) => (
+                  <option key={group} value={group}>
+                    {GROUP_LABELS[group] || group}
+                  </option>
                 ))}
               </select>
             </div>
@@ -244,7 +252,7 @@ export default function AdminFooter() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#6B7280] mb-1">Иконка (опционально)</label>
+              <label className="block text-sm font-medium text-[#6B7280] mb-1">Иконка</label>
               <input
                 type="text"
                 value={formData.icon}
@@ -318,7 +326,7 @@ export default function AdminFooter() {
                           <td className="px-4 py-2 text-sm text-[#6B7280]">{link.icon || '—'}</td>
                           <td className="px-4 py-2">
                             <span className={`tag ${link.isActive ? '' : 'tag-gray'}`}>
-                              {link.isActive ? '✅ Активно' : '⛔ Неактивно'}
+                              {link.isActive ? 'Активно' : 'Неактивно'}
                             </span>
                           </td>
                           <td className="px-4 py-2">
