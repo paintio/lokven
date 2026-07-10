@@ -1,6 +1,25 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+// =========================
+// 🔹 РЕЖИМ ОБСЛУЖИВАНИЯ
+// =========================
+const MAINTENANCE_MODE = true; // true = включён, false = выключен
+
+// Роли, которые могут видеть сайт в режиме обслуживания
+const ALLOWED_ROLES = ['admin', 'moderator', 'developer'];
+
+// Маршруты, доступные всегда (даже в режиме обслуживания)
+const MAINTENANCE_PUBLIC_ROUTES = [
+  '/maintenance',
+  '/auth/login',
+  '/auth/register',
+];
+
+// =========================
+// 🔹 ОСНОВНАЯ ЛОГИКА
+// =========================
+
 function safeParseUser(value: string | undefined) {
   if (!value) return null;
   try {
@@ -36,6 +55,32 @@ export function middleware(req: NextRequest) {
   const user = safeParseUser(userCookie);
   const isAuthenticated = !!token && !!user;
 
+  // =========================
+  // 🔹 РЕЖИМ ОБСЛУЖИВАНИЯ
+  // =========================
+  if (MAINTENANCE_MODE) {
+    // Публичные маршруты всегда доступны
+    if (MAINTENANCE_PUBLIC_ROUTES.some(route => pathname.startsWith(route))) {
+      return NextResponse.next();
+    }
+
+    // Проверяем, есть ли доступ у пользователя
+    const isAllowed = isAuthenticated && user?.role && ALLOWED_ROLES.includes(user.role);
+
+    // Если пользователь имеет доступ — показываем сайт
+    if (isAllowed) {
+      return NextResponse.next();
+    }
+
+    // Иначе — редирект на страницу обслуживания
+    return NextResponse.redirect(new URL('/maintenance', req.url));
+  }
+
+  // =========================
+  // 🔹 ОСНОВНАЯ ЛОГИКА (без режима обслуживания)
+  // =========================
+
+  // Админ-маршруты
   if (pathname.startsWith('/admin')) {
     if (!isAuthenticated) {
       const redirectUrl = new URL('/auth/login', req.url);
@@ -50,10 +95,12 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  // Страницы авторизации (редирект если уже авторизован)
   if (pathname.startsWith('/auth/') && isAuthenticated) {
     return NextResponse.redirect(new URL('/', req.url));
   }
 
+  // Публичные маршруты
   const isPublicRoute = PUBLIC_ROUTES.some(route => 
     pathname === route || pathname.startsWith(route + '/')
   );
@@ -62,6 +109,7 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  // Защищённые маршруты
   const isProtectedRoute = PROTECTED_ROUTES.some(route => 
     pathname === route || pathname.startsWith(route + '/')
   );
