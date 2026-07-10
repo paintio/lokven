@@ -4,9 +4,8 @@ import { useState, useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation, EffectFade } from 'swiper/modules';
 import Link from 'next/link';
-import { useAuth } from '@/hooks/useAuth';
+import { Package, Shield, Truck, Users, Briefcase, Car, Home, Wrench } from 'lucide-react';
 
-// Стили Swiper
 import 'swiper/css';
 import 'swiper/css/effect-fade';
 import 'swiper/css/pagination';
@@ -15,48 +14,87 @@ import 'swiper/css/navigation';
 const slides = [
   {
     id: 1,
-    title: 'Найдите всё, что вам нужно',
-    description: 'Покупайте товары, находите работу, выбирайте автомобили, недвижимость и услуги на одной современной платформе.',
-    bgImage: '/images/hero/hero-1.jpg',
-    ctaText: 'Начать',
-    ctaLink: '/auth/register',
+    number: '01',
+    title: 'Покупайте товары',
+    description: 'Миллионы товаров для дома, электроники, красоты, спорта и многое другое.',
+    gradient: 'from-[#6366F1] to-[#8B5CF6]',
+    primaryLink: '/listings?category=marketplace',
+    primaryText: 'Смотреть товары →',
+    secondaryLink: '/listings/create',
+    secondaryText: 'Подать объявление',
+    stats: [
+      { value: 'Миллионы товаров', icon: Package },
+      { value: 'Проверенные продавцы', icon: Shield },
+      { value: 'Быстрая доставка', icon: Truck },
+    ],
   },
   {
     id: 2,
-    title: 'Покупайте товары',
-    description: 'Миллионы товаров от проверенных продавцов. От электроники до товаров для дома.',
-    bgImage: '/images/hero/hero-2.jpg',
-    ctaText: 'В маркетплейс',
-    ctaLink: '/listings?category=marketplace',
+    number: '02',
+    title: 'Находите работу',
+    description: 'Тысячи вакансий от проверенных работодателей по всей стране.',
+    gradient: 'from-[#3B82F6] to-[#60A5FA]',
+    primaryLink: '/listings?category=jobs',
+    primaryText: 'Найти работу →',
+    secondaryLink: '/listings/create',
+    secondaryText: 'Разместить вакансию',
+    stats: [
+      { value: 'Тысячи вакансий', icon: Briefcase },
+      { value: 'Проверенные компании', icon: Shield },
+      { value: 'Быстрый отклик', icon: Users },
+    ],
   },
   {
     id: 3,
-    title: 'Находите работу',
-    description: 'Вакансии и карьерные возможности. Работайте в лучших компаниях.',
-    bgImage: '/images/hero/hero-3.jpg',
-    ctaText: 'Найти работу',
-    ctaLink: '/listings?category=jobs',
+    number: '03',
+    title: 'Выбирайте автомобили',
+    description: 'Новые и автомобили с пробегом от частных продавцов и дилеров.',
+    gradient: 'from-[#10B981] to-[#34D399]',
+    primaryLink: '/listings?category=auto',
+    primaryText: 'Смотреть авто →',
+    secondaryLink: '/listings/create',
+    secondaryText: 'Продать автомобиль',
+    stats: [
+      { value: 'Любые марки', icon: Car },
+      { value: 'Проверенные продавцы', icon: Shield },
+      { value: 'Быстрая сделка', icon: Truck },
+    ],
   },
   {
     id: 4,
-    title: 'Выбирайте автомобили',
-    description: 'Автомобили с пробегом от проверенных продавцов. Любые марки и модели.',
-    bgImage: '/images/hero/hero-4.jpg',
-    ctaText: 'Подобрать авто',
-    ctaLink: '/listings?category=auto',
+    number: '04',
+    title: 'Покупайте и арендуйте недвижимость',
+    description: 'Квартиры, дома, коммерческие помещения и земельные участки.',
+    gradient: 'from-[#8B5CF6] to-[#A78BFA]',
+    primaryLink: '/listings?category=realty',
+    primaryText: 'Смотреть объекты →',
+    secondaryLink: '/listings/create',
+    secondaryText: 'Разместить объект',
+    stats: [
+      { value: 'Тысячи объектов', icon: Home },
+      { value: 'Проверенные агенты', icon: Shield },
+      { value: 'Быстрый поиск', icon: Users },
+    ],
   },
   {
     id: 5,
-    title: 'Недвижимость и услуги',
-    description: 'Квартиры, дома, коммерческая недвижимость. А также любые услуги рядом с вами.',
-    bgImage: '/images/hero/hero-5.jpg',
-    ctaText: 'Смотреть объекты',
-    ctaLink: '/listings?category=realty',
+    number: '05',
+    title: 'Находите специалистов',
+    description: 'Ремонт, строительство, перевозки, обучение и сотни других услуг.',
+    gradient: 'from-[#F59E0B] to-[#FBBF24]',
+    primaryLink: '/listings?category=services',
+    primaryText: 'Найти специалиста →',
+    secondaryLink: '/listings/create',
+    secondaryText: 'Предложить услугу',
+    stats: [
+      { value: 'Сотни услуг', icon: Wrench },
+      { value: 'Проверенные мастера', icon: Shield },
+      { value: 'Быстрый заказ', icon: Truck },
+    ],
   },
 ];
 
 export default function HeroCarousel() {
-  const { isAuthenticated } = useAuth();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -65,7 +103,7 @@ export default function HeroCarousel() {
 
   if (!mounted) {
     return (
-      <div className="relative rounded-2xl overflow-hidden bg-[#F3F4F6] h-[400px] md:h-[500px] flex items-center justify-center">
+      <div className="relative rounded-2xl overflow-hidden bg-[#F3F4F6] h-[400px] md:h-[500px] flex items-center justify-center mb-12">
         <div className="text-[#9CA3AF]">Загрузка...</div>
       </div>
     );
@@ -77,7 +115,7 @@ export default function HeroCarousel() {
         modules={[Autoplay, Pagination, Navigation, EffectFade]}
         effect="fade"
         autoplay={{
-          delay: 5000,
+          delay: 6000,
           disableOnInteraction: false,
           pauseOnMouseEnter: true,
         }}
@@ -91,39 +129,68 @@ export default function HeroCarousel() {
         }}
         loop={true}
         speed={800}
-        className="h-[400px] md:h-[500px]"
+        className="h-[420px] md:h-[520px]"
       >
         {slides.map((slide) => (
           <SwiperSlide key={slide.id}>
             <div className="relative w-full h-full">
-              {/* Фоновое изображение */}
-              <div
-                className="absolute inset-0 bg-cover bg-center bg-no-repeat transform scale-105"
-                style={{ backgroundImage: `url(${slide.bgImage})` }}
-              />
+              {/* Градиентный фон */}
+              <div className={`absolute inset-0 bg-gradient-to-br ${slide.gradient}`} />
               
-              {/* Градиентное затемнение */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
-              
-              {/* Дополнительное затемнение снизу */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+              {/* Декоративные круги */}
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-10 right-10 w-64 h-64 bg-white rounded-full blur-3xl" />
+                <div className="absolute bottom-10 left-10 w-48 h-48 bg-white rounded-full blur-3xl" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/20 rounded-full blur-2xl" />
+              </div>
 
               {/* Контент */}
               <div className="relative h-full flex items-center">
                 <div className="container-custom">
-                  <div className="max-w-2xl text-white">
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4">
+                  <div className="max-w-3xl text-white">
+                    {/* Номер */}
+                    <span className="text-4xl md:text-5xl font-bold text-white/20 mb-2 block">
+                      {slide.number}
+                    </span>
+
+                    {/* Заголовок */}
+                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-3">
                       {slide.title}
                     </h1>
-                    <p className="text-lg md:text-xl text-white/90 mb-8 leading-relaxed">
+
+                    {/* Описание */}
+                    <p className="text-base md:text-lg text-white/90 mb-6 leading-relaxed max-w-xl">
                       {slide.description}
                     </p>
-                    <Link
-                      href={slide.ctaLink}
-                      className="inline-block px-8 py-3 bg-white text-[#6366F1] font-semibold rounded-lg hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
-                    >
-                      {slide.ctaText}
-                    </Link>
+
+                    {/* Кнопки */}
+                    <div className="flex flex-wrap gap-4 mb-8">
+                      <Link
+                        href={slide.primaryLink}
+                        className="px-6 py-2.5 bg-white text-[#6366F1] font-medium rounded-lg hover:shadow-lg hover:scale-[1.02] transition-all duration-300 text-sm md:text-base"
+                      >
+                        {slide.primaryText}
+                      </Link>
+                      <Link
+                        href={slide.secondaryLink}
+                        className="px-6 py-2.5 bg-white/20 backdrop-blur-sm text-white font-medium rounded-lg hover:bg-white/30 transition-all duration-300 text-sm md:text-base border border-white/10"
+                      >
+                        {slide.secondaryText}
+                      </Link>
+                    </div>
+
+                    {/* Статистика */}
+                    <div className="flex flex-wrap gap-6 md:gap-8 pt-4 border-t border-white/20">
+                      {slide.stats.map((stat, index) => {
+                        const Icon = stat.icon;
+                        return (
+                          <div key={index} className="flex items-center gap-2 text-sm md:text-base text-white/80">
+                            <Icon className="w-4 h-4 text-white/60" />
+                            <span>{stat.value}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -132,7 +199,7 @@ export default function HeroCarousel() {
         ))}
       </Swiper>
 
-      {/* Кастомные кнопки навигации */}
+      {/* Кнопки навигации */}
       <button className="swiper-button-prev absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/20 backdrop-blur-sm text-white rounded-full flex items-center justify-center hover:bg-white/30 transition-all duration-300 border border-white/10">
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -144,7 +211,6 @@ export default function HeroCarousel() {
         </svg>
       </button>
 
-      {/* Стили для пагинации */}
       <style jsx global>{`
         .swiper-pagination-bullet {
           background: rgba(255, 255, 255, 0.5);
