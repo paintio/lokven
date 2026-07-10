@@ -144,23 +144,36 @@ export default function AdminFooter() {
     setIsAdding(true);
   };
 
-  // Группируем ссылки
-  const groupedLinks = links.reduce((acc, link) => {
-    const groupKey = link.group || 'other';
-    if (!acc[groupKey]) acc[groupKey] = [];
-    acc[groupKey].push(link);
-    return acc;
-  }, {} as Record<string, FooterLink[]>);
+ // Группируем ссылки из БД
+const groupedLinks = links.reduce((acc, link) => {
+  const groupKey = link.group || 'other';
+  if (!acc[groupKey]) acc[groupKey] = [];
+  acc[groupKey].push(link);
+  return acc;
+}, {} as Record<string, FooterLink[]>);
 
-  // Получаем все группы из БД + предопределённые
-  const allGroups = [...new Set([
-    ...Object.keys(groupedLinks),
-    ...Object.keys(GROUP_LABELS),
-  ])].sort();
+// Получаем все уникальные группы
+const allGroupKeys = Object.keys(groupedLinks).concat(Object.keys(GROUP_LABELS));
+const allGroups = Array.from(new Set(allGroupKeys)).sort();
 
-  if (!mounted || loading) {
-    return <div className="text-[#9CA3AF]">Загрузка...</div>;
-  }
+// Сортируем группы в нужном порядке
+const groupOrder = [
+  'Компании',
+  'О компании',
+  'Покупателям',
+  'Продавцам',
+  'Помощь',
+  'Социальные сети',
+];
+
+const sortedGroups = allGroups.sort((a, b) => {
+  const indexA = groupOrder.indexOf(a);
+  const indexB = groupOrder.indexOf(b);
+  if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+  if (indexA === -1) return 1;
+  if (indexB === -1) return -1;
+  return indexA - indexB;
+});
 
   return (
     <div>
