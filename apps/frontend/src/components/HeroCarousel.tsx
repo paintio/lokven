@@ -98,29 +98,16 @@ export default function HeroCarousel() {
 
   if (!mounted) {
     return (
-      <div className="
-        h-[420px]
-        md:h-[520px]
-        rounded-2xl
-        bg-[#F3F4F6]
-        flex
-        items-center
-        justify-center
-        mb-12
-      ">
+      <div
+        className="h-[420px] md:h-[520px] rounded-2xl bg-[#F3F4F6] flex items-center justify-center mb-12"
+      >
         <span className="text-[#9CA3AF]">Загрузка...</span>
       </div>
     );
   }
 
   return (
-    <section className="
-      relative
-      rounded-3xl
-      overflow-hidden
-      mb-12
-      shadow-sm
-    ">
+    <div className="relative rounded-3xl overflow-hidden mb-12 shadow-sm">
       <Swiper
         modules={[Autoplay, Pagination, Navigation, EffectFade]}
         effect="fade"
@@ -143,200 +130,81 @@ export default function HeroCarousel() {
         {slides.map((slide) => (
           <SwiperSlide key={slide.id}>
             <div className="relative w-full h-full bg-[#111827]">
-              {/* Фоновое изображение */}
               <img
                 src={slide.image}
                 alt={slide.title}
-                className="
-                  absolute
-                  inset-0
-                  w-full
-                  h-full
-                  object-cover
-                "
+                className="absolute inset-0 w-full h-full object-cover"
               />
 
-              {/* Затемнение для текста */}
-              <div className="
-                absolute
-                inset-0
-                bg-gradient-to-r
-                from-black/70
-                via-black/40
-                to-black/10
-              " />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/10" />
 
-              {/* Контент */}
-<div className="relative h-full flex items-center">
-  <div className="container-custom">
-    <div className="
-      max-w-xl
-      bg-white/10
-      backdrop-blur-md
-      rounded-3xl
-      p-6
-      md:p-8
-      shadow-xl
-      border
-      border-white/10
-    ">
-      <h1 className="
-        text-3xl
-        md:text-5xl
-        font-bold
-        text-white
-        leading-tight
-        mb-4
-      ">
-        {slide.title}
-      </h1>
+              <div className="relative h-full flex items-center">
+                <div className="container-custom">
+                  <div className="max-w-xl bg-white/10 backdrop-blur-md rounded-3xl p-6 md:p-8 shadow-xl border border-white/10">
+                    <h1 className="text-3xl md:text-5xl font-bold text-white leading-tight mb-4">
+                      {slide.title}
+                    </h1>
 
-      <p className="
-        text-white/80
-        text-base
-        md:text-lg
-        leading-relaxed
-        mb-6
-      ">
-        {slide.description}
-      </p>
+                    <p className="text-white/80 text-base md:text-lg leading-relaxed mb-6">
+                      {slide.description}
+                    </p>
 
-      <div className="flex flex-wrap gap-3 mb-7">
-        <Link
-          href={slide.primaryLink}
-          className="
-            px-6
-            py-3
-            bg-white
-            text-[#111827]
-            rounded-xl
-            font-medium
-            hover:bg-white/90
-            transition
-          "
-        >
-          {slide.primaryText}
-        </Link>
+                    <div className="flex flex-wrap gap-3 mb-7">
+                      <Link
+                        href={slide.primaryLink}
+                        className="px-6 py-3 bg-white text-[#111827] rounded-xl font-medium hover:bg-white/90 transition"
+                      >
+                        {slide.primaryText}
+                      </Link>
 
-        <Link
-          href={slide.secondaryLink}
-          className="
-            px-6
-            py-3
-            bg-white/20
-            text-white
-            rounded-xl
-            font-medium
-            hover:bg-white/30
-            transition
-            border
-            border-white/20
-          "
-        >
-          {slide.secondaryText}
-        </Link>
-      </div>
+                      <Link
+                        href={slide.secondaryLink}
+                        className="px-6 py-3 bg-white/20 text-white rounded-xl font-medium hover:bg-white/30 transition border border-white/20"
+                      >
+                        {slide.secondaryText}
+                      </Link>
+                    </div>
 
-      {/* Статистика */}
-      <div className="
-        flex
-        flex-wrap
-        gap-5
-        pt-5
-        border-t
-        border-white/20
-      ">
-        {slide.stats.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <div
-              key={index}
-              className="
-                flex
-                items-center
-                gap-2
-                text-sm
-                text-white/80
-              "
-            >
-              <div className="
-                w-8
-                h-8
-                rounded-lg
-                bg-white/20
-                flex
-                items-center
-                justify-center
-              ">
-                <Icon className="w-4 h-4 text-white" />
+                    <div className="flex flex-wrap gap-5 pt-5 border-t border-white/20">
+                      {slide.stats.map((stat, index) => {
+                        const Icon = stat.icon;
+                        return (
+                          <div
+                            key={index}
+                            className="flex items-center gap-2 text-sm text-white/80"
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                              <Icon className="w-4 h-4 text-white" />
+                            </div>
+                            <span>{stat.value}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
               </div>
-              <span>{stat.value}</span>
             </div>
-          );
-        })}
-      </div>
-    </div>
-  </div>
-</div>
           </SwiperSlide>
         ))}
       </Swiper>
 
-      {/* Левая кнопка */}
       <button
-        className="
-          hero-prev
-          absolute
-          left-5
-          top-1/2
-          -translate-y-1/2
-          z-10
-          w-11
-          h-11
-          rounded-full
-          bg-white/80
-          backdrop-blur
-          shadow-md
-          flex
-          items-center
-          justify-center
-          hover:bg-white
-          transition
-        "
+        className="hero-prev absolute left-5 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full bg-white/80 backdrop-blur shadow-md flex items-center justify-center hover:bg-white transition"
       >
         <svg className="w-5 h-5 text-[#111827]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
         </svg>
       </button>
 
-      {/* Правая кнопка */}
       <button
-        className="
-          hero-next
-          absolute
-          right-5
-          top-1/2
-          -translate-y-1/2
-          z-10
-          w-11
-          h-11
-          rounded-full
-          bg-white/80
-          backdrop-blur
-          shadow-md
-          flex
-          items-center
-          justify-center
-          hover:bg-white
-          transition
-        "
+        className="hero-next absolute right-5 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full bg-white/80 backdrop-blur shadow-md flex items-center justify-center hover:bg-white transition"
       >
         <svg className="w-5 h-5 text-[#111827]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
         </svg>
       </button>
 
-      {/* Кастомные стили для Swiper */}
       <style jsx global>{`
         .swiper-pagination {
           bottom: 24px !important;
@@ -383,6 +251,6 @@ export default function HeroCarousel() {
           opacity: 1 !important;
         }
       `}</style>
-    </section>
+    </div>
   );
 }
