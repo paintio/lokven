@@ -33,16 +33,31 @@ export function Navigation() {
   const [usbLoading, setUsbLoading] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // При монтировании — обновляем состояние
   useEffect(() => {
     refreshUser();
   }, []);
 
+  // Слушаем изменения в localStorage (для синхронизации между вкладками)
   useEffect(() => {
     const handleStorageChange = () => {
       refreshUser();
     };
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  // 👈 ДОБАВЛЯЕМ: периодическая проверка cookies (для обновления после входа)
+  useEffect(() => {
+    let lastCookie = document.cookie;
+    const interval = setInterval(() => {
+      if (document.cookie !== lastCookie) {
+        lastCookie = document.cookie;
+        refreshUser();
+      }
+    }, 500);
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleLogout = () => {
@@ -90,6 +105,7 @@ export function Navigation() {
 
       setShowUsbModal(false);
       setUsbToken('');
+      refreshUser(); // 👈 ОБНОВЛЯЕМ ПОСЛЕ УСПЕШНОГО ВХОДА
       router.push('/admin');
     } catch (error: any) {
       setUsbError(error.message || 'Ошибка проверки USB-токена');

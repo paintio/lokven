@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/useAuth'; // 👈 ДОБАВЛЯЕМ
 
 export default function LoginPage() {
   const router = useRouter();
+  const { refreshUser } = useAuth(); // 👈 ДОБАВЛЯЕМ
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
@@ -54,6 +56,9 @@ export default function LoginPage() {
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
+
+      // 👈 ОБНОВЛЯЕМ СОСТОЯНИЕ ХУКА
+      refreshUser();
 
       router.push('/');
     } catch (error: any) {
