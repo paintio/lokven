@@ -133,7 +133,7 @@ export class AuthService {
   }
 
   // =========================
-  // 🔹 ПОЛУЧЕНИЕ ПРОФИЛЯ (ИСПРАВЛЕНО)
+  // 🔹 ПОЛУЧЕНИЕ ПРОФИЛЯ
   // =========================
   async getProfile(userId: string) {
     const user = await this.prisma.user.findUnique({
@@ -338,6 +338,127 @@ export class AuthService {
       where: { id: sessionId },
     });
     return { message: 'Logged out successfully' };
+  }
+
+  // =========================
+  // 🔹 ДОПОЛНИТЕЛЬНЫЕ МЕТОДЫ ДЛЯ USB-ТОКЕНОВ
+  // =========================
+
+  async getAllUsbTokens() {
+    return this.prisma.adminUsbToken.findMany({
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        status: true,
+        deviceId: true,
+        usedAt: true,
+        expiresAt: true,
+        createdAt: true,
+      },
+    });
+  }
+
+  async getUsbTokenById(tokenId: string) {
+    return this.prisma.adminUsbToken.findUnique({
+      where: { id: tokenId },
+    });
+  }
+
+  async generateUsbToken(userId: string, deviceId?: string) {
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto
+      .createHash('sha256')
+      .update(rawToken)
+      .digest('hex');
+
+    const token = await this.prisma.adminUsbToken.create({
+      data: {
+        tokenHash,
+        status: 'PENDING',
+        deviceId: deviceId || null,
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      },
+    });
+
+    return {
+      id: token.id,
+      rawToken,
+      expiresAt: token.expiresAt,
+      status: token.status,
+      deviceId: token.deviceId,
+    };
+  }
+
+  async updateUsbTokenStatus(tokenId: string, status: 'APPROVED' | 'REJECTED' | 'PENDING') {
+    return this.prisma.adminUsbToken.update({
+      where: { id: tokenId },
+      data: { status },
+    });
+  }
+
+  async updateUsbTokenDevice(tokenId: string, deviceId: string) {
+    return this.prisma.adminUsbToken.update({
+      where: { id: tokenId },
+      data: { deviceId },
+    });
+  }
+
+  async deleteUsbToken(tokenId: string) {
+    return this.prisma.adminUsbToken.delete({
+      where: { id: tokenId },
+    });
+  }
+
+  async checkUsbTokenExists(rawToken: string): Promise<boolean> {
+    const tokenHash = crypto
+      .createHash('sha256')
+      .update(rawToken)
+      .digest('hex');
+
+    const token = await this.prisma.adminUsbToken.findUnique({
+      where: { tokenHash },
+    });
+
+    return !!token;
+  }
+
+  async getUsbTokenStats() {
+    const [total, approved, pending, rejected, used] = await Promise.all([
+      this.prisma.adminUsbToken.count(),
+      this.prisma.adminUsbToken.count({ where: { status: 'APPROVED' } }),
+      this.prisma.adminUsbToken.count({ where: { status: 'PENDING' } }),
+      this.prisma.adminUsbToken.count({ where: { status: 'REJECTED' } }),
+      this.prisma.adminUsbToken.count({ where: { usedAt: { not: null } } }),
+    ]);
+
+    return {
+      total,
+      approved,
+      pending,
+      rejected,
+      used,
+    };
+  }
+
+  async createOneTimeUsbToken(userId: string) {
+    const rawToken = crypto.randomBytes(16).toString('hex');
+    const tokenHash = crypto
+      .createHash('sha256')
+      .update(rawToken)
+      .digest('hex');
+
+    const token = await this.prisma.adminUsbToken.create({
+      data: {
+        tokenHash,
+        status: 'APPROVED',
+        expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+      },
+    });
+
+    return {
+      token: rawToken,
+      expiresIn: 300,
+    };
   }
 
   // =========================
