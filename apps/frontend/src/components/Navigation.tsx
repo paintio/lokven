@@ -26,40 +26,23 @@ export function Navigation() {
   const [usbError, setUsbError] = useState('');
   const [usbLoading, setUsbLoading] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [navKey, setNavKey] = useState(0); // 👈 ДОБАВЛЯЕМ ДЛЯ ФОРСИРОВАННОГО ОБНОВЛЕНИЯ
 
-  // При монтировании и при изменении авторизации — обновляем
+  // При монтировании обновляем состояние
   useEffect(() => {
     refreshUser();
   }, []);
 
-  // Слушаем изменения в localStorage
+  // 👈 Слушаем изменения localStorage ТОЛЬКО для других вкладок
   useEffect(() => {
     const handleStorageChange = () => {
       refreshUser();
-      setNavKey(prev => prev + 1); // 👈 ФОРСИРУЕМ ПЕРЕРЕНДЕР
     };
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // Периодическая проверка cookies
-  useEffect(() => {
-    let lastCookie = document.cookie;
-    const interval = setInterval(() => {
-      if (document.cookie !== lastCookie) {
-        lastCookie = document.cookie;
-        refreshUser();
-        setNavKey(prev => prev + 1); // 👈 ФОРСИРУЕМ ПЕРЕРЕНДЕР
-      }
-    }, 500);
-
-    return () => clearInterval(interval);
-  }, []);
-
   const handleLogout = () => {
     logout();
-    setNavKey(prev => prev + 1); // 👈 ФОРСИРУЕМ ПЕРЕРЕНДЕР
     router.push('/');
     setIsMobileMenuOpen(false);
   };
@@ -104,7 +87,6 @@ export function Navigation() {
       setShowUsbModal(false);
       setUsbToken('');
       refreshUser();
-      setNavKey(prev => prev + 1); // 👈 ФОРСИРУЕМ ПЕРЕРЕНДЕР
       router.push('/admin');
     } catch (error: any) {
       setUsbError(error.message || 'Ошибка проверки USB-токена');
@@ -123,7 +105,7 @@ export function Navigation() {
   }
 
   return (
-    <div key={navKey}> {/* 👈 ОБЁРТЫВАЕМ В DIV С KEY ДЛЯ ФОРСИРОВАННОГО ОБНОВЛЕНИЯ */}
+    <>
       <nav className="flex items-center justify-between p-4 bg-white border-b border-[#E5E7EB] sticky top-0 z-50">
         <Link href="/" className="flex items-center gap-2 text-2xl font-bold text-[#6366F1]">
           <Home className="w-6 h-6" />
@@ -241,6 +223,6 @@ export function Navigation() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
