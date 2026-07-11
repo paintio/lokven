@@ -304,32 +304,16 @@ export default function ProfilePage() {
             </div>
           ) : (
             <div className="text-center py-12 bg-white rounded-xl border border-[#E5E7EB]">
-  <Inbox className="w-16 h-16 text-[#9CA3AF] mx-auto mb-3" />
-  <p className="text-[#6B7280] font-medium">У вас пока нет объявлений</p>
-  <Link href="/listings/create" className="btn-primary mt-4 inline-block">
-    Создать первое объявление
-  </Link>
-</div>
+              <Inbox className="w-16 h-16 text-[#9CA3AF] mx-auto mb-3" />
+              <p className="text-[#6B7280] font-medium">У вас пока нет объявлений</p>
+              <Link href="/listings/create" className="btn-primary mt-4 inline-block">
+                Создать первое объявление
+              </Link>
+            </div>
           )}
 
-          {/* Ссылки на другие разделы */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <Link href="/profile/orders" className="bg-white rounded-xl p-4 border border-[#E5E7EB] hover:shadow-md transition-all text-center group">
-              <ShoppingCart className="w-8 h-8 mx-auto mb-1 text-[#6366F1] group-hover:scale-110 transition-transform" />
-              <div className="font-medium text-[#111827]">Мои заказы</div>
-              <div className="text-xs text-[#6B7280]">История покупок</div>
-            </Link>
-            <Link href="/profile/favorites" className="bg-white rounded-xl p-4 border border-[#E5E7EB] hover:shadow-md transition-all text-center group">
-              <Heart className="w-8 h-8 mx-auto mb-1 text-[#6366F1] group-hover:scale-110 transition-transform" />
-              <div className="font-medium text-[#111827]">Избранное</div>
-              <div className="text-xs text-[#6B7280]">Сохраненные товары</div>
-            </Link>
-            <Link href="/profile/balance" className="bg-white rounded-xl p-4 border border-[#E5E7EB] hover:shadow-md transition-all text-center group">
-              <Wallet className="w-8 h-8 mx-auto mb-1 text-[#6366F1] group-hover:scale-110 transition-transform" />
-              <div className="font-medium text-[#111827]">Баланс</div>
-              <div className="text-xs text-[#6B7280]">Пополнить и вывести</div>
-            </Link>
-          </div>
+          {/* 👈 БЛОК С ДУБЛЯМИ УДАЛЁН */}
+
         </div>
       </div>
     </div>
