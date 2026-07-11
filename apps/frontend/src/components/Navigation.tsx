@@ -27,18 +27,13 @@ export function Navigation() {
   const [usbLoading, setUsbLoading] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // При монтировании обновляем состояние
   useEffect(() => {
     refreshUser();
   }, []);
 
-  // 👈 СЛУШАЕМ ИЗМЕНЕНИЯ В ТОЙ ЖЕ ВКЛАДКЕ
+  // 👈 СЛУШАЕМ ИЗМЕНЕНИЯ COOKIES
   useEffect(() => {
-    const handleStorageChange = () => {
-      refreshUser();
-    };
-    window.addEventListener('storage', handleStorageChange);
-    
-    // 👈 ПРОВЕРКА COOKIES КАЖДУЮ СЕКУНДУ
     let lastCookie = document.cookie;
     const interval = setInterval(() => {
       if (document.cookie !== lastCookie) {
@@ -47,15 +42,20 @@ export function Navigation() {
       }
     }, 500);
 
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      clearInterval(interval);
+    return () => clearInterval(interval);
+  }, []);
+
+  // 👈 СЛУШАЕМ ИЗМЕНЕНИЯ localStorage
+  useEffect(() => {
+    const handleStorageChange = () => {
+      refreshUser();
     };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   const handleLogout = () => {
     logout();
-    window.location.href = '/'; // 👈 ПРИНУДИТЕЛЬНЫЙ РЕДИРЕКТ
     setIsMobileMenuOpen(false);
   };
 

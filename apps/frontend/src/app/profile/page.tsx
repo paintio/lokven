@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Inbox } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   User,
-  Users,
   Package,
   ShoppingCart,
   Heart,
@@ -88,15 +88,19 @@ export default function ProfilePage() {
       setUser(data);
       setIsAdmin(data.role === 'admin');
       
+      console.log('User data:', data);
+      console.log('Listings:', data.listings);
+      
       setStats({
-        totalListings: data._count.listings || 0,
-        totalOrders: (data._count.ordersAsBuyer || 0) + (data._count.ordersAsSeller || 0),
-        totalFavorites: data._count.favorites || 0,
+        totalListings: data._count?.listings || 0,
+        totalOrders: (data._count?.ordersAsBuyer || 0) + (data._count?.ordersAsSeller || 0),
+        totalFavorites: data._count?.favorites || 0,
         totalReviews: 0,
         averageRating: 0,
         balance: 1500,
       });
     } catch (error) {
+      console.error('Error fetching profile:', error);
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       router.push('/auth/login');
@@ -108,6 +112,8 @@ export default function ProfilePage() {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    document.cookie = 'token=; path=/; max-age=0';
+    document.cookie = 'user=; path=/; max-age=0';
     router.push('/');
   };
 
@@ -122,14 +128,6 @@ export default function ProfilePage() {
   if (!user) {
     return null;
   }
-
-  const getRoleLabel = () => {
-    if (user.role === 'admin') return 'Администратор';
-    if (user.role === 'employer') return 'Работодатель';
-    if (user.role === 'performer') return 'Исполнитель';
-    if (user.isSeller) return 'Продавец';
-    return 'Покупатель';
-  };
 
   const getRoleBadge = () => {
     if (user.role === 'admin') {
@@ -183,7 +181,7 @@ export default function ProfilePage() {
         <ProfileSidebar role={user.role} isSeller={user.isSeller} />
 
         <div className="flex-1 space-y-6">
-          {/* Карточка профиля с аватаром */}
+          {/* Карточка профиля */}
           <div className="bg-white rounded-xl p-6 border border-[#E5E7EB]">
             <div className="flex items-center gap-4">
               <div className="relative w-20 h-20 bg-[#F3F4F6] rounded-full flex items-center justify-center text-3xl flex-shrink-0 overflow-hidden">
@@ -262,13 +260,18 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Последние объявления */}
-          {user.listings && user.listings.length > 0 && (
+          {/* Мои объявления */}
+          {user?.listings && user.listings.length > 0 ? (
             <div className="bg-white rounded-xl p-6 border border-[#E5E7EB]">
-              <h3 className="font-semibold text-[#111827] mb-4 flex items-center gap-2">
-                <ClipboardList className="w-5 h-5 text-[#6366F1]" />
-                Мои объявления
-              </h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-[#111827] flex items-center gap-2">
+                  <ClipboardList className="w-5 h-5 text-[#6366F1]" />
+                  Мои объявления
+                </h3>
+                <Link href="/profile/listings" className="text-sm text-[#3B82F6] hover:underline">
+                  Смотреть все ({user.listings.length})
+                </Link>
+              </div>
               <div className="space-y-3">
                 {user.listings.slice(0, 3).map((listing) => (
                   <div key={listing.id} className="flex items-center gap-4 p-3 border border-[#F3F4F6] rounded-lg hover:bg-[#F9FAFB] transition-colors">
@@ -298,12 +301,15 @@ export default function ProfilePage() {
                   </div>
                 ))}
               </div>
-              {user.listings.length > 3 && (
-                <Link href="/profile/listings" className="text-sm text-[#3B82F6] hover:underline mt-3 inline-block">
-                  Смотреть все ({user.listings.length})
-                </Link>
-              )}
             </div>
+          ) : (
+            <div className="text-center py-12 bg-white rounded-xl border border-[#E5E7EB]">
+  <Inbox className="w-16 h-16 text-[#9CA3AF] mx-auto mb-3" />
+  <p className="text-[#6B7280] font-medium">У вас пока нет объявлений</p>
+  <Link href="/listings/create" className="btn-primary mt-4 inline-block">
+    Создать первое объявление
+  </Link>
+</div>
           )}
 
           {/* Ссылки на другие разделы */}

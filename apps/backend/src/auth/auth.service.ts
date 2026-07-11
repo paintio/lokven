@@ -91,7 +91,7 @@ export class AuthService {
   }
 
   // =========================
-  // 🔹 ВХОД ПО ТЕЛЕФОНУ (БЕЗ USB)
+  // 🔹 ВХОД ПО ТЕЛЕФОНУ
   // =========================
   async loginByPhone(dto: { phone: string; password: string }) {
     const user = await this.prisma.user.findUnique({
@@ -133,61 +133,24 @@ export class AuthService {
   }
 
   // =========================
-  // 🔹 ВХОД ПО EMAIL (БЕЗ USB)
-  // =========================
-  async login(dto: { email: string; password: string }) {
-    const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
-    });
-
-    if (!user) {
-      throw new UnauthorizedException('Неверный email или пароль');
-    }
-
-    if (user.isBlocked) {
-      throw new UnauthorizedException('Пользователь заблокирован');
-    }
-
-    const isPasswordValid = await bcrypt.compare(dto.password, user.password);
-
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Неверный email или пароль');
-    }
-
-    const session = await this.createSession(user.id);
-    const token = this.generateToken(user.id, user.email || user.phone);
-
-    return {
-      user: {
-        id: user.id,
-        phone: user.phone,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        isVerified: user.isVerified,
-        isSeller: user.isSeller,
-        sellerStatus: user.sellerStatus,
-        avatar: user.avatar,
-      },
-      token,
-      sessionId: session.id,
-    };
-  }
-
-  // =========================
-  // 🔹 ПОЛУЧЕНИЕ ПРОФИЛЯ
+  // 🔹 ПОЛУЧЕНИЕ ПРОФИЛЯ (ИСПРАВЛЕНО)
   // =========================
   async getProfile(userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: {
+        listings: {
+          where: { status: { not: 'archived' } },
+          orderBy: { createdAt: 'desc' },
+        },
         _count: {
           select: {
-            listings: true,
+            listings: {
+              where: { status: { not: 'archived' } },
+            },
             ordersAsBuyer: true,
             ordersAsSeller: true,
-            reviewsAsSeller: true,
-            reviewsAsBuyer: true,
+            favorites: true,
           },
         },
       },
@@ -247,13 +210,18 @@ export class AuthService {
         documents: dto.documents,
       },
       include: {
+        listings: {
+          where: { status: { not: 'archived' } },
+          orderBy: { createdAt: 'desc' },
+        },
         _count: {
           select: {
-            listings: true,
+            listings: {
+              where: { status: { not: 'archived' } },
+            },
             ordersAsBuyer: true,
             ordersAsSeller: true,
-            reviewsAsSeller: true,
-            reviewsAsBuyer: true,
+            favorites: true,
           },
         },
       },
@@ -296,11 +264,9 @@ export class AuthService {
   }
 
   // =========================
-  // 🔹 USB ADMIN LOGIN (только для проверки токена)
+  // 🔹 USB ADMIN LOGIN
   // =========================
   async usbLogin(rawToken: string, deviceId?: string, ip?: string, userAgent?: string) {
-    console.log('🔑 USB Login attempt:', { rawToken, deviceId, ip });
-
     const tokenHash = crypto
       .createHash('sha256')
       .update(rawToken)
@@ -311,11 +277,8 @@ export class AuthService {
     });
 
     if (!record) {
-      console.log('❌ Token not found');
       throw new UnauthorizedException('Invalid USB token');
     }
-
-    console.log('✅ Token found:', record.id);
 
     if (record.status !== 'APPROVED') {
       throw new UnauthorizedException('Token not approved');
@@ -358,16 +321,13 @@ export class AuthService {
       role: 'admin',
     });
 
-    const result = {
+    return {
       token: jwt,
       sessionId: session.token,
       type: 'usb',
       expiresAt: expiresAt,
       deviceId: session.deviceId,
     };
-
-    console.log('✅ USB Login result:', result);
-    return result;
   }
 
   // =========================
@@ -378,127 +338,6 @@ export class AuthService {
       where: { id: sessionId },
     });
     return { message: 'Logged out successfully' };
-  }
-
-  // =========================
-  // 🔹 ДОПОЛНИТЕЛЬНЫЕ МЕТОДЫ ДЛЯ USB-ТОКЕНОВ
-  // =========================
-
-  async generateUsbToken(userId: string, deviceId?: string) {
-    const rawToken = crypto.randomBytes(32).toString('hex');
-    const tokenHash = crypto
-      .createHash('sha256')
-      .update(rawToken)
-      .digest('hex');
-
-    const token = await this.prisma.adminUsbToken.create({
-      data: {
-        tokenHash,
-        status: 'PENDING',
-        deviceId: deviceId || null,
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-      },
-    });
-
-    return {
-      id: token.id,
-      rawToken,
-      expiresAt: token.expiresAt,
-      status: token.status,
-      deviceId: token.deviceId,
-    };
-  }
-
-  async getAllUsbTokens() {
-    return this.prisma.adminUsbToken.findMany({
-      orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        status: true,
-        deviceId: true,
-        usedAt: true,
-        expiresAt: true,
-        createdAt: true,
-      },
-    });
-  }
-
-  async getUsbTokenById(tokenId: string) {
-    return this.prisma.adminUsbToken.findUnique({
-      where: { id: tokenId },
-    });
-  }
-
-  async updateUsbTokenStatus(tokenId: string, status: 'APPROVED' | 'REJECTED' | 'PENDING') {
-    return this.prisma.adminUsbToken.update({
-      where: { id: tokenId },
-      data: { status },
-    });
-  }
-
-  async deleteUsbToken(tokenId: string) {
-    return this.prisma.adminUsbToken.delete({
-      where: { id: tokenId },
-    });
-  }
-
-  async checkUsbTokenExists(rawToken: string): Promise<boolean> {
-    const tokenHash = crypto
-      .createHash('sha256')
-      .update(rawToken)
-      .digest('hex');
-
-    const token = await this.prisma.adminUsbToken.findUnique({
-      where: { tokenHash },
-    });
-
-    return !!token;
-  }
-
-  async createOneTimeUsbToken(userId: string) {
-    const rawToken = crypto.randomBytes(16).toString('hex');
-    const tokenHash = crypto
-      .createHash('sha256')
-      .update(rawToken)
-      .digest('hex');
-
-    const token = await this.prisma.adminUsbToken.create({
-      data: {
-        tokenHash,
-        status: 'APPROVED',
-        expiresAt: new Date(Date.now() + 5 * 60 * 1000),
-      },
-    });
-
-    return {
-      token: rawToken,
-      expiresIn: 300,
-    };
-  }
-
-  async updateUsbTokenDevice(tokenId: string, deviceId: string) {
-    return this.prisma.adminUsbToken.update({
-      where: { id: tokenId },
-      data: { deviceId },
-    });
-  }
-
-  async getUsbTokenStats() {
-    const [total, approved, pending, rejected, used] = await Promise.all([
-      this.prisma.adminUsbToken.count(),
-      this.prisma.adminUsbToken.count({ where: { status: 'APPROVED' } }),
-      this.prisma.adminUsbToken.count({ where: { status: 'PENDING' } }),
-      this.prisma.adminUsbToken.count({ where: { status: 'REJECTED' } }),
-      this.prisma.adminUsbToken.count({ where: { usedAt: { not: null } } }),
-    ]);
-
-    return {
-      total,
-      approved,
-      pending,
-      rejected,
-      used,
-    };
   }
 
   // =========================
