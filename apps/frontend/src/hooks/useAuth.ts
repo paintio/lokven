@@ -64,21 +64,19 @@ export function useAuth() {
     };
   }, []);
 
-  // 👈 ФУНКЦИЯ ВЫХОДА — ПОЛНОСТЬЮ ОЧИЩАЕТ ВСЁ
   const logout = () => {
-    // Очищаем localStorage
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     
-    // Очищаем cookies (несколько способов для надёжности)
-    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
-    document.cookie = 'user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
-    document.cookie = 'token=; path=/; max-age=0';
-    document.cookie = 'user=; path=/; max-age=0';
-    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-    document.cookie = 'user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    // 👈 ПОЛНАЯ ОЧИСТКА COOKIES
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i];
+      const eqPos = cookie.indexOf('=');
+      const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+      document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+    }
     
-    // Обнуляем состояние
     setUser(null);
     setRefreshTrigger(prev => prev + 1);
   };

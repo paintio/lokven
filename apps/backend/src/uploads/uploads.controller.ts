@@ -1,35 +1,38 @@
-import { Controller, Post, UseInterceptors, UploadedFiles, UploadedFile, Delete, Query, Logger } from '@nestjs/common';
+import { Controller, Post, Delete, UseInterceptors, UploadedFiles, UploadedFile, Query, UseGuards, BadRequestException } from '@nestjs/common';
 import { FilesInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { UploadsService } from './uploads.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('uploads')
+@UseGuards(JwtAuthGuard)
 export class UploadsController {
-  private readonly logger = new Logger(UploadsController.name);
-
   constructor(private uploadsService: UploadsService) {}
-
-  @Post('single')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadSingle(@UploadedFile() file: any) {
-    this.logger.log('Запрос на загрузку одного файла');
-    const url = await this.uploadsService.saveFile(file);
-    return { url };
-  }
 
   @Post('multiple')
   @UseInterceptors(FilesInterceptor('files', 10))
-  async uploadMultiple(@UploadedFiles() files: any[]) {
-    this.logger.log(`Запрос на загрузку ${files?.length || 0} файлов`);
+  async uploadMultiple(@UploadedFiles() files: Express.Multer.File[]) {
     if (!files || files.length === 0) {
-      throw new Error('Файлы не переданы');
+      throw new BadRequestException('Файлы не загружены');
     }
-    const urls = await this.uploadsService.saveMultiple(files);
+    const urls = await this.uploadsService.uploadMultiple(files, 'listings');
     return { urls };
+  }
+
+  @Post('avatar')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadAvatar(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('Файл не загружен');
+    }
+    const url = await this.uploadsService.uploadFile(file, 'avatars');
+    return { url };
   }
 
   @Delete()
   async deleteFile(@Query('url') url: string) {
-    this.logger.log(`Запрос на удаление файла: ${url}`);
+    if (!url) {
+      throw new BadRequestException('URL не указан');
+    }
     await this.uploadsService.deleteFile(url);
     return { success: true };
   }

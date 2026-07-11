@@ -27,23 +27,35 @@ export function Navigation() {
   const [usbLoading, setUsbLoading] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // При монтировании обновляем состояние
   useEffect(() => {
     refreshUser();
   }, []);
 
-  // 👈 Слушаем изменения localStorage ТОЛЬКО для других вкладок
+  // 👈 СЛУШАЕМ ИЗМЕНЕНИЯ В ТОЙ ЖЕ ВКЛАДКЕ
   useEffect(() => {
     const handleStorageChange = () => {
       refreshUser();
     };
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    
+    // 👈 ПРОВЕРКА COOKIES КАЖДУЮ СЕКУНДУ
+    let lastCookie = document.cookie;
+    const interval = setInterval(() => {
+      if (document.cookie !== lastCookie) {
+        lastCookie = document.cookie;
+        refreshUser();
+      }
+    }, 500);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
   }, []);
 
   const handleLogout = () => {
     logout();
-    router.push('/');
+    window.location.href = '/'; // 👈 ПРИНУДИТЕЛЬНЫЙ РЕДИРЕКТ
     setIsMobileMenuOpen(false);
   };
 
