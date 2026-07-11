@@ -15,7 +15,7 @@ function getCookie(name: string) {
 export function useAuth() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [refreshTrigger, setRefreshTrigger] = useState(0); // 👈 ДОБАВЛЯЕМ
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const checkAuth = () => {
     try {
@@ -38,19 +38,53 @@ export function useAuth() {
 
   useEffect(() => {
     checkAuth();
-  }, [refreshTrigger]); // 👈 ЗАВИСИМ ОТ ТРИГГЕРА
+  }, [refreshTrigger]);
 
+  // 👈 СЛУШАЕМ ИЗМЕНЕНИЯ В ТОЙ ЖЕ ВКЛАДКЕ
+  useEffect(() => {
+    const originalSetItem = localStorage.setItem;
+    localStorage.setItem = function(key, value) {
+      originalSetItem.apply(this, [key, value]);
+      if (key === 'token' || key === 'user') {
+        setRefreshTrigger(prev => prev + 1);
+      }
+    };
+
+    const cookieInterval = setInterval(() => {
+      const token = getCookie('token');
+      const userData = getCookie('user');
+      if (token || userData) {
+        setRefreshTrigger(prev => prev + 1);
+      }
+    }, 300);
+
+    return () => {
+      localStorage.setItem = originalSetItem;
+      clearInterval(cookieInterval);
+    };
+  }, []);
+
+  // 👈 ФУНКЦИЯ ВЫХОДА — ПОЛНОСТЬЮ ОЧИЩАЕТ ВСЁ
   const logout = () => {
+    // Очищаем localStorage
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    
+    // Очищаем cookies (несколько способов для надёжности)
+    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+    document.cookie = 'user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
     document.cookie = 'token=; path=/; max-age=0';
     document.cookie = 'user=; path=/; max-age=0';
+    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    document.cookie = 'user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    
+    // Обнуляем состояние
     setUser(null);
-    setRefreshTrigger(prev => prev + 1); // 👈 ТРИГГЕРИМ ОБНОВЛЕНИЕ
+    setRefreshTrigger(prev => prev + 1);
   };
 
   const refreshUser = () => {
-    setRefreshTrigger(prev => prev + 1); // 👈 ТРИГГЕРИМ ОБНОВЛЕНИЕ
+    setRefreshTrigger(prev => prev + 1);
   };
 
   return { 
