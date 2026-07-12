@@ -18,7 +18,7 @@ const slides = [
     description: 'Миллионы товаров для дома, электроники, красоты, спорта и многое другое.',
     image: '/images/hero/hero-shopping.png',
     primaryLink: '/listings?category=marketplace',
-    primaryText: 'Смотреть товары →',
+    primaryText: 'Смотреть товары',
     secondaryLink: '/listings/create',
     secondaryText: 'Подать объявление',
     stats: [
@@ -33,7 +33,7 @@ const slides = [
     description: 'Тысячи вакансий от проверенных работодателей по всей стране.',
     image: '/images/hero/hero-career.png',
     primaryLink: '/listings?category=jobs',
-    primaryText: 'Найти работу →',
+    primaryText: 'Найти работу',
     secondaryLink: '/listings/create',
     secondaryText: 'Разместить вакансию',
     stats: [
@@ -48,7 +48,7 @@ const slides = [
     description: 'Новые и автомобили с пробегом от частных продавцов и дилеров.',
     image: '/images/hero/hero-driving.png',
     primaryLink: '/listings?category=auto',
-    primaryText: 'Смотреть авто →',
+    primaryText: 'Смотреть авто',
     secondaryLink: '/listings/create',
     secondaryText: 'Продать автомобиль',
     stats: [
@@ -63,7 +63,7 @@ const slides = [
     description: 'Квартиры, дома, коммерческие помещения и земельные участки.',
     image: '/images/hero/hero-realty.png',
     primaryLink: '/listings?category=realty',
-    primaryText: 'Смотреть объекты →',
+    primaryText: 'Смотреть объекты',
     secondaryLink: '/listings/create',
     secondaryText: 'Разместить объект',
     stats: [
@@ -78,7 +78,7 @@ const slides = [
     description: 'Ремонт, строительство, перевозки, обучение и сотни других услуг.',
     image: '/images/hero/hero-services.png',
     primaryLink: '/listings?category=services',
-    primaryText: 'Найти специалиста →',
+    primaryText: 'Найти специалиста',
     secondaryLink: '/listings/create',
     secondaryText: 'Предложить услугу',
     stats: [
@@ -150,16 +150,18 @@ export default function HeroCarousel() {
                     </p>
 
                     <div className="flex flex-wrap gap-3 mb-7">
+                      {/* 👈 ПЕРВАЯ КНОПКА — прозрачная */}
                       <Link
                         href={slide.primaryLink}
-                        className="px-6 py-3 bg-white text-[#111827] rounded-xl font-medium hover:bg-white/90 transition"
+                        className="btn-transparent-white"
                       >
                         {slide.primaryText}
                       </Link>
 
+                      {/* 👈 ВТОРАЯ КНОПКА — прозрачная */}
                       <Link
                         href={slide.secondaryLink}
-                        className="px-6 py-3 bg-white/20 text-white rounded-xl font-medium hover:bg-white/30 transition border border-white/20"
+                        className="btn-transparent-white"
                       >
                         {slide.secondaryText}
                       </Link>

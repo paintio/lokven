@@ -188,8 +188,8 @@ export default function Home() {
                 <p className="text-sm text-white/80">
                   {card.description}
                 </p>
-                <span className="inline-block mt-3 text-sm font-medium text-white group-hover:translate-x-1 transition-transform duration-300">
-                  Смотреть →
+                <span className="btn-transparent btn-transparent-sm">
+                   Смотреть →
                 </span>
               </div>
             </Link>
