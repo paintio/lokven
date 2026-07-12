@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { getImageUrl } from '@/lib/api';
 import {
   Search,
-  Filter,
   Package,
   Car,
   Wrench,
@@ -15,7 +14,6 @@ import {
   Pin,
   X,
   MapPin,
-  DollarSign,
   Inbox,
   ArrowLeft,
   ArrowRight,
@@ -28,7 +26,7 @@ interface Listing {
   title: string;
   price: number;
   type: string;
-  attributes: any;
+  attributes: Record<string, any> | null;
   images: { url: string }[];
   author: {
     name: string | null;
@@ -36,6 +34,8 @@ interface Listing {
   };
   createdAt: string;
 }
+
+type Filters = Record<string, string>;
 
 const categories = [
   { value: '', label: 'Все' },
@@ -45,6 +45,151 @@ const categories = [
   { value: 'realty', label: 'Недвижимость', icon: HomeIcon },
   { value: 'job', label: 'Работа', icon: Briefcase },
   { value: 'service', label: 'Услуги', icon: Wrench },
+];
+
+const baseFilters: Filters = {
+  search: '',
+  type: '',
+  category: '',
+  minPrice: '',
+  maxPrice: '',
+  sort: 'new',
+  address: '',
+
+  brand: '',
+  model: '',
+  yearFrom: '',
+  yearTo: '',
+  mileageMax: '',
+  bodyType: '',
+  engine: '',
+  engineVolumeFrom: '',
+  engineVolumeTo: '',
+  powerFrom: '',
+  powerTo: '',
+  transmission: '',
+  drive: '',
+  steeringWheel: '',
+  color: '',
+  condition: '',
+  owners: '',
+  pts: '',
+  customsCleared: '',
+  accident: '',
+
+  realtyType: '',
+  dealType: '',
+  rooms: '',
+  areaMin: '',
+  areaMax: '',
+  kitchenAreaMin: '',
+  floorFrom: '',
+  floorTo: '',
+  totalFloorsFrom: '',
+  houseType: '',
+  buildYearFrom: '',
+  buildYearTo: '',
+  renovation: '',
+  bathroom: '',
+  balcony: '',
+  parking: '',
+
+  productCategory: '',
+  subcategory: '',
+  storage: '',
+  sellerType: '',
+
+  adsCategory: '',
+  delivery: '',
+
+  profession: '',
+  industry: '',
+  salaryFrom: '',
+  salaryTo: '',
+  employment: '',
+  experience: '',
+  schedule: '',
+  education: '',
+  remote: '',
+
+  serviceType: '',
+  specialization: '',
+  paymentType: '',
+  experienceYearsFrom: '',
+  homeVisit: '',
+  online: '',
+};
+
+function Field({
+  label,
+  name,
+  value,
+  placeholder,
+  type = 'text',
+  onChange,
+}: {
+  label: string;
+  name: string;
+  value: string;
+  placeholder?: string;
+  type?: string;
+  onChange: (name: string, value: string) => void;
+}) {
+  return (
+    <div>
+      <label className="block mb-1.5 text-xs font-medium text-[#6B7280]">
+        {label}
+      </label>
+
+      <input
+        type={type}
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) => onChange(name, e.target.value)}
+        className="w-full h-11 rounded-xl border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none transition focus:border-[#4F6BFF] focus:ring-4 focus:ring-[#4F6BFF]/10"
+      />
+    </div>
+  );
+}
+
+function SelectField({
+  label,
+  name,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  name: string;
+  value: string;
+  options: { value: string; label: string }[];
+  onChange: (name: string, value: string) => void;
+}) {
+  return (
+    <div>
+      <label className="block mb-1.5 text-xs font-medium text-[#6B7280]">
+        {label}
+      </label>
+
+      <select
+        value={value}
+        onChange={(e) => onChange(name, e.target.value)}
+        className="w-full h-11 rounded-xl border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none transition focus:border-[#4F6BFF] focus:ring-4 focus:ring-[#4F6BFF]/10"
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+const yesNoOptions = [
+  { value: '', label: 'Не важно' },
+  { value: 'true', label: 'Да' },
+  { value: 'false', label: 'Нет' },
 ];
 
 function ListingsContent() {
@@ -57,14 +202,14 @@ function ListingsContent() {
   const [page, setPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
 
-  const [filters, setFilters] = useState({
-    search: searchParams.get('search') || '',
-    type: searchParams.get('type') || '',
-    category: searchParams.get('category') || '',
-    minPrice: '',
-    maxPrice: '',
-    sort: 'new',
-    address: '',
+  const [filters, setFilters] = useState<Filters>(() => {
+    const initial = { ...baseFilters };
+
+    Object.keys(initial).forEach((key) => {
+      initial[key] = searchParams.get(key) || initial[key];
+    });
+
+    return initial;
   });
 
   useEffect(() => {
@@ -75,18 +220,10 @@ function ListingsContent() {
     setLoading(true);
 
     try {
-      const params = new URLSearchParams();
+      const params = new URLSearchParams(searchParams.toString());
 
-      if (filters.search) params.append('search', filters.search);
-      if (filters.type) params.append('type', filters.type);
-      if (filters.category) params.append('category', filters.category);
-      if (filters.minPrice) params.append('minPrice', filters.minPrice);
-      if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
-      if (filters.sort) params.append('sort', filters.sort);
-      if (filters.address) params.append('address', filters.address);
-
-      params.append('page', page.toString());
-      params.append('limit', '20');
+      params.set('page', page.toString());
+      params.set('limit', '20');
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/listings?${params.toString()}`
@@ -98,86 +235,65 @@ function ListingsContent() {
       setTotal(data.total || 0);
     } catch (error) {
       console.error('Error fetching listings:', error);
+      setListings([]);
+      setTotal(0);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleFilterChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-
+  const changeFilter = (name: string, value: string) => {
     setFilters((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
-  const applyFilters = () => {
+  const buildParams = (values: Filters) => {
     const params = new URLSearchParams();
 
-    if (filters.search) params.append('search', filters.search);
-    if (filters.type) params.append('type', filters.type);
-    if (filters.category) params.append('category', filters.category);
-    if (filters.minPrice) params.append('minPrice', filters.minPrice);
-    if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
-    if (filters.sort) params.append('sort', filters.sort);
-    if (filters.address) params.append('address', filters.address);
+    Object.entries(values).forEach(([key, value]) => {
+      if (value !== '') {
+        params.set(key, value);
+      }
+    });
 
+    return params;
+  };
+
+  const applyFilters = () => {
     setPage(1);
-    router.push(`/listings?${params.toString()}`);
+    router.push(`/listings?${buildParams(filters).toString()}`);
   };
 
   const selectCategory = (type: string) => {
     const nextFilters = {
-      ...filters,
+      ...baseFilters,
+      search: filters.search,
+      address: filters.address,
+      minPrice: filters.minPrice,
+      maxPrice: filters.maxPrice,
+      sort: filters.sort,
       type,
     };
 
     setFilters(nextFilters);
     setPage(1);
 
-    const params = new URLSearchParams();
-
-    if (nextFilters.search) params.append('search', nextFilters.search);
-    if (nextFilters.type) params.append('type', nextFilters.type);
-    if (nextFilters.category) {
-      params.append('category', nextFilters.category);
-    }
-    if (nextFilters.minPrice) {
-      params.append('minPrice', nextFilters.minPrice);
-    }
-    if (nextFilters.maxPrice) {
-      params.append('maxPrice', nextFilters.maxPrice);
-    }
-    if (nextFilters.sort) params.append('sort', nextFilters.sort);
-    if (nextFilters.address) {
-      params.append('address', nextFilters.address);
-    }
-
-    router.push(`/listings?${params.toString()}`);
+    router.push(
+      `/listings?${buildParams(nextFilters).toString()}`
+    );
   };
 
   const clearFilters = () => {
-    setFilters({
-      search: '',
-      type: '',
-      category: '',
-      minPrice: '',
-      maxPrice: '',
-      sort: 'new',
-      address: '',
-    });
-
+    setFilters({ ...baseFilters });
     setPage(1);
     setShowFilters(false);
     router.push('/listings');
   };
 
-  const formatPrice = (price: number) => {
-    return price.toLocaleString('ru-RU') + ' ₽';
-  };
+  const formatPrice = (price: number) =>
+    price.toLocaleString('ru-RU') + ' ₽';
 
   const getTypeIcon = (type: string) => {
     const icons: Record<string, any> = {
@@ -193,37 +309,429 @@ function ListingsContent() {
   };
 
   const getCategoryTitle = () => {
-    if (filters.category) {
-      const names: Record<string, string> = {
-        avto: 'Авто',
-        nedvizhimost: 'Недвижимость',
-        elektronika: 'Электроника',
-        'media-i-stil': 'Медиа и стиль',
-        'dom-i-sad': 'Для дома и сада',
-        'sport-i-otdyh': 'Спорт и отдых',
-      };
+    const category = categories.find(
+      (item) => item.value === filters.type
+    );
 
-      return names[filters.category] || filters.category;
+    return category?.label || 'Все объявления';
+  };
+
+  const renderAutoFilters = () => (
+    <>
+      <Field label="Марка" name="brand" value={filters.brand} placeholder="BMW, Ford..." onChange={changeFilter} />
+      <Field label="Модель" name="model" value={filters.model} placeholder="Focus, X5..." onChange={changeFilter} />
+
+      <Field label="Год от" name="yearFrom" value={filters.yearFrom} type="number" onChange={changeFilter} />
+      <Field label="Год до" name="yearTo" value={filters.yearTo} type="number" onChange={changeFilter} />
+
+      <Field label="Пробег до, км" name="mileageMax" value={filters.mileageMax} type="number" onChange={changeFilter} />
+
+      <SelectField
+        label="Кузов"
+        name="bodyType"
+        value={filters.bodyType}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любой' },
+          { value: 'sedan', label: 'Седан' },
+          { value: 'hatchback', label: 'Хэтчбек' },
+          { value: 'wagon', label: 'Универсал' },
+          { value: 'suv', label: 'Внедорожник / кроссовер' },
+          { value: 'coupe', label: 'Купе' },
+          { value: 'convertible', label: 'Кабриолет' },
+          { value: 'minivan', label: 'Минивэн' },
+          { value: 'pickup', label: 'Пикап' },
+          { value: 'van', label: 'Фургон' },
+        ]}
+      />
+
+      <SelectField
+        label="Двигатель"
+        name="engine"
+        value={filters.engine}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любой' },
+          { value: 'petrol', label: 'Бензин' },
+          { value: 'diesel', label: 'Дизель' },
+          { value: 'hybrid', label: 'Гибрид' },
+          { value: 'electric', label: 'Электро' },
+          { value: 'gas', label: 'Газ' },
+        ]}
+      />
+
+      <Field label="Объём от, л" name="engineVolumeFrom" value={filters.engineVolumeFrom} type="number" onChange={changeFilter} />
+      <Field label="Объём до, л" name="engineVolumeTo" value={filters.engineVolumeTo} type="number" onChange={changeFilter} />
+
+      <Field label="Мощность от, л.с." name="powerFrom" value={filters.powerFrom} type="number" onChange={changeFilter} />
+      <Field label="Мощность до, л.с." name="powerTo" value={filters.powerTo} type="number" onChange={changeFilter} />
+
+      <SelectField
+        label="Коробка передач"
+        name="transmission"
+        value={filters.transmission}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любая' },
+          { value: 'manual', label: 'Механика' },
+          { value: 'automatic', label: 'Автомат' },
+          { value: 'robot', label: 'Робот' },
+          { value: 'variator', label: 'Вариатор' },
+        ]}
+      />
+
+      <SelectField
+        label="Привод"
+        name="drive"
+        value={filters.drive}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любой' },
+          { value: 'front', label: 'Передний' },
+          { value: 'rear', label: 'Задний' },
+          { value: 'all', label: 'Полный' },
+        ]}
+      />
+
+      <SelectField
+        label="Руль"
+        name="steeringWheel"
+        value={filters.steeringWheel}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любой' },
+          { value: 'left', label: 'Левый' },
+          { value: 'right', label: 'Правый' },
+        ]}
+      />
+
+      <Field label="Цвет" name="color" value={filters.color} placeholder="Белый, чёрный..." onChange={changeFilter} />
+
+      <SelectField
+        label="Состояние"
+        name="condition"
+        value={filters.condition}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любое' },
+          { value: 'new', label: 'Новый' },
+          { value: 'used', label: 'С пробегом' },
+          { value: 'damaged', label: 'Требует ремонта' },
+        ]}
+      />
+
+      <SelectField
+        label="Владельцев"
+        name="owners"
+        value={filters.owners}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Не важно' },
+          { value: '1', label: '1 владелец' },
+          { value: '2', label: '2 владельца' },
+          { value: '3', label: '3 владельца' },
+          { value: '4', label: '4 и более' },
+        ]}
+      />
+
+      <SelectField
+        label="ПТС"
+        name="pts"
+        value={filters.pts}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Не важно' },
+          { value: 'original', label: 'Оригинал' },
+          { value: 'duplicate', label: 'Дубликат' },
+          { value: 'electronic', label: 'Электронный' },
+        ]}
+      />
+
+      <SelectField label="Растаможен" name="customsCleared" value={filters.customsCleared} options={yesNoOptions} onChange={changeFilter} />
+      <SelectField label="Участие в ДТП" name="accident" value={filters.accident} options={yesNoOptions} onChange={changeFilter} />
+    </>
+  );
+
+  const renderRealtyFilters = () => (
+    <>
+      <SelectField
+        label="Тип недвижимости"
+        name="realtyType"
+        value={filters.realtyType}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любая' },
+          { value: 'apartment', label: 'Квартира' },
+          { value: 'house', label: 'Дом' },
+          { value: 'room', label: 'Комната' },
+          { value: 'land', label: 'Участок' },
+          { value: 'commercial', label: 'Коммерческая' },
+          { value: 'garage', label: 'Гараж' },
+        ]}
+      />
+
+      <SelectField
+        label="Тип сделки"
+        name="dealType"
+        value={filters.dealType}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любой' },
+          { value: 'sale', label: 'Продажа' },
+          { value: 'rent', label: 'Аренда' },
+        ]}
+      />
+
+      <SelectField
+        label="Комнаты"
+        name="rooms"
+        value={filters.rooms}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любое количество' },
+          { value: '1', label: '1' },
+          { value: '2', label: '2' },
+          { value: '3', label: '3' },
+          { value: '4', label: '4' },
+          { value: '5', label: '5+' },
+        ]}
+      />
+
+      <Field label="Площадь от, м²" name="areaMin" value={filters.areaMin} type="number" onChange={changeFilter} />
+      <Field label="Площадь до, м²" name="areaMax" value={filters.areaMax} type="number" onChange={changeFilter} />
+      <Field label="Кухня от, м²" name="kitchenAreaMin" value={filters.kitchenAreaMin} type="number" onChange={changeFilter} />
+
+      <Field label="Этаж от" name="floorFrom" value={filters.floorFrom} type="number" onChange={changeFilter} />
+      <Field label="Этаж до" name="floorTo" value={filters.floorTo} type="number" onChange={changeFilter} />
+      <Field label="Этажей в доме от" name="totalFloorsFrom" value={filters.totalFloorsFrom} type="number" onChange={changeFilter} />
+
+      <SelectField
+        label="Тип дома"
+        name="houseType"
+        value={filters.houseType}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любой' },
+          { value: 'brick', label: 'Кирпичный' },
+          { value: 'panel', label: 'Панельный' },
+          { value: 'monolith', label: 'Монолитный' },
+          { value: 'block', label: 'Блочный' },
+          { value: 'wood', label: 'Деревянный' },
+        ]}
+      />
+
+      <Field label="Год постройки от" name="buildYearFrom" value={filters.buildYearFrom} type="number" onChange={changeFilter} />
+      <Field label="Год постройки до" name="buildYearTo" value={filters.buildYearTo} type="number" onChange={changeFilter} />
+
+      <SelectField
+        label="Ремонт"
+        name="renovation"
+        value={filters.renovation}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любой' },
+          { value: 'none', label: 'Без ремонта' },
+          { value: 'cosmetic', label: 'Косметический' },
+          { value: 'euro', label: 'Евроремонт' },
+          { value: 'designer', label: 'Дизайнерский' },
+        ]}
+      />
+
+      <SelectField
+        label="Санузел"
+        name="bathroom"
+        value={filters.bathroom}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любой' },
+          { value: 'combined', label: 'Совмещённый' },
+          { value: 'separate', label: 'Раздельный' },
+        ]}
+      />
+
+      <SelectField label="Балкон" name="balcony" value={filters.balcony} options={yesNoOptions} onChange={changeFilter} />
+      <SelectField label="Парковка" name="parking" value={filters.parking} options={yesNoOptions} onChange={changeFilter} />
+    </>
+  );
+
+  const renderProductFilters = () => (
+    <>
+      <Field label="Категория товара" name="productCategory" value={filters.productCategory} placeholder="Электроника..." onChange={changeFilter} />
+      <Field label="Подкатегория" name="subcategory" value={filters.subcategory} placeholder="Смартфоны..." onChange={changeFilter} />
+      <Field label="Бренд" name="brand" value={filters.brand} placeholder="Apple, Samsung..." onChange={changeFilter} />
+      <Field label="Модель" name="model" value={filters.model} onChange={changeFilter} />
+      <Field label="Цвет" name="color" value={filters.color} onChange={changeFilter} />
+      <Field label="Память" name="storage" value={filters.storage} placeholder="128 GB" onChange={changeFilter} />
+
+      <SelectField
+        label="Состояние"
+        name="condition"
+        value={filters.condition}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любое' },
+          { value: 'new', label: 'Новое' },
+          { value: 'used', label: 'Б/у' },
+          { value: 'refurbished', label: 'Восстановленное' },
+        ]}
+      />
+
+      <SelectField
+        label="Продавец"
+        name="sellerType"
+        value={filters.sellerType}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любой' },
+          { value: 'private', label: 'Частное лицо' },
+          { value: 'company', label: 'Компания' },
+        ]}
+      />
+    </>
+  );
+
+  const renderAdsFilters = () => (
+    <>
+      <Field label="Категория" name="adsCategory" value={filters.adsCategory} placeholder="Животные, хобби..." onChange={changeFilter} />
+      <Field label="Подкатегория" name="subcategory" value={filters.subcategory} onChange={changeFilter} />
+
+      <SelectField
+        label="Состояние"
+        name="condition"
+        value={filters.condition}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любое' },
+          { value: 'new', label: 'Новое' },
+          { value: 'used', label: 'Б/у' },
+        ]}
+      />
+
+      <SelectField
+        label="Продавец"
+        name="sellerType"
+        value={filters.sellerType}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любой' },
+          { value: 'private', label: 'Частное лицо' },
+          { value: 'company', label: 'Компания' },
+        ]}
+      />
+
+      <SelectField label="Доставка" name="delivery" value={filters.delivery} options={yesNoOptions} onChange={changeFilter} />
+    </>
+  );
+
+  const renderJobFilters = () => (
+    <>
+      <Field label="Профессия / должность" name="profession" value={filters.profession} placeholder="Водитель, менеджер..." onChange={changeFilter} />
+      <Field label="Отрасль" name="industry" value={filters.industry} onChange={changeFilter} />
+      <Field label="Зарплата от" name="salaryFrom" value={filters.salaryFrom} type="number" onChange={changeFilter} />
+      <Field label="Зарплата до" name="salaryTo" value={filters.salaryTo} type="number" onChange={changeFilter} />
+
+      <SelectField
+        label="Занятость"
+        name="employment"
+        value={filters.employment}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любая' },
+          { value: 'full', label: 'Полная' },
+          { value: 'part', label: 'Частичная' },
+          { value: 'project', label: 'Проектная' },
+          { value: 'internship', label: 'Стажировка' },
+        ]}
+      />
+
+      <SelectField
+        label="Опыт"
+        name="experience"
+        value={filters.experience}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любой' },
+          { value: 'none', label: 'Без опыта' },
+          { value: '1-3', label: '1–3 года' },
+          { value: '3-6', label: '3–6 лет' },
+          { value: '6+', label: 'Более 6 лет' },
+        ]}
+      />
+
+      <SelectField
+        label="График"
+        name="schedule"
+        value={filters.schedule}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любой' },
+          { value: 'full_day', label: 'Полный день' },
+          { value: 'shift', label: 'Сменный' },
+          { value: 'flexible', label: 'Гибкий' },
+          { value: 'remote', label: 'Удалённый' },
+          { value: 'rotation', label: 'Вахта' },
+        ]}
+      />
+
+      <SelectField
+        label="Образование"
+        name="education"
+        value={filters.education}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Не важно' },
+          { value: 'secondary', label: 'Среднее' },
+          { value: 'special', label: 'Среднее специальное' },
+          { value: 'higher', label: 'Высшее' },
+        ]}
+      />
+
+      <SelectField label="Удалённая работа" name="remote" value={filters.remote} options={yesNoOptions} onChange={changeFilter} />
+    </>
+  );
+
+  const renderServiceFilters = () => (
+    <>
+      <Field label="Категория услуги" name="serviceType" value={filters.serviceType} placeholder="Ремонт, обучение..." onChange={changeFilter} />
+      <Field label="Специализация" name="specialization" value={filters.specialization} onChange={changeFilter} />
+
+      <SelectField
+        label="Тип оплаты"
+        name="paymentType"
+        value={filters.paymentType}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любой' },
+          { value: 'fixed', label: 'Фиксированная цена' },
+          { value: 'hour', label: 'За час' },
+          { value: 'service', label: 'За услугу' },
+          { value: 'negotiable', label: 'Договорная' },
+        ]}
+      />
+
+      <Field label="Опыт от, лет" name="experienceYearsFrom" value={filters.experienceYearsFrom} type="number" onChange={changeFilter} />
+      <SelectField label="Выезд к клиенту" name="homeVisit" value={filters.homeVisit} options={yesNoOptions} onChange={changeFilter} />
+      <SelectField label="Онлайн" name="online" value={filters.online} options={yesNoOptions} onChange={changeFilter} />
+    </>
+  );
+
+  const renderCategoryFilters = () => {
+    switch (filters.type) {
+      case 'auto':
+        return renderAutoFilters();
+      case 'realty':
+        return renderRealtyFilters();
+      case 'product':
+        return renderProductFilters();
+      case 'ads':
+        return renderAdsFilters();
+      case 'job':
+        return renderJobFilters();
+      case 'service':
+        return renderServiceFilters();
+      default:
+        return null;
     }
-
-    if (filters.search) {
-      return `Результаты поиска: "${filters.search}"`;
-    }
-
-    if (filters.type) {
-      const types: Record<string, string> = {
-        product: 'Маркетплейс',
-        ads: 'Объявления',
-        auto: 'Авто',
-        realty: 'Недвижимость',
-        job: 'Работа',
-        service: 'Услуги',
-      };
-
-      return types[filters.type] || filters.type;
-    }
-
-    return 'Все объявления';
   };
 
   const totalPages = Math.ceil(total / 20);
@@ -246,23 +754,17 @@ function ListingsContent() {
         </span>
       </div>
 
-      <div className="relative z-10 rounded-[22px] border border-white/70 bg-white/80 backdrop-blur-xl shadow-[0_12px_40px_rgba(15,23,42,0.08)] p-3 md:p-4 mb-5">
+      <div className="rounded-[22px] border border-white/70 bg-white/80 backdrop-blur-xl shadow-[0_12px_40px_rgba(15,23,42,0.08)] p-3 md:p-4 mb-5">
         <div className="flex flex-col lg:flex-row gap-2.5">
           <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#9CA3AF]" />
 
             <input
-              type="text"
-              name="search"
               value={filters.search}
-              onChange={handleFilterChange}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  applyFilters();
-                }
-              }}
+              onChange={(e) => changeFilter('search', e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
               placeholder="Что вы ищете?"
-              className="w-full h-12 rounded-xl border border-[#E5E7EB] bg-white/90 pl-11 pr-4 text-sm text-[#111827] outline-none transition focus:border-[#4F6BFF] focus:ring-4 focus:ring-[#4F6BFF]/10"
+              className="w-full h-12 rounded-xl border border-[#E5E7EB] bg-white/90 pl-11 pr-4 text-sm outline-none focus:border-[#4F6BFF]"
             />
           </div>
 
@@ -270,23 +772,16 @@ function ListingsContent() {
             <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#9CA3AF]" />
 
             <input
-              type="text"
-              name="address"
               value={filters.address}
-              onChange={handleFilterChange}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  applyFilters();
-                }
-              }}
+              onChange={(e) => changeFilter('address', e.target.value)}
               placeholder="Город"
-              className="w-full h-12 rounded-xl border border-[#E5E7EB] bg-white/90 pl-11 pr-4 text-sm text-[#111827] outline-none transition focus:border-[#4F6BFF] focus:ring-4 focus:ring-[#4F6BFF]/10"
+              className="w-full h-12 rounded-xl border border-[#E5E7EB] bg-white/90 pl-11 pr-4 text-sm outline-none focus:border-[#4F6BFF]"
             />
           </div>
 
           <button
             onClick={applyFilters}
-            className="h-12 px-6 rounded-xl bg-[#4F6BFF] text-white text-sm font-semibold flex items-center justify-center gap-2 transition hover:bg-[#4059E8] hover:-translate-y-0.5 shadow-[0_8px_20px_rgba(79,107,255,0.25)]"
+            className="h-12 px-6 rounded-xl bg-[#4F6BFF] text-white text-sm font-semibold flex items-center justify-center gap-2 shadow-[0_8px_20px_rgba(79,107,255,0.25)]"
           >
             <Search className="w-4 h-4" />
             Найти
@@ -294,24 +789,19 @@ function ListingsContent() {
 
           <button
             onClick={() => setShowFilters((prev) => !prev)}
-            className={`h-12 px-5 rounded-xl border text-sm font-semibold flex items-center justify-center gap-2 transition ${
+            className={`h-12 px-5 rounded-xl border text-sm font-semibold flex items-center justify-center gap-2 ${
               showFilters
                 ? 'border-[#4F6BFF] bg-[#EEF1FF] text-[#4F6BFF]'
-                : 'border-[#E5E7EB] bg-white/90 text-[#374151] hover:border-[#C7D2FE]'
+                : 'border-[#E5E7EB] bg-white text-[#374151]'
             }`}
           >
             <SlidersHorizontal className="w-4 h-4" />
             Фильтры
-
-            <ChevronDown
-              className={`w-4 h-4 transition-transform ${
-                showFilters ? 'rotate-180' : ''
-              }`}
-            />
+            <ChevronDown className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
           </button>
         </div>
 
-        <div className="flex gap-2 overflow-x-auto pt-3 pb-1 scrollbar-hide">
+        <div className="flex gap-2 overflow-x-auto pt-3 pb-1">
           {categories.map((category) => {
             const Icon = category.icon;
             const active = filters.type === category.value;
@@ -322,8 +812,8 @@ function ListingsContent() {
                 onClick={() => selectCategory(category.value)}
                 className={`shrink-0 h-9 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 border transition ${
                   active
-                    ? 'bg-[#111827] border-[#111827] text-white shadow-sm'
-                    : 'bg-white/80 border-[#E5E7EB] text-[#4B5563] hover:border-[#A5B4FC] hover:text-[#4F6BFF]'
+                    ? 'bg-[#111827] border-[#111827] text-white'
+                    : 'bg-white/80 border-[#E5E7EB] text-[#4B5563]'
                 }`}
               >
                 {Icon && <Icon className="w-3.5 h-3.5" />}
@@ -334,77 +824,63 @@ function ListingsContent() {
         </div>
 
         {showFilters && (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3 pt-3 border-t border-[#E5E7EB]/80">
-            <div>
-              <label className="block text-xs font-medium text-[#6B7280] mb-1.5">
-                Цена от
-              </label>
+          <div className="mt-4 pt-4 border-t border-[#E5E7EB]">
+            <div className="mb-5">
+              <p className="text-sm font-semibold text-[#111827] mb-3">
+                Основные параметры
+              </p>
 
-              <div className="relative">
-                <DollarSign className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <Field label="Цена от" name="minPrice" value={filters.minPrice} type="number" onChange={changeFilter} />
+                <Field label="Цена до" name="maxPrice" value={filters.maxPrice} type="number" onChange={changeFilter} />
 
-                <input
-                  type="number"
-                  name="minPrice"
-                  value={filters.minPrice}
-                  onChange={handleFilterChange}
-                  placeholder="0"
-                  className="w-full h-11 rounded-xl border border-[#E5E7EB] bg-white pl-10 pr-3 text-sm outline-none focus:border-[#4F6BFF]"
+                <SelectField
+                  label="Сортировка"
+                  name="sort"
+                  value={filters.sort}
+                  onChange={changeFilter}
+                  options={[
+                    { value: 'new', label: 'Сначала новые' },
+                    { value: 'price_asc', label: 'Сначала дешевле' },
+                    { value: 'price_desc', label: 'Сначала дороже' },
+                    { value: 'popular', label: 'По популярности' },
+                  ]}
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-medium text-[#6B7280] mb-1.5">
-                Цена до
-              </label>
+            {filters.type && (
+              <div>
+                <p className="text-sm font-semibold text-[#111827] mb-3">
+                  Параметры: {getCategoryTitle()}
+                </p>
 
-              <div className="relative">
-                <DollarSign className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
-
-                <input
-                  type="number"
-                  name="maxPrice"
-                  value={filters.maxPrice}
-                  onChange={handleFilterChange}
-                  placeholder="Любая"
-                  className="w-full h-11 rounded-xl border border-[#E5E7EB] bg-white pl-10 pr-3 text-sm outline-none focus:border-[#4F6BFF]"
-                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  {renderCategoryFilters()}
+                </div>
               </div>
-            </div>
+            )}
 
-            <div>
-              <label className="block text-xs font-medium text-[#6B7280] mb-1.5">
-                Сортировка
-              </label>
+            {!filters.type && (
+              <div className="rounded-xl bg-[#F5F7FF] border border-[#E0E7FF] px-4 py-3 text-sm text-[#5B6475]">
+                Выберите раздел выше — появятся подробные параметры именно для него.
+              </div>
+            )}
 
-              <select
-                name="sort"
-                value={filters.sort}
-                onChange={handleFilterChange}
-                className="w-full h-11 rounded-xl border border-[#E5E7EB] bg-white px-3 text-sm outline-none focus:border-[#4F6BFF]"
-              >
-                <option value="new">Сначала новые</option>
-                <option value="price_asc">Сначала дешевле</option>
-                <option value="price_desc">Сначала дороже</option>
-                <option value="popular">По популярности</option>
-              </select>
-            </div>
-
-            <div className="sm:col-span-3 flex flex-wrap gap-2 pt-1">
+            <div className="flex flex-wrap gap-2 mt-5 pt-4 border-t border-[#E5E7EB]">
               <button
                 onClick={applyFilters}
-                className="h-10 px-5 rounded-xl bg-[#4F6BFF] text-white text-sm font-semibold hover:bg-[#4059E8] transition"
+                className="h-10 px-5 rounded-xl bg-[#4F6BFF] text-white text-sm font-semibold"
               >
-                Применить
+                Показать объявления
               </button>
 
               <button
                 onClick={clearFilters}
-                className="h-10 px-4 rounded-xl text-sm font-medium text-[#6B7280] flex items-center gap-2 hover:bg-[#F3F4F6] transition"
+                className="h-10 px-4 rounded-xl text-sm font-medium text-[#6B7280] flex items-center gap-2 hover:bg-[#F3F4F6]"
               >
                 <X className="w-4 h-4" />
-                Сбросить
+                Сбросить всё
               </button>
             </div>
           </div>
@@ -412,27 +888,20 @@ function ListingsContent() {
       </div>
 
       {loading ? (
-        <div className="text-center py-16 text-[#9CA3AF] text-sm">
+        <div className="text-center py-16 text-[#9CA3AF]">
           Загрузка...
         </div>
       ) : listings.length === 0 ? (
-        <div className="text-center py-16 bg-white/80 backdrop-blur-xl rounded-[24px] border border-white/70 shadow-sm">
+        <div className="text-center py-16 bg-white/80 backdrop-blur-xl rounded-[24px] border border-white/70">
           <Inbox className="w-14 h-14 text-[#9CA3AF] mx-auto mb-3" />
 
-          <p className="text-[#374151] font-semibold">
+          <p className="font-semibold text-[#374151]">
             Объявлений не найдено
           </p>
 
-          <p className="text-[#9CA3AF] text-sm mt-1">
+          <p className="text-sm text-[#9CA3AF] mt-1">
             Попробуйте изменить параметры поиска
           </p>
-
-          <button
-            onClick={clearFilters}
-            className="mt-5 h-10 px-5 rounded-xl bg-[#4F6BFF] text-white text-sm font-semibold"
-          >
-            Сбросить фильтры
-          </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
@@ -446,7 +915,7 @@ function ListingsContent() {
                 className="group overflow-hidden rounded-[20px] border border-white/70 bg-white/90 backdrop-blur-xl shadow-[0_8px_24px_rgba(15,23,42,0.07)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(15,23,42,0.13)]"
               >
                 <div className="relative aspect-[4/3] overflow-hidden bg-[#F3F4F6]">
-                  {listing.images && listing.images.length > 0 ? (
+                  {listing.images?.length > 0 ? (
                     <img
                       src={getImageUrl(listing.images[0].url)}
                       alt={listing.title}
@@ -457,19 +926,15 @@ function ListingsContent() {
                       <Icon className="w-14 h-14 text-[#9CA3AF]" />
                     </div>
                   )}
-
-                  <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
 
                 <div className="p-4">
-                  <h3 className="text-[15px] font-semibold text-[#111827] line-clamp-2 leading-snug">
+                  <h3 className="text-[15px] font-semibold text-[#111827] line-clamp-2">
                     {listing.title}
                   </h3>
 
-                  <div className="mt-2">
-                    <span className="text-lg font-bold tracking-tight text-[#111827]">
-                      {formatPrice(listing.price)}
-                    </span>
+                  <div className="mt-2 text-lg font-bold text-[#111827]">
+                    {formatPrice(listing.price)}
                   </div>
 
                   <div className="mt-3 pt-3 border-t border-[#F3F4F6] text-xs text-[#6B7280] truncate">
@@ -485,48 +950,23 @@ function ListingsContent() {
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-2 mt-8">
           <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            onClick={() => setPage((value) => Math.max(1, value - 1))}
             disabled={page === 1}
-            className="w-10 h-10 rounded-xl border border-[#E5E7EB] bg-white flex items-center justify-center disabled:opacity-40 transition hover:border-[#A5B4FC]"
+            className="w-10 h-10 rounded-xl border border-[#E5E7EB] bg-white flex items-center justify-center disabled:opacity-40"
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
 
-          {Array.from(
-            { length: Math.min(5, totalPages) },
-            (_, i) => {
-              let pageNum;
-
-              if (totalPages <= 5) {
-                pageNum = i + 1;
-              } else if (page <= 3) {
-                pageNum = i + 1;
-              } else if (page >= totalPages - 2) {
-                pageNum = totalPages - 4 + i;
-              } else {
-                pageNum = page - 2 + i;
-              }
-
-              return (
-                <button
-                  key={pageNum}
-                  onClick={() => setPage(pageNum)}
-                  className={`w-10 h-10 rounded-xl text-sm font-semibold transition ${
-                    page === pageNum
-                      ? 'bg-[#4F6BFF] text-white shadow-[0_6px_16px_rgba(79,107,255,0.25)]'
-                      : 'border border-[#E5E7EB] bg-white text-[#4B5563] hover:border-[#A5B4FC]'
-                  }`}
-                >
-                  {pageNum}
-                </button>
-              );
-            }
-          )}
+          <span className="px-4 text-sm font-semibold text-[#374151]">
+            {page} / {totalPages}
+          </span>
 
           <button
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            onClick={() =>
+              setPage((value) => Math.min(totalPages, value + 1))
+            }
             disabled={page === totalPages}
-            className="w-10 h-10 rounded-xl border border-[#E5E7EB] bg-white flex items-center justify-center disabled:opacity-40 transition hover:border-[#A5B4FC]"
+            className="w-10 h-10 rounded-xl border border-[#E5E7EB] bg-white flex items-center justify-center disabled:opacity-40"
           >
             <ArrowRight className="w-4 h-4" />
           </button>
