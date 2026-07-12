@@ -316,141 +316,296 @@ function ListingsContent() {
     return category?.label || 'Все объявления';
   };
 
-  const renderAutoFilters = () => (
-    <>
-      <Field label="Марка" name="brand" value={filters.brand} placeholder="BMW, Ford..." onChange={changeFilter} />
-      <Field label="Модель" name="model" value={filters.model} placeholder="Focus, X5..." onChange={changeFilter} />
+  const autoBrands: Record<string, string[]> = {
+    BMW: ['1 Series', '3 Series', '5 Series', '7 Series', 'X1', 'X3', 'X5', 'X6', 'X7'],
+    Mercedes: ['A-Class', 'C-Class', 'E-Class', 'S-Class', 'CLA', 'GLA', 'GLC', 'GLE', 'GLS'],
+    Audi: ['A1', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'Q3', 'Q5', 'Q7', 'Q8'],
+    Ford: ['Focus', 'Fiesta', 'Mondeo', 'Kuga', 'Explorer', 'Mustang', 'Transit'],
+    Toyota: ['Corolla', 'Camry', 'RAV4', 'Land Cruiser', 'Highlander', 'Prius', 'Yaris'],
+    Volkswagen: ['Polo', 'Golf', 'Passat', 'Tiguan', 'Touareg', 'Jetta', 'Transporter'],
+    Volvo: ['S60', 'S90', 'V60', 'V90', 'XC40', 'XC60', 'XC90'],
+    Honda: ['Civic', 'Accord', 'CR-V', 'HR-V', 'Jazz'],
+    Nissan: ['Qashqai', 'X-Trail', 'Juke', 'Patrol', 'Micra', 'Leaf'],
+    Hyundai: ['Solaris', 'Elantra', 'Sonata', 'Tucson', 'Santa Fe', 'Creta'],
+    Kia: ['Rio', 'Ceed', 'K5', 'Sportage', 'Sorento', 'Stinger'],
+    Renault: ['Logan', 'Sandero', 'Duster', 'Kaptur', 'Megane', 'Arkana'],
+    Skoda: ['Fabia', 'Rapid', 'Octavia', 'Superb', 'Karoq', 'Kodiaq'],
+    Mazda: ['Mazda 2', 'Mazda 3', 'Mazda 6', 'CX-3', 'CX-5', 'CX-9'],
+    Lexus: ['IS', 'ES', 'LS', 'NX', 'RX', 'GX', 'LX'],
+    Porsche: ['718', '911', 'Panamera', 'Macan', 'Cayenne', 'Taycan'],
+    Chevrolet: ['Aveo', 'Cruze', 'Malibu', 'Camaro', 'Tahoe', 'Trailblazer'],
+    Opel: ['Corsa', 'Astra', 'Insignia', 'Mokka', 'Zafira'],
+    Peugeot: ['208', '308', '408', '508', '2008', '3008', '5008'],
+    Citroen: ['C3', 'C4', 'C5', 'Berlingo', 'C3 Aircross', 'C5 Aircross'],
+    Fiat: ['500', 'Panda', 'Tipo', 'Doblo', 'Ducato'],
+    Tesla: ['Model 3', 'Model S', 'Model X', 'Model Y'],
+    Lada: ['Granta', 'Vesta', 'Niva', 'Largus', 'XRAY'],
+  };
 
-      <Field label="Год от" name="yearFrom" value={filters.yearFrom} type="number" onChange={changeFilter} />
-      <Field label="Год до" name="yearTo" value={filters.yearTo} type="number" onChange={changeFilter} />
-
-      <Field label="Пробег до, км" name="mileageMax" value={filters.mileageMax} type="number" onChange={changeFilter} />
-
-      <SelectField
-        label="Кузов"
-        name="bodyType"
-        value={filters.bodyType}
-        onChange={changeFilter}
-        options={[
-          { value: '', label: 'Любой' },
-          { value: 'sedan', label: 'Седан' },
-          { value: 'hatchback', label: 'Хэтчбек' },
-          { value: 'wagon', label: 'Универсал' },
-          { value: 'suv', label: 'Внедорожник / кроссовер' },
-          { value: 'coupe', label: 'Купе' },
-          { value: 'convertible', label: 'Кабриолет' },
-          { value: 'minivan', label: 'Минивэн' },
-          { value: 'pickup', label: 'Пикап' },
-          { value: 'van', label: 'Фургон' },
-        ]}
-      />
-
-      <SelectField
-        label="Двигатель"
-        name="engine"
-        value={filters.engine}
-        onChange={changeFilter}
-        options={[
-          { value: '', label: 'Любой' },
-          { value: 'petrol', label: 'Бензин' },
-          { value: 'diesel', label: 'Дизель' },
-          { value: 'hybrid', label: 'Гибрид' },
-          { value: 'electric', label: 'Электро' },
-          { value: 'gas', label: 'Газ' },
-        ]}
-      />
-
-      <Field label="Объём от, л" name="engineVolumeFrom" value={filters.engineVolumeFrom} type="number" onChange={changeFilter} />
-      <Field label="Объём до, л" name="engineVolumeTo" value={filters.engineVolumeTo} type="number" onChange={changeFilter} />
-
-      <Field label="Мощность от, л.с." name="powerFrom" value={filters.powerFrom} type="number" onChange={changeFilter} />
-      <Field label="Мощность до, л.с." name="powerTo" value={filters.powerTo} type="number" onChange={changeFilter} />
-
-      <SelectField
-        label="Коробка передач"
-        name="transmission"
-        value={filters.transmission}
-        onChange={changeFilter}
-        options={[
-          { value: '', label: 'Любая' },
-          { value: 'manual', label: 'Механика' },
-          { value: 'automatic', label: 'Автомат' },
-          { value: 'robot', label: 'Робот' },
-          { value: 'variator', label: 'Вариатор' },
-        ]}
-      />
-
-      <SelectField
-        label="Привод"
-        name="drive"
-        value={filters.drive}
-        onChange={changeFilter}
-        options={[
-          { value: '', label: 'Любой' },
-          { value: 'front', label: 'Передний' },
-          { value: 'rear', label: 'Задний' },
-          { value: 'all', label: 'Полный' },
-        ]}
-      />
-
-      <SelectField
-        label="Руль"
-        name="steeringWheel"
-        value={filters.steeringWheel}
-        onChange={changeFilter}
-        options={[
-          { value: '', label: 'Любой' },
-          { value: 'left', label: 'Левый' },
-          { value: 'right', label: 'Правый' },
-        ]}
-      />
-
-      <Field label="Цвет" name="color" value={filters.color} placeholder="Белый, чёрный..." onChange={changeFilter} />
-
-      <SelectField
-        label="Состояние"
-        name="condition"
-        value={filters.condition}
-        onChange={changeFilter}
-        options={[
-          { value: '', label: 'Любое' },
-          { value: 'new', label: 'Новый' },
-          { value: 'used', label: 'С пробегом' },
-          { value: 'damaged', label: 'Требует ремонта' },
-        ]}
-      />
-
-      <SelectField
-        label="Владельцев"
-        name="owners"
-        value={filters.owners}
-        onChange={changeFilter}
-        options={[
-          { value: '', label: 'Не важно' },
-          { value: '1', label: '1 владелец' },
-          { value: '2', label: '2 владельца' },
-          { value: '3', label: '3 владельца' },
-          { value: '4', label: '4 и более' },
-        ]}
-      />
-
-      <SelectField
-        label="ПТС"
-        name="pts"
-        value={filters.pts}
-        onChange={changeFilter}
-        options={[
-          { value: '', label: 'Не важно' },
-          { value: 'original', label: 'Оригинал' },
-          { value: 'duplicate', label: 'Дубликат' },
-          { value: 'electronic', label: 'Электронный' },
-        ]}
-      />
-
-      <SelectField label="Растаможен" name="customsCleared" value={filters.customsCleared} options={yesNoOptions} onChange={changeFilter} />
-      <SelectField label="Участие в ДТП" name="accident" value={filters.accident} options={yesNoOptions} onChange={changeFilter} />
-    </>
+  const autoYears = Array.from(
+    { length: new Date().getFullYear() - 1949 },
+    (_, index) => String(new Date().getFullYear() - index)
   );
+
+  const engineVolumes = [
+    '0.6',
+    '0.8',
+    '1.0',
+    '1.2',
+    '1.3',
+    '1.4',
+    '1.5',
+    '1.6',
+    '1.8',
+    '2.0',
+    '2.2',
+    '2.3',
+    '2.4',
+    '2.5',
+    '2.7',
+    '2.8',
+    '3.0',
+    '3.2',
+    '3.5',
+    '4.0',
+    '4.2',
+    '4.4',
+    '4.5',
+    '5.0',
+    '5.5',
+    '6.0',
+    '6.5',
+    '7.0',
+  ];
+
+  const renderAutoFilters = () => {
+    const models = filters.brand
+      ? autoBrands[filters.brand] || []
+      : [];
+
+    return (
+      <>
+        <SelectField
+          label="Марка"
+          name="brand"
+          value={filters.brand}
+          onChange={(name, value) => {
+            changeFilter(name, value);
+            changeFilter('model', '');
+          }}
+          options={[
+            { value: '', label: 'Любая марка' },
+            ...Object.keys(autoBrands)
+              .sort()
+              .map((brand) => ({
+                value: brand,
+                label: brand,
+              })),
+          ]}
+        />
+
+        <SelectField
+          label="Модель"
+          name="model"
+          value={filters.model}
+          onChange={changeFilter}
+          options={[
+            {
+              value: '',
+              label: filters.brand
+                ? 'Любая модель'
+                : 'Сначала выберите марку',
+            },
+            ...models.map((model) => ({
+              value: model,
+              label: model,
+            })),
+          ]}
+        />
+
+        <SelectField
+          label="Год"
+          name="yearFrom"
+          value={filters.yearFrom}
+          onChange={changeFilter}
+          options={[
+            { value: '', label: 'Любой год' },
+            ...autoYears.map((year) => ({
+              value: year,
+              label: year,
+            })),
+          ]}
+        />
+
+        <Field
+          label="Пробег км."
+          name="mileageMax"
+          value={filters.mileageMax}
+          type="number"
+          onChange={changeFilter}
+        />
+
+        <SelectField
+          label="Кузов"
+          name="bodyType"
+          value={filters.bodyType}
+          onChange={changeFilter}
+          options={[
+            { value: '', label: 'Любой' },
+            { value: 'sedan', label: 'Седан' },
+            { value: 'hatchback', label: 'Хэтчбек' },
+            { value: 'wagon', label: 'Универсал' },
+            { value: 'suv', label: 'Внедорожник / кроссовер' },
+            { value: 'coupe', label: 'Купе' },
+            { value: 'convertible', label: 'Кабриолет' },
+            { value: 'minivan', label: 'Минивэн' },
+            { value: 'pickup', label: 'Пикап' },
+            { value: 'van', label: 'Фургон' },
+          ]}
+        />
+
+        <SelectField
+          label="Двигатель"
+          name="engine"
+          value={filters.engine}
+          onChange={changeFilter}
+          options={[
+            { value: '', label: 'Любой' },
+            { value: 'petrol', label: 'Бензин' },
+            { value: 'diesel', label: 'Дизель' },
+            { value: 'hybrid', label: 'Гибрид' },
+            { value: 'electric', label: 'Электро' },
+            { value: 'gas', label: 'Газ' },
+          ]}
+        />
+
+        <SelectField
+          label="Объем л."
+          name="engineVolumeFrom"
+          value={filters.engineVolumeFrom}
+          onChange={changeFilter}
+          options={[
+            { value: '', label: 'Любой объем' },
+            ...engineVolumes.map((volume) => ({
+              value: volume,
+              label: volume,
+            })),
+          ]}
+        />
+
+        <Field
+          label="Мощность л.с."
+          name="powerFrom"
+          value={filters.powerFrom}
+          type="number"
+          onChange={changeFilter}
+        />
+
+        <SelectField
+          label="Коробка передач"
+          name="transmission"
+          value={filters.transmission}
+          onChange={changeFilter}
+          options={[
+            { value: '', label: 'Любая' },
+            { value: 'manual', label: 'Механика' },
+            { value: 'automatic', label: 'Автомат' },
+            { value: 'robot', label: 'Робот' },
+            { value: 'variator', label: 'Вариатор' },
+          ]}
+        />
+
+        <SelectField
+          label="Привод"
+          name="drive"
+          value={filters.drive}
+          onChange={changeFilter}
+          options={[
+            { value: '', label: 'Любой' },
+            { value: 'front', label: 'Передний' },
+            { value: 'rear', label: 'Задний' },
+            { value: 'awd', label: 'Полный' },
+          ]}
+        />
+
+        <SelectField
+          label="Руль"
+          name="steeringWheel"
+          value={filters.steeringWheel}
+          onChange={changeFilter}
+          options={[
+            { value: '', label: 'Любой' },
+            { value: 'left', label: 'Левый' },
+            { value: 'right', label: 'Правый' },
+          ]}
+        />
+
+        <Field
+          label="Цвет"
+          name="color"
+          value={filters.color}
+          placeholder="Белый, черный..."
+          onChange={changeFilter}
+        />
+
+        <SelectField
+          label="Состояние"
+          name="condition"
+          value={filters.condition}
+          onChange={changeFilter}
+          options={[
+            { value: '', label: 'Любое' },
+            { value: 'new', label: 'Новый' },
+            { value: 'used', label: 'С пробегом' },
+            { value: 'damaged', label: 'Поврежден' },
+          ]}
+        />
+
+        <SelectField
+          label="Владельцев"
+          name="owners"
+          value={filters.owners}
+          onChange={changeFilter}
+          options={[
+            { value: '', label: 'Не важно' },
+            { value: '1', label: '1 владелец' },
+            { value: '2', label: '2 владельца' },
+            { value: '3', label: '3 владельца' },
+            { value: '4+', label: '4 и более' },
+          ]}
+        />
+
+        <SelectField
+          label="ПТС"
+          name="pts"
+          value={filters.pts}
+          onChange={changeFilter}
+          options={[
+            { value: '', label: 'Не важно' },
+            { value: 'original', label: 'Оригинал' },
+            { value: 'duplicate', label: 'Дубликат' },
+            { value: 'electronic', label: 'Электронный' },
+          ]}
+        />
+
+        <SelectField
+          label="Растаможен"
+          name="customsCleared"
+          value={filters.customsCleared}
+          options={yesNoOptions}
+          onChange={changeFilter}
+        />
+
+        <SelectField
+          label="Участие в ДТП"
+          name="accident"
+          value={filters.accident}
+          options={yesNoOptions}
+          onChange={changeFilter}
+        />
+      </>
+    );
+  };
 
   const renderRealtyFilters = () => (
     <>
