@@ -9,7 +9,7 @@ const categories = [
     title: 'Маркетплейс',
     description: 'Товары и электроника',
     icon: '/icons/marketplace.svg',
-    image: '/images/cards/card-marketplace.png',
+    image: 'https://res.cloudinary.com/qunkgqft/image/upload/f_auto/q_auto/v1783863135/card-marketplace_cup83z.png',
     href: '/listings/create/marketplace',
     color: 'from-blue-500/20 to-blue-600/10',
     border: 'hover:border-blue-500'
@@ -19,7 +19,7 @@ const categories = [
     title: 'Объявления',
     description: 'Частные объявления',
     icon: '/icons/ads.svg',
-    image: '/images/cards/card-ads.png',
+    image: 'https://res.cloudinary.com/qunkgqft/image/upload/f_auto/q_auto/v1783863122/card-ads_cslguk.png',
     href: '/listings/create/ads',
     color: 'from-emerald-500/20 to-emerald-600/10',
     border: 'hover:border-emerald-500'
@@ -29,7 +29,7 @@ const categories = [
     title: 'Авто',
     description: 'Автомобили с пробегом',
     icon: '/icons/auto.svg',
-    image: '/images/cards/card-auto.png',
+    image: 'https://res.cloudinary.com/qunkgqft/image/upload/f_auto/q_auto/v1783863128/card-auto_g5rtmc.png',
     href: '/listings/create/auto',
     color: 'from-purple-500/20 to-purple-600/10',
     border: 'hover:border-purple-500'
@@ -39,7 +39,7 @@ const categories = [
     title: 'Недвижимость',
     description: 'Квартиры и дома',
     icon: '/icons/realty.svg',
-    image: '/images/cards/card-realty.png',
+    image: 'https://res.cloudinary.com/qunkgqft/image/upload/f_auto/q_auto/v1783863141/card-realty_r3veyt.png',
     href: '/listings/create/realty',
     color: 'from-amber-500/20 to-amber-600/10',
     border: 'hover:border-amber-500'
@@ -49,7 +49,7 @@ const categories = [
     title: 'Работа',
     description: 'Вакансии и резюме',
     icon: '/icons/jobs.svg',
-    image: '/images/cards/card-jobs.png',
+    image: 'https://res.cloudinary.com/qunkgqft/image/upload/f_auto/q_auto/v1783863132/card-jobs_m5mscy.png',
     href: '/listings/create/jobs',
     color: 'from-orange-500/20 to-orange-600/10',
     border: 'hover:border-orange-500'
@@ -59,7 +59,7 @@ const categories = [
     title: 'Услуги',
     description: 'Специалисты и сервисы',
     icon: '/icons/services.svg',
-    image: '/images/cards/card-services.png',
+    image: 'https://res.cloudinary.com/qunkgqft/image/upload/f_auto/q_auto/v1783863146/card-services_cxgkxk.png',
     href: '/listings/create/services',
     color: 'from-rose-500/20 to-rose-600/10',
     border: 'hover:border-rose-500'
