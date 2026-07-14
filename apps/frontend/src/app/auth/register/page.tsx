@@ -107,6 +107,7 @@ export default function RegisterPage() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
 
+      window.dispatchEvent(new Event('authchange'));
       router.push('/');
     } catch (error: any) {
       setError(error.message || 'Ошибка регистрации');

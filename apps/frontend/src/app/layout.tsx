@@ -43,10 +43,17 @@ export default function RootLayout({
       });
     }
 
-    const token = getCookie('token');
-    const userData = getCookie('user');
+    const syncAuthState = () => {
+      const token = getCookie('token');
+      const userData = getCookie('user');
 
-    if (token && userData) {
+      if (!token || !userData) {
+        setIsAuthenticated(false);
+        setUser(null);
+        setIsAdmin(false);
+        return;
+      }
+
       try {
         const parsedUser = JSON.parse(userData);
 
@@ -55,8 +62,20 @@ export default function RootLayout({
         setIsAdmin(parsedUser.role === 'admin');
       } catch (e) {
         console.error('Failed to parse user cookie', e);
+        setIsAuthenticated(false);
+        setUser(null);
+        setIsAdmin(false);
       }
-    }
+    };
+
+    syncAuthState();
+    window.addEventListener('storage', syncAuthState);
+    window.addEventListener('authchange', syncAuthState);
+
+    return () => {
+      window.removeEventListener('storage', syncAuthState);
+      window.removeEventListener('authchange', syncAuthState);
+    };
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {

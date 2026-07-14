@@ -67,6 +67,7 @@ function LoginForm() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
 
+      window.dispatchEvent(new Event('authchange'));
       refreshUser();
       router.push(redirect);
     } catch (error: any) {
