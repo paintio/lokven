@@ -71,12 +71,18 @@ export default function RootLayout({
   };
 
   const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+
     document.cookie =
       'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
 
     document.cookie =
       'user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
 
+    setIsAuthenticated(false);
+    setUser(null);
+    setIsAdmin(false);
     window.location.href = '/';
   };
 
