@@ -15,6 +15,12 @@ export default function AdminCMS() {
       description: 'Управление ссылками в футере',
       href: '/admin/cms/footer',
       icon: '🔗'
+    },
+    {
+      title: '⚙️ Настройки CMS',
+      description: 'Контентные значения и настройки интеграций',
+      href: '/admin/cms/settings',
+      icon: '⚙️'
     }
   ];
 

@@ -9,8 +9,7 @@ interface Page {
   content: string;
   metaTitle: string | null;
   metaDescription: string | null;
-  isPublished: boolean;
-  order: number;
+  isActive: boolean;
 }
 
 export default function AdminPages() {
@@ -24,8 +23,7 @@ export default function AdminPages() {
     content: '',
     metaTitle: '',
     metaDescription: '',
-    isPublished: true,
-    order: 0,
+    isActive: true,
   });
 
   useEffect(() => {
@@ -95,8 +93,7 @@ export default function AdminPages() {
       content: '',
       metaTitle: '',
       metaDescription: '',
-      isPublished: true,
-      order: 0,
+      isActive: true,
     });
     setEditing(null);
     setIsAdding(false);
@@ -110,8 +107,7 @@ export default function AdminPages() {
       content: page.content,
       metaTitle: page.metaTitle || '',
       metaDescription: page.metaDescription || '',
-      isPublished: page.isPublished,
-      order: page.order,
+      isActive: page.isActive,
     });
     setIsAdding(true);
   };
@@ -198,21 +194,12 @@ export default function AdminPages() {
               <label className="flex items-center gap-2 text-sm text-[#6B7280]">
                 <input
                   type="checkbox"
-                  checked={formData.isPublished}
-                  onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })}
+                  checked={formData.isActive}
+                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                   className="w-4 h-4"
                 />
                 Опубликовано
               </label>
-              <div>
-                <label className="block text-sm font-medium text-[#6B7280] mb-1">Порядок</label>
-                <input
-                  type="number"
-                  value={formData.order}
-                  onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-                  className="input-field w-24"
-                />
-              </div>
             </div>
 
             <div className="flex gap-3">
@@ -243,8 +230,8 @@ export default function AdminPages() {
                 <td className="px-4 py-3 font-medium text-[#111827]">{page.title}</td>
                 <td className="px-4 py-3 text-sm text-[#6B7280]">/{page.slug}</td>
                 <td className="px-4 py-3">
-                  <span className={`tag ${page.isPublished ? '' : 'tag-gray'}`}>
-                    {page.isPublished ? '✅ Опубликовано' : '⛔ Черновик'}
+                  <span className={`tag ${page.isActive ? '' : 'tag-gray'}`}>
+                    {page.isActive ? '✅ Опубликовано' : '⛔ Черновик'}
                   </span>
                 </td>
                 <td className="px-4 py-3">

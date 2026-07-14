@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
 import { CmsService } from './cms.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { AdminAccessGuard } from '../admin/admin-access.guard';
 
 @Controller('cms')
 export class CmsController {
@@ -24,67 +25,67 @@ export class CmsController {
 
   // АДМИНСКИЕ ЭНДПОИНТЫ (с авторизацией)
   @Get('pages')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminAccessGuard)
   async getPages() {
     return this.cmsService.getPages();
   }
 
   @Post('pages')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminAccessGuard)
   async createPage(@Body() data: any) {
     return this.cmsService.createPage(data);
   }
 
   @Put('pages/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminAccessGuard)
   async updatePage(@Param('id') id: string, @Body() data: any) {
     return this.cmsService.updatePage(id, data);
   }
 
   @Delete('pages/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminAccessGuard)
   async deletePage(@Param('id') id: string) {
     return this.cmsService.deletePage(id);
   }
 
   @Post('footer')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminAccessGuard)
   async createFooterLink(@Body() data: any) {
     return this.cmsService.createFooterLink(data);
   }
 
   @Put('footer/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminAccessGuard)
   async updateFooterLink(@Param('id') id: string, @Body() data: any) {
     return this.cmsService.updateFooterLink(id, data);
   }
 
   @Delete('footer/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminAccessGuard)
   async deleteFooterLink(@Param('id') id: string) {
     return this.cmsService.deleteFooterLink(id);
   }
 
   @Get('settings')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminAccessGuard)
   async getSettings() {
     return this.cmsService.getSettings();
   }
 
   @Get('settings/:key')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminAccessGuard)
   async getSetting(@Param('key') key: string) {
     return this.cmsService.getSetting(key);
   }
 
   @Post('settings')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminAccessGuard)
   async createSetting(@Body() data: any) {
     return this.cmsService.createSetting(data);
   }
 
   @Put('settings/:key')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminAccessGuard)
   async updateSetting(@Param('key') key: string, @Body() data: any) {
     return this.cmsService.updateSetting(key, data);
   }

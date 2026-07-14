@@ -17,6 +17,7 @@ const menuItems = [
   { href: '/admin/cms', label: 'Контент' },
   { href: '/admin/cms/pages', label: 'Страницы' },
   { href: '/admin/cms/footer', label: 'Футер' },
+  { href: '/admin/cms/settings', label: 'Настройки CMS' },
   { href: '/admin/notifications', label: 'Рассылка' },
   { href: '/admin/settings', label: 'Настройки' },
   { href: '/admin/export', label: 'Экспорт' },

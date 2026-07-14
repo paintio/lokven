@@ -8,14 +8,13 @@ export class CmsService {
   // Страницы
   async getPages() {
     return this.prisma.page.findMany({
-      where: { isActive: true },
       orderBy: { createdAt: 'desc' },
     });
   }
 
   async getPage(slug: string) {
-    return this.prisma.page.findUnique({
-      where: { slug },
+    return this.prisma.page.findFirst({
+      where: { slug, isActive: true },
     });
   }
 
