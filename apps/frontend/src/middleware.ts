@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 // =========================
 // 🔹 РЕЖИМ ОБСЛУЖИВАНИЯ
 // =========================
-const MAINTENANCE_MODE = true; // true = включён, false = выключен
+const MAINTENANCE_MODE = false; // true = включён, false = выключен
 
 // Роли, которые могут видеть сайт в режиме обслуживания
 const ALLOWED_ROLES = ['admin', 'moderator', 'developer'];
