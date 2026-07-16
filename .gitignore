@@ -44,4 +44,5 @@ uploads/
 # Misc
 *.tmp
 *.temp
-*.bak
+*.bakapps/backend/.env 
+node_modules/ 
