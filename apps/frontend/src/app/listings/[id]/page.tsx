@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
-import { getImageUrl } from '@/lib/api';
 import {
   Package,
   Car,
@@ -29,7 +27,9 @@ import {
   ArrowLeft,
   Star,
   Share2,
+  ExternalLink,
 } from 'lucide-react';
+import { attributeLabels } from '@/lib/attribute-labels';
 
 interface Listing {
   id: string;
@@ -133,82 +133,31 @@ export default function ListingDetailPage() {
     return icons[type] || Pin;
   };
 
-  const renderJobAttributes = () => {
-    if (!listing?.attributes) return null;
-    const attrs = listing.attributes;
-
-    const jobFields: { key: string; label: string }[] = [
-      { key: 'employment', label: 'Тип занятости' },
-      { key: 'schedule', label: 'График работы' },
-      { key: 'experience', label: 'Опыт работы' },
-      { key: 'education', label: 'Образование' },
-      { key: 'skills', label: 'Ключевые навыки' },
-      { key: 'companyName', label: 'Компания' },
-      { key: 'contactPerson', label: 'Контактное лицо' },
-      { key: 'responsibilities', label: 'Обязанности' },
-      { key: 'requirements', label: 'Требования' },
-      { key: 'conditions', label: 'Условия работы' },
-      { key: 'companyDescription', label: 'Описание компании' },
-    ];
-
-    const filtered = jobFields.filter(f => attrs[f.key] && attrs[f.key] !== '');
-    if (filtered.length === 0) return null;
-
-    const mainFields = filtered.filter(f => ['employment', 'schedule', 'experience', 'education', 'companyName', 'contactPerson'].includes(f.key));
-    const textFields = filtered.filter(f => ['skills', 'responsibilities', 'requirements', 'conditions', 'companyDescription'].includes(f.key));
-
-    return (
-      <div className="mt-6">
-        <h3 className="font-semibold text-[#111827] mb-3">Информация о вакансии</h3>
-        
-        {mainFields.length > 0 && (
-          <div className="space-y-2 mb-4">
-            {mainFields.map(({ key, label }) => (
-              <div key={key} className="flex justify-between py-1 border-b border-[#F3F4F6]">
-                <span className="text-sm text-[#6B7280]">{label}</span>
-                <span className="text-sm font-medium text-[#111827]">{attrs[key]}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {textFields.map(({ key, label }) => {
-          if (!attrs[key] || attrs[key] === '') return null;
-          return (
-            <div key={key} className="mt-3">
-              <h4 className="text-sm font-semibold text-[#111827]">{label}</h4>
-              <div className="text-sm text-[#6B7280] mt-1 whitespace-pre-wrap">{attrs[key]}</div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
-
   const renderAttributes = () => {
     if (!listing?.attributes) return null;
-    const type = listing.type;
-
-    if (type === 'job') {
-      return renderJobAttributes();
-    }
-
     const attrs = listing.attributes;
-    const keys = Object.keys(attrs).filter(k => attrs[k] !== '' && attrs[k] !== null && attrs[k] !== undefined);
+    const keys = Object.keys(attrs).filter(k => 
+      attrs[k] !== '' && attrs[k] !== null && attrs[k] !== undefined
+    );
     if (keys.length === 0) return null;
 
     return (
       <div className="mt-6">
         <h3 className="font-semibold text-[#111827] mb-3">Характеристики</h3>
-        <div className="space-y-2">
-          {keys.map((key) => (
-            <div key={key} className="flex justify-between py-1 border-b border-[#F3F4F6]">
-              <span className="text-sm text-[#6B7280]">{key}</span>
-              <span className="text-sm font-medium text-[#111827]">
-                {typeof attrs[key] === 'boolean' ? (attrs[key] ? 'Да' : 'Нет') : attrs[key]}
-              </span>
-            </div>
-          ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          {keys.map((key) => {
+            const label = attributeLabels[key] || key;
+            const value = typeof attrs[key] === 'boolean' 
+              ? (attrs[key] ? 'Да' : 'Нет') 
+              : attrs[key];
+            
+            return (
+              <div key={key} className="flex justify-between py-2 px-3 bg-[#F9FAFB] rounded-lg">
+                <span className="text-sm text-[#6B7280]">{label}</span>
+                <span className="text-sm font-medium text-[#111827]">{value}</span>
+              </div>
+            );
+          })}
         </div>
       </div>
     );
@@ -251,7 +200,7 @@ export default function ListingDetailPage() {
             <div className="relative w-full h-[400px] bg-[#F3F4F6]">
               {listing.images && listing.images.length > 0 ? (
                 <img
-                  src={getImageUrl(listing.images[activeImage].url)}
+                  src={listing.images[activeImage].url}
                   alt={listing.title}
                   className="w-full h-full object-contain"
                 />
@@ -269,11 +218,11 @@ export default function ListingDetailPage() {
                     key={index}
                     onClick={() => setActiveImage(index)}
                     className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                      activeImage === index ? 'border-[#3B82F6]' : 'border-transparent'
+                      activeImage === index ? 'border-[#6366F1]' : 'border-transparent'
                     }`}
                   >
                     <img
-                      src={getImageUrl(image.url)}
+                      src={image.url}
                       alt={`Фото ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
@@ -307,10 +256,9 @@ export default function ListingDetailPage() {
               {listing.description && (
                 <div>
                   <h3 className="font-semibold text-[#111827]">Описание</h3>
-                  <div 
-                    className="text-[#6B7280] mt-1 prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{ __html: listing.description }}
-                  />
+                  <div className="text-[#6B7280] mt-1 whitespace-pre-wrap">
+                    {listing.description}
+                  </div>
                 </div>
               )}
 
@@ -332,7 +280,7 @@ export default function ListingDetailPage() {
                 <p className="text-[#6B7280] mt-1">
                   {listing.author.name || listing.author.phone}
                   {listing.author.isSeller && (
-                    <span className="ml-2 text-xs text-[#3B82F6]">(Продавец)</span>
+                    <span className="ml-2 text-xs text-[#6366F1]">Продавец</span>
                   )}
                 </p>
                 {listing.author.companyName && (
