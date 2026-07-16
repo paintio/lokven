@@ -30,6 +30,8 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { attributeLabels } from '@/lib/attribute-labels';
+import VehicleCheck from '@/components/listing/VehicleCheck';
+import RealtyCheck from '@/components/listing/RealtyCheck';
 
 interface Listing {
   id: string;
@@ -228,6 +230,35 @@ export default function ListingDetailPage() {
                     />
                   </button>
                 ))}
+              </div>
+            )}
+          </div>
+
+          {/* =========================
+              🔹 БЛОК ПРОВЕРКИ
+              ========================= */}
+          <div className="mt-6 space-y-4">
+            {listing.type === 'auto' && listing.attributes?.vin && (
+              <VehicleCheck vin={listing.attributes.vin} />
+            )}
+            
+            {listing.type === 'realty' && listing.attributes?.cadastralNumber && (
+              <RealtyCheck cadastralNumber={listing.attributes.cadastralNumber} />
+            )}
+            
+            {listing.type === 'auto' && !listing.attributes?.vin && (
+              <div className="bg-white rounded-xl p-6 border border-[#E5E7EB] text-center">
+                <Car className="w-8 h-8 text-[#9CA3AF] mx-auto mb-2" />
+                <p className="text-sm text-[#6B7280]">VIN номер не указан</p>
+                <p className="text-xs text-[#9CA3AF]">Проверка автомобиля недоступна</p>
+              </div>
+            )}
+            
+            {listing.type === 'realty' && !listing.attributes?.cadastralNumber && (
+              <div className="bg-white rounded-xl p-6 border border-[#E5E7EB] text-center">
+                <Home className="w-8 h-8 text-[#9CA3AF] mx-auto mb-2" />
+                <p className="text-sm text-[#6B7280]">Кадастровый номер не указан</p>
+                <p className="text-xs text-[#9CA3AF]">Проверка недвижимости недоступна</p>
               </div>
             )}
           </div>
