@@ -10,6 +10,7 @@ yarn-error.log*
 .env.local
 .env.production
 .env.development
+.env.*.local
 
 # Build
 dist/
@@ -24,8 +25,6 @@ out/
 *.swp
 *.swo
 *~
-
-# OS
 .DS_Store
 Thumbs.db
 
@@ -44,5 +43,10 @@ uploads/
 # Misc
 *.tmp
 *.temp
-*.bakapps/backend/.env 
-node_modules/ 
+*.bak
+*.cache
+.cache/
+*.tsbuildinfo
+
+# Secret scanning
+.secrets/

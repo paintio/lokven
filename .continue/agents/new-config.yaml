@@ -1,0 +1,18 @@
+{
+  "models": [
+    {
+      "title": "Gemini 2.5 Flash (Free)",
+      "provider": "openai",
+      "model": "google/gemini-2.5-flash:free",
+      "apiKey": "sk-or-v1-...",
+      "apiBase": "https://openrouter.ai"
+    }
+  ],
+  "tabAutocompleteModel": {
+    "title": "Gemini 2.5 Flash (Free)",
+    "provider": "openai",
+    "model": "google/gemini-2.5-flash:free",
+    "apiKey": "sk-or-v1-...",
+    "apiBase": "https://openrouter.ai"
+  }
+}
