@@ -1,145 +1,415 @@
-'use client';
-
-import Link from 'next/link';
+import React from 'react';
 import {
-  Briefcase,
-  Shield,
-  Users,
   Zap,
-  ArrowRight,
+  ShieldCheck,
+  Users,
+  Search,
+  User,
+  UserPlus,
+  PlusCircle,
   Building2,
-  CheckCircle2,
+  FileText,
+  CheckCircle2
 } from 'lucide-react';
-import JobsForm from '@/components/forms/JobsForm';
 
-export default function CreateJobsListing() {
-  // Здесь можно добавить проверку роли, если нужно
-  const isEmployer = true; // Пример: true для работодателя, false для обычного пользователя
-  const isAdmin = false;
+const CreateVacancy = () => {
+  return (
+    <div className="container">
+      {/* ===== ШАПКА ===== */}
+      <header className="navbar">
+        <div className="logo">Lokven</div>
+        <div className="nav-links">
+          <a href="#">Главная</a>
+          <a href="#">Объявления</a>
+          <a href="#">Подать</a>
+        </div>
+        <div className="nav-actions">
+          <div className="search-wrapper">
+            <Search size={18} className="search-icon" />
+            <input className="search-input" type="text" placeholder="Поиск..." />
+          </div>
+          <button className="btn-outline-nav">
+            <User size={16} />
+            Войти
+          </button>
+          <button className="btn-outline-nav">
+            <UserPlus size={16} />
+            Регистрация
+          </button>
+          <button className="btn-primary-nav">
+            <PlusCircle size={16} />
+            Подать объявление
+          </button>
+        </div>
+      </header>
 
-  // Если пользователь не работодатель и не админ — показываем баннер
-  if (!isEmployer && !isAdmin) {
-    return (
-      <div className="min-h-[70vh] relative overflow-hidden rounded-[32px] border border-white/40 bg-white/70 backdrop-blur-xl shadow-[0_20px_80px_rgba(15,23,42,0.12)]">
-        {/* Фоновое изображение из Cloudinary */}
-        <div className="absolute inset-0">
+      {/* ===== ХЛЕБНЫЕ КРОШКИ ===== */}
+      <div className="breadcrumb">
+        Главная / <span>Создание вакансии</span>
+      </div>
+
+      {/* ===== HERO ===== */}
+      <section className="hero">
+        <div className="hero-text">
+          <h1>Создавайте <span>вакансии</span> на Lokven</h1>
+          <p>Размещайте вакансии и находите лучших специалистов среди тысяч пользователей платформы.</p>
+          <ul className="hero-features">
+            <li>
+              <ShieldCheck size={20} className="feature-icon" />
+              Проверенные работодатели
+            </li>
+            <li>
+              <Zap size={20} className="feature-icon" />
+              Быстрая публикация
+            </li>
+            <li>
+              <Users size={20} className="feature-icon" />
+              Большая аудитория
+            </li>
+          </ul>
+          <div className="hero-buttons">
+            <button className="btn-primary">
+              <Building2 size={18} />
+              Заполнить данные компании
+            </button>
+            <button className="btn-secondary">
+              <FileText size={18} />
+              Разместить резюме
+            </button>
+          </div>
+        </div>
+        <div className="hero-image">
           <img
             src="https://res.cloudinary.com/qunkgqft/image/upload/v1784271762/hero-employer_pzn4sn.png"
             alt="Работодатель"
-            className="w-full h-full object-cover opacity-90"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/88 to-white/55" />
         </div>
+      </section>
 
-        <div className="relative z-10 px-6 py-10 md:px-10 md:py-14">
-          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-8 items-center">
-            {/* Левый контент */}
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#BFDBFE] bg-[#EFF6FF] px-4 py-2 text-sm font-medium text-[#1D4ED8] mb-6">
-                <Briefcase className="w-4 h-4" />
-                Для работодателей
-              </div>
-
-              <h1 className="text-3xl md:text-5xl font-bold text-[#111827] leading-tight mb-5">
-                Размещайте вакансии
-                <br />
-                и находите лучших сотрудников
-              </h1>
-
-              <p className="text-lg text-[#4B5563] leading-relaxed mb-8 max-w-2xl">
-                Создайте компанию в Lokven, публикуйте вакансии и получайте отклики от тысяч соискателей по всей стране. Интерфейс адаптирован под HR-команды и владельцев бизнеса.
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
-                <div className="flex items-center gap-3 rounded-2xl border border-white/60 bg-white/80 px-4 py-3 shadow-sm">
-                  <Shield className="w-5 h-5 text-[#2563EB]" />
-                  <span className="font-medium text-[#111827]">Проверенные работодатели</span>
-                </div>
-                <div className="flex items-center gap-3 rounded-2xl border border-white/60 bg-white/80 px-4 py-3 shadow-sm">
-                  <Zap className="w-5 h-5 text-[#2563EB]" />
-                  <span className="font-medium text-[#111827]">Публикация за несколько минут</span>
-                </div>
-                <div className="flex items-center gap-3 rounded-2xl border border-white/60 bg-white/80 px-4 py-3 shadow-sm">
-                  <Users className="w-5 h-5 text-[#2563EB]" />
-                  <span className="font-medium text-[#111827]">Большая аудитория соискателей</span>
-                </div>
-                <div className="flex items-center gap-3 rounded-2xl border border-white/60 bg-white/80 px-4 py-3 shadow-sm">
-                  <Briefcase className="w-5 h-5 text-[#2563EB]" />
-                  <span className="font-medium text-[#111827]">Удобное управление вакансиями</span>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-4">
-                <Link
-                  href="/profile/company"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#2563EB] text-white font-semibold hover:bg-[#1D4ED8] transition shadow-lg shadow-blue-500/20"
-                >
-                  Заполнить компанию
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-                <Link
-                  href="/listings/create/resume"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-[#D1D5DB] bg-white/80 text-[#111827] font-semibold hover:bg-white transition"
-                >
-                  Разместить резюме
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Правая карточка */}
-            <div className="rounded-[28px] border border-white/60 bg-white/78 backdrop-blur-xl p-6 md:p-7 shadow-[0_18px_50px_rgba(15,23,42,0.14)]">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-12 h-12 rounded-2xl bg-[#EFF6FF] flex items-center justify-center">
-                  <Building2 className="w-6 h-6 text-[#2563EB]" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-[#111827]">Что потребуется</h3>
-                  <p className="text-sm text-[#6B7280]">Подготовьте данные компании перед публикацией вакансии.</p>
-                </div>
-              </div>
-
-              <div className="space-y-3 mb-6">
-                {[
-                  'Название компании и описание деятельности',
-                  'Контактный телефон и email',
-                  'Город и адрес работы',
-                  'Информация о зарплате и графике',
-                  'Требования к кандидату',
-                ].map((item) => (
-                  <div key={item} className="flex items-start gap-3 rounded-xl border border-[#E5E7EB] bg-white/80 px-4 py-3">
-                    <CheckCircle2 className="w-5 h-5 text-[#16A34A] mt-0.5" />
-                    <span className="text-[#111827]">{item}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="rounded-2xl border border-[#DBEAFE] bg-[#EFF6FF] px-4 py-4">
-                <div className="flex items-center gap-2 text-[#1D4ED8] font-semibold mb-1">
-                  <Shield className="w-4 h-4" />
-                  Проверка компании
-                </div>
-                <p className="text-sm text-[#1E3A8A] leading-relaxed">
-                  После заполнения профиля компания получает статус работодателя и может публиковать вакансии без дополнительных ограничений.
-                </p>
-              </div>
-            </div>
-          </div>
+      {/* ===== ПРЕИМУЩЕСТВА ===== */}
+      <div className="benefits">
+        <div className="benefit-card">
+          <Zap size={36} className="benefit-icon" />
+          <h3>Быстрая публикация</h3>
+          <p>Разместите вакансию за несколько минут и получайте отклик от соискателей.</p>
+        </div>
+        <div className="benefit-card">
+          <ShieldCheck size={36} className="benefit-icon" />
+          <h3>Проверенные компании</h3>
+          <p>Все работодатели проходят проверку. Это повышает доверие соискателей к вашим вакансиям.</p>
+        </div>
+        <div className="benefit-card">
+          <Users size={36} className="benefit-icon" />
+          <h3>Тысячи соискателей</h3>
+          <p>Ваша вакансия будет доступна тысячам пользователей на всей платформе Lokven.</p>
         </div>
       </div>
-    );
-  }
 
-  // Если пользователь — работодатель или админ, показываем форму
-  return (
-    <div className="container-custom max-w-3xl py-8">
-      <div className="flex items-center gap-3 mb-6">
-        <Briefcase className="w-8 h-8 text-[#6366F1]" />
-        <h1 className="text-2xl font-bold text-[#111827]">Создать вакансию</h1>
+      <div className="footer-note">
+        Lokven — создайте вакансию и найдите лучших специалистов
       </div>
-      <div className="bg-white rounded-xl p-6 border border-[#E5E7EB]">
-        <JobsForm mode="vacancy" />
-      </div>
+
+      <style jsx>{`
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .container {
+          max-width: 1200px;
+          width: 100%;
+          margin: 0 auto;
+          background-color: #ffffff;
+          border-radius: 24px;
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
+          padding: 24px 32px 48px;
+        }
+
+        .navbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 16px;
+          padding-bottom: 16px;
+          border-bottom: 1px solid #eef3f8;
+        }
+
+        .logo {
+          font-size: 24px;
+          font-weight: 700;
+          color: #0b1e33;
+          letter-spacing: -0.5px;
+        }
+        .logo span {
+          color: #2b7be4;
+        }
+
+        .nav-links {
+          display: flex;
+          gap: 24px;
+          font-size: 15px;
+          font-weight: 500;
+          color: #1e3a5f;
+        }
+        .nav-links a {
+          text-decoration: none;
+          color: inherit;
+        }
+        .nav-links a:hover {
+          color: #2b7be4;
+        }
+
+        .nav-actions {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+
+        .search-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+        }
+
+        .search-icon {
+          position: absolute;
+          left: 14px;
+          color: #8aa3bc;
+        }
+
+        .search-input {
+          padding: 8px 16px 8px 40px;
+          border-radius: 40px;
+          border: 1px solid #d9e2ec;
+          background-color: #f8fafc;
+          font-size: 14px;
+          width: 180px;
+          outline: none;
+          transition: 0.2s;
+        }
+        .search-input:focus {
+          border-color: #2b7be4;
+          background-color: #fff;
+        }
+
+        .btn-outline-nav {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 8px 18px;
+          border-radius: 40px;
+          border: 1px solid #d0ddee;
+          background: transparent;
+          font-weight: 500;
+          font-size: 14px;
+          color: #1e3a5f;
+          cursor: pointer;
+          transition: 0.2s;
+        }
+        .btn-outline-nav:hover {
+          background: #f0f6fe;
+          border-color: #2b7be4;
+        }
+
+        .btn-primary-nav {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 8px 20px;
+          border-radius: 40px;
+          border: none;
+          background: #2b7be4;
+          color: #fff;
+          font-weight: 600;
+          font-size: 14px;
+          cursor: pointer;
+          transition: 0.2s;
+        }
+        .btn-primary-nav:hover {
+          background: #1a66c4;
+        }
+
+        .breadcrumb {
+          margin: 18px 0 12px;
+          font-size: 14px;
+          color: #5e7a99;
+        }
+        .breadcrumb span {
+          color: #0b1e33;
+          font-weight: 500;
+        }
+
+        .hero {
+          background: linear-gradient(135deg, #eef6fe 0%, #ffffff 100%);
+          border-radius: 20px;
+          padding: 40px 44px;
+          margin: 12px 0 32px;
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: space-between;
+          border: 1px solid #e2edf7;
+        }
+
+        .hero-text {
+          flex: 1 1 300px;
+        }
+        .hero-text h1 {
+          font-size: 36px;
+          font-weight: 700;
+          color: #0b1e33;
+          margin-bottom: 10px;
+        }
+        .hero-text h1 span {
+          color: #2b7be4;
+        }
+        .hero-text p {
+          font-size: 16px;
+          color: #2e4a6e;
+          line-height: 1.5;
+          max-width: 480px;
+          margin-bottom: 18px;
+        }
+
+        .hero-features {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 20px 32px;
+          font-size: 15px;
+          color: #1a3452;
+          margin-bottom: 28px;
+          padding-left: 0;
+        }
+        .hero-features li {
+          list-style: none;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .feature-icon {
+          color: #2b7be4;
+          flex-shrink: 0;
+        }
+
+        .hero-buttons {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 14px;
+        }
+
+        .btn-primary {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 14px 32px;
+          border-radius: 40px;
+          border: none;
+          background: #2b7be4;
+          color: #fff;
+          font-weight: 600;
+          font-size: 16px;
+          cursor: pointer;
+          box-shadow: 0 4px 12px rgba(43, 123, 228, 0.25);
+          transition: 0.2s;
+        }
+        .btn-primary:hover {
+          background: #1a66c4;
+          transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 14px 32px;
+          border-radius: 40px;
+          border: 1.5px solid #c9d9eb;
+          background: transparent;
+          color: #1e3a5f;
+          font-weight: 600;
+          font-size: 16px;
+          cursor: pointer;
+          transition: 0.2s;
+        }
+        .btn-secondary:hover {
+          background: #f0f6fe;
+          border-color: #2b7be4;
+        }
+
+        .hero-image {
+          flex: 0 0 180px;
+          text-align: center;
+        }
+        .hero-image img {
+          max-width: 100%;
+          height: auto;
+          border-radius: 12px;
+        }
+
+        .benefits {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 24px;
+          margin: 40px 0 16px;
+        }
+
+        .benefit-card {
+          background: #f9fcff;
+          padding: 28px 20px 24px;
+          border-radius: 18px;
+          border: 1px solid #e6eff8;
+          text-align: center;
+          transition: 0.2s;
+        }
+        .benefit-card:hover {
+          border-color: #2b7be4;
+          box-shadow: 0 4px 16px rgba(43, 123, 228, 0.08);
+        }
+
+        .benefit-icon {
+          color: #2b7be4;
+          margin-bottom: 10px;
+        }
+
+        .benefit-card h3 {
+          font-size: 20px;
+          color: #0b1e33;
+          margin-bottom: 8px;
+        }
+        .benefit-card p {
+          font-size: 14px;
+          color: #3c5b7c;
+          line-height: 1.5;
+        }
+
+        .footer-note {
+          margin-top: 40px;
+          padding-top: 20px;
+          border-top: 1px solid #ecf2f8;
+          font-size: 13px;
+          color: #6b88a6;
+          text-align: center;
+        }
+
+        @media (max-width: 700px) {
+          .container { padding: 16px; }
+          .navbar { flex-direction: column; align-items: stretch; }
+          .nav-links { flex-wrap: wrap; gap: 12px; }
+          .nav-actions { flex-wrap: wrap; }
+          .search-input { width: 100%; }
+          .hero { flex-direction: column; text-align: center; padding: 28px 20px; }
+          .hero-text p { margin-left: auto; margin-right: auto; }
+          .hero-features { justify-content: center; }
+          .hero-buttons { justify-content: center; }
+          .hero-image { margin-top: 20px; }
+        }
+      `}</style>
     </div>
   );
-}
+};
+
+export default CreateVacancy;
