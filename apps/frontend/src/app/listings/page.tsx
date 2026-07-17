@@ -56,6 +56,7 @@ const baseFilters: Filters = {
   sort: 'new',
   address: '',
 
+  // Авто
   brand: '',
   model: '',
   yearFrom: '',
@@ -77,6 +78,7 @@ const baseFilters: Filters = {
   customsCleared: '',
   accident: '',
 
+  // Недвижимость
   realtyType: '',
   dealType: '',
   rooms: '',
@@ -94,14 +96,27 @@ const baseFilters: Filters = {
   balcony: '',
   parking: '',
 
+  // Участки
+  areaUnit: '',
+  electricity: '',
+  gas: '',
+  water: '',
+  sewerage: '',
+  roadType: '',
+  landPurpose: '',
+  cadastralNumber: '',
+
+  // Маркетплейс
   productCategory: '',
   subcategory: '',
   storage: '',
   sellerType: '',
 
+  // Объявления
   adsCategory: '',
   delivery: '',
 
+  // Работа
   profession: '',
   industry: '',
   salaryFrom: '',
@@ -112,6 +127,7 @@ const baseFilters: Filters = {
   education: '',
   remote: '',
 
+  // Услуги
   serviceType: '',
   specialization: '',
   paymentType: '',
@@ -603,7 +619,7 @@ function ListingsContent() {
           options={yesNoOptions}
           onChange={changeFilter}
         />
-      </>
+    </>
     );
   };
 
@@ -706,6 +722,115 @@ function ListingsContent() {
 
       <SelectField label="Балкон" name="balcony" value={filters.balcony} options={yesNoOptions} onChange={changeFilter} />
       <SelectField label="Парковка" name="parking" value={filters.parking} options={yesNoOptions} onChange={changeFilter} />
+    </>
+  );
+
+  // 🏡 ФИЛЬТРЫ ДЛЯ УЧАСТКОВ
+  const renderLandFilters = () => (
+    <>
+      <SelectField
+        label="Тип участка"
+        name="landPurpose"
+        value={filters.landPurpose}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любой' },
+          { value: 'ИЖС', label: 'ИЖС' },
+          { value: 'ЛПХ', label: 'ЛПХ' },
+          { value: 'СНТ', label: 'СНТ' },
+          { value: 'ДНП', label: 'ДНП' },
+          { value: 'КФХ', label: 'КФХ' },
+          { value: 'коммерческое', label: 'Коммерческое' },
+          { value: 'промышленное', label: 'Промышленное' },
+        ]}
+      />
+
+      <div className="grid grid-cols-2 gap-3">
+        <Field
+          label="Площадь от"
+          name="areaMin"
+          value={filters.areaMin}
+          type="number"
+          onChange={changeFilter}
+        />
+        <Field
+          label="Площадь до"
+          name="areaMax"
+          value={filters.areaMax}
+          type="number"
+          onChange={changeFilter}
+        />
+      </div>
+
+      <SelectField
+        label="Единица площади"
+        name="areaUnit"
+        value={filters.areaUnit}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любая' },
+          { value: 'сотка', label: 'Сотки' },
+          { value: 'гектар', label: 'Гектары' },
+          { value: 'м²', label: 'м²' },
+        ]}
+      />
+
+      <div className="col-span-1 sm:col-span-2">
+        <p className="text-xs font-medium text-[#6B7280] mb-2">Коммуникации</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <SelectField
+            label="Электричество"
+            name="electricity"
+            value={filters.electricity}
+            options={yesNoOptions}
+            onChange={changeFilter}
+          />
+          <SelectField
+            label="Газ"
+            name="gas"
+            value={filters.gas}
+            options={yesNoOptions}
+            onChange={changeFilter}
+          />
+          <SelectField
+            label="Вода"
+            name="water"
+            value={filters.water}
+            options={yesNoOptions}
+            onChange={changeFilter}
+          />
+          <SelectField
+            label="Канализация"
+            name="sewerage"
+            value={filters.sewerage}
+            options={yesNoOptions}
+            onChange={changeFilter}
+          />
+        </div>
+      </div>
+
+      <SelectField
+        label="Дорога"
+        name="roadType"
+        value={filters.roadType}
+        onChange={changeFilter}
+        options={[
+          { value: '', label: 'Любая' },
+          { value: 'асфальт', label: 'Асфальтированная' },
+          { value: 'грунт', label: 'Грунтовая' },
+          { value: 'щебень', label: 'Щебёночная' },
+          { value: 'бетон', label: 'Бетонная' },
+          { value: 'отсутствует', label: 'Отсутствует' },
+        ]}
+      />
+
+      <Field
+        label="Кадастровый номер"
+        name="cadastralNumber"
+        value={filters.cadastralNumber}
+        placeholder="77:01:0000000:0000"
+        onChange={changeFilter}
+      />
     </>
   );
 
@@ -875,6 +1000,9 @@ function ListingsContent() {
       case 'auto':
         return renderAutoFilters();
       case 'realty':
+        if (filters.realtyType === 'land') {
+          return renderLandFilters();
+        }
         return renderRealtyFilters();
       case 'product':
         return renderProductFilters();
