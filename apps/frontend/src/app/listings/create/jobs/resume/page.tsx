@@ -1,17 +1,17 @@
 'use client';
 
 import JobsForm from '@/components/forms/JobsForm';
-import { Briefcase } from 'lucide-react';
+import { User } from 'lucide-react';
 
-export default function CreateJobsListing() {
+export default function CreateResumeListing() {
   return (
     <div className="container-custom max-w-3xl py-8">
       <div className="flex items-center gap-3 mb-6">
-        <Briefcase className="w-8 h-8 text-[#6366F1]" />
-        <h1 className="text-2xl font-bold text-[#111827]">Создать вакансию</h1>
+        <User className="w-8 h-8 text-[#6366F1]" />
+        <h1 className="text-2xl font-bold text-[#111827]">Создать резюме</h1>
       </div>
       <div className="bg-white rounded-xl p-6 border border-[#E5E7EB]">
-        <JobsForm mode="vacancy" />
+        <JobsForm mode="resume" />
       </div>
     </div>
   );
