@@ -50,3 +50,8 @@ uploads/
 
 # Secret scanning
 .secrets/
+
+# Git artifacts (prevent accidental commits)
+( 
+{
+h --force-with-lease origin main
