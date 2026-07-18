@@ -26,9 +26,9 @@ export default function CreateJobsListing() {
           Главная / <span className="text-[#0B1E33] font-medium">Создание вакансии</span>
         </div>
 
-        {/* Герой-блок с картинкой как фон */}
+        {/* Герой-блок с картинкой как фон - оптимальная высота */}
         <div 
-          className="relative rounded-3xl p-8 md:p-12 mb-8 border border-[#E2EDF7] overflow-hidden min-h-[320px] flex items-center"
+          className="relative rounded-3xl p-8 md:p-12 mb-8 border border-[#E2EDF7] overflow-hidden min-h-[280px] md:min-h-[320px] flex items-center"
           style={{
             backgroundImage: `url('https://res.cloudinary.com/qunkgqft/image/upload/v1784271762/hero-employer_pzn4sn.png')`,
             backgroundSize: 'cover',
@@ -40,41 +40,41 @@ export default function CreateJobsListing() {
           <div className="absolute inset-0 bg-gradient-to-r from-[#EEF6FE] via-[#EEF6FE]/90 to-transparent" />
           
           <div className="relative z-10 flex-1 max-w-2xl">
-            <h1 className="text-3xl md:text-5xl font-bold text-[#0B1E33] leading-tight mb-3">
+            <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-[#0B1E33] leading-tight mb-3">
               Создавайте <span className="text-[#2B7BE4]">вакансии</span> на Lokven
             </h1>
-            <p className="text-[#2E4A6E] text-base md:text-lg max-w-lg mb-5">
+            <p className="text-[#2E4A6E] text-sm md:text-base lg:text-lg max-w-lg mb-4">
               Размещайте вакансии и находите лучших специалистов среди тысяч пользователей платформы.
             </p>
 
-            <ul className="flex flex-wrap gap-4 md:gap-8 text-[#1A3452] mb-6">
+            <ul className="flex flex-wrap gap-3 md:gap-6 text-[#1A3452] text-sm md:text-base mb-5">
               <li className="flex items-center gap-2">
-                <Shield className="w-5 h-5 text-[#2B7BE4]" />
+                <Shield className="w-4 h-4 md:w-5 md:h-5 text-[#2B7BE4]" />
                 Проверенные работодатели
               </li>
               <li className="flex items-center gap-2">
-                <Zap className="w-5 h-5 text-[#2B7BE4]" />
+                <Zap className="w-4 h-4 md:w-5 md:h-5 text-[#2B7BE4]" />
                 Быстрая публикация
               </li>
               <li className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-[#2B7BE4]" />
+                <Users className="w-4 h-4 md:w-5 md:h-5 text-[#2B7BE4]" />
                 Большая аудитория
               </li>
             </ul>
 
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-3 md:gap-4">
               <Link
                 href="/profile/company"
-                className="flex items-center gap-2 px-6 py-3 rounded-full bg-[#2B7BE4] text-white font-semibold hover:bg-[#1A66C4] transition shadow-md"
+                className="flex items-center gap-2 px-5 md:px-6 py-2.5 md:py-3 rounded-full bg-[#2B7BE4] text-white font-semibold text-sm md:text-base hover:bg-[#1A66C4] transition shadow-md"
               >
-                <Building2 className="w-5 h-5" />
+                <Building2 className="w-4 h-4 md:w-5 md:h-5" />
                 Заполнить данные компании
               </Link>
               <Link
                 href="/listings/create/resume"
-                className="flex items-center gap-2 px-6 py-3 rounded-full border-2 border-[#C9D9EB] text-[#1E3A5F] font-semibold hover:bg-[#F0F6FE] hover:border-[#2B7BE4] transition"
+                className="flex items-center gap-2 px-5 md:px-6 py-2.5 md:py-3 rounded-full border-2 border-[#C9D9EB] text-[#1E3A5F] font-semibold text-sm md:text-base hover:bg-[#F0F6FE] hover:border-[#2B7BE4] transition"
               >
-                <Briefcase className="w-5 h-5" />
+                <Briefcase className="w-4 h-4 md:w-5 md:h-5" />
                 Разместить резюме
               </Link>
             </div>
