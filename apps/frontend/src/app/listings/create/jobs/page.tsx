@@ -26,9 +26,20 @@ export default function CreateJobsListing() {
           Главная / <span className="text-[#0B1E33] font-medium">Создание вакансии</span>
         </div>
 
-        {/* Герой-блок */}
-        <div className="bg-gradient-to-br from-[#EEF6FE] to-white rounded-3xl p-8 md:p-12 mb-8 border border-[#E2EDF7] flex flex-col lg:flex-row items-center justify-between gap-8">
-          <div className="flex-1">
+        {/* Герой-блок с картинкой как фон */}
+        <div 
+          className="relative rounded-3xl p-8 md:p-12 mb-8 border border-[#E2EDF7] overflow-hidden min-h-[320px] flex items-center"
+          style={{
+            backgroundImage: `url('https://res.cloudinary.com/qunkgqft/image/upload/v1784271762/hero-employer_pzn4sn.png')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center right',
+            backgroundRepeat: 'no-repeat',
+          }}
+        >
+          {/* Затемнение для читаемости текста */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#EEF6FE] via-[#EEF6FE]/90 to-transparent" />
+          
+          <div className="relative z-10 flex-1 max-w-2xl">
             <h1 className="text-3xl md:text-5xl font-bold text-[#0B1E33] leading-tight mb-3">
               Создавайте <span className="text-[#2B7BE4]">вакансии</span> на Lokven
             </h1>
@@ -67,14 +78,6 @@ export default function CreateJobsListing() {
                 Разместить резюме
               </Link>
             </div>
-          </div>
-
-          <div className="flex-shrink-0 w-full lg:w-48">
-            <img
-              src="https://res.cloudinary.com/qunkgqft/image/upload/v1784271762/hero-employer_pzn4sn.png"
-              alt="Работодатель"
-              className="w-full h-auto rounded-xl"
-            />
           </div>
         </div>
 
