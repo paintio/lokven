@@ -6,13 +6,7 @@ import {
   Shield,
   Users,
   Zap,
-  ArrowRight,
   Building2,
-  CheckCircle2,
-  Search,
-  User,
-  UserPlus,
-  PlusCircle,
 } from 'lucide-react';
 import JobsForm from '@/components/forms/JobsForm';
 import { useAuth } from '@/hooks/useAuth';
@@ -27,51 +21,6 @@ export default function CreateJobsListing() {
   if (!loading && !isEmployer && !isAdmin) {
     return (
       <div className="container-custom py-8">
-        {/* Навигация */}
-        <div className="flex items-center justify-between flex-wrap gap-4 pb-4 border-b border-[#EEF3F8] mb-6">
-          <div className="text-2xl font-bold text-[#0B1E33] tracking-tight">
-            Lokven
-          </div>
-
-          <div className="flex items-center gap-6 text-sm font-medium text-[#1E3A5F]">
-            <Link href="/" className="hover:text-[#2B7BE4] transition">Главная</Link>
-            <Link href="/listings" className="hover:text-[#2B7BE4] transition">Объявления</Link>
-            <Link href="/listings/create" className="hover:text-[#2B7BE4] transition">Подать</Link>
-          </div>
-
-          <div className="flex items-center gap-3 flex-wrap">
-            <div className="relative flex items-center">
-              <Search className="absolute left-4 text-[#8AA3BC] w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Поиск..."
-                className="pl-10 pr-4 py-2 rounded-full border border-[#D9E2EC] bg-[#F8FAFC] text-sm outline-none focus:border-[#2B7BE4] focus:bg-white transition w-40 md:w-48"
-              />
-            </div>
-            <Link
-              href="/auth/login"
-              className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#D0DDEE] text-sm font-medium text-[#1E3A5F] hover:bg-[#F0F6FE] hover:border-[#2B7BE4] transition"
-            >
-              <User className="w-4 h-4" />
-              Войти
-            </Link>
-            <Link
-              href="/auth/register"
-              className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#D0DDEE] text-sm font-medium text-[#1E3A5F] hover:bg-[#F0F6FE] hover:border-[#2B7BE4] transition"
-            >
-              <UserPlus className="w-4 h-4" />
-              Регистрация
-            </Link>
-            <Link
-              href="/listings/create"
-              className="flex items-center gap-2 px-5 py-2 rounded-full bg-[#2B7BE4] text-white text-sm font-semibold hover:bg-[#1A66C4] transition shadow-md"
-            >
-              <PlusCircle className="w-4 h-4" />
-              Подать объявление
-            </Link>
-          </div>
-        </div>
-
         {/* Хлебные крошки */}
         <div className="text-sm text-[#5E7A99] mb-4">
           Главная / <span className="text-[#0B1E33] font-medium">Создание вакансии</span>
@@ -129,27 +78,34 @@ export default function CreateJobsListing() {
           </div>
         </div>
 
-        {/* Преимущества */}
+        {/* Преимущества - 3 карточки */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <div className="bg-[#F9FCFF] p-6 rounded-2xl border border-[#E6EFF8] text-center hover:border-[#2B7BE4] hover:shadow-md transition">
             <Zap className="w-9 h-9 text-[#2B7BE4] mx-auto mb-2" />
             <h3 className="text-xl font-semibold text-[#0B1E33]">Быстрая публикация</h3>
-            <p className="text-sm text-[#3C5B7C]">Разместите вакансию за несколько минут и получайте отклик.</p>
+            <p className="text-sm text-[#3C5B7C]">
+              Разместите вакансию за несколько минут и получайте отклик.
+            </p>
           </div>
           <div className="bg-[#F9FCFF] p-6 rounded-2xl border border-[#E6EFF8] text-center hover:border-[#2B7BE4] hover:shadow-md transition">
             <Shield className="w-9 h-9 text-[#2B7BE4] mx-auto mb-2" />
             <h3 className="text-xl font-semibold text-[#0B1E33]">Проверенные компании</h3>
-            <p className="text-sm text-[#3C5B7C]">Все работодатели проходят проверку, повышая доверие соискателей.</p>
+            <p className="text-sm text-[#3C5B7C]">
+              Все работодатели проходят проверку, повышая доверие соискателей.
+            </p>
           </div>
           <div className="bg-[#F9FCFF] p-6 rounded-2xl border border-[#E6EFF8] text-center hover:border-[#2B7BE4] hover:shadow-md transition">
             <Users className="w-9 h-9 text-[#2B7BE4] mx-auto mb-2" />
             <h3 className="text-xl font-semibold text-[#0B1E33]">Тысячи соискателей</h3>
-            <p className="text-sm text-[#3C5B7C]">Ваша вакансия будет доступна тысячам пользователей платформы.</p>
+            <p className="text-sm text-[#3C5B7C]">
+              Ваша вакансия будет доступна тысячам пользователей платформы.
+            </p>
           </div>
         </div>
 
+        {/* Футер */}
         <div className="text-center text-sm text-[#6B88A6] pt-4 border-t border-[#ECF2F8]">
-          Lokven — создайте вакансию и найдите лучших специалистов
+          Lokven — создайте вакансию и найдите лучших специалистов.
         </div>
       </div>
     );
