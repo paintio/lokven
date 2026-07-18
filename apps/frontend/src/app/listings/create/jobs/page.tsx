@@ -9,6 +9,10 @@ import {
   ArrowRight,
   Building2,
   CheckCircle2,
+  Search,
+  User,
+  UserPlus,
+  PlusCircle,
 } from 'lucide-react';
 import JobsForm from '@/components/forms/JobsForm';
 import { useAuth } from '@/hooks/useAuth';
@@ -16,118 +20,136 @@ import { useAuth } from '@/hooks/useAuth';
 export default function CreateJobsListing() {
   const { user, isAuthenticated, loading } = useAuth();
 
-  // Проверяем, является ли пользователь работодателем или админом
   const isEmployer = user?.isSeller || user?.role === 'employer' || user?.role === 'admin';
   const isAdmin = user?.role === 'admin';
 
   // Если пользователь не работодатель и не админ — показываем баннер
   if (!loading && !isEmployer && !isAdmin) {
     return (
-      <div className="min-h-[70vh] relative overflow-hidden rounded-[32px] border border-white/40 bg-white/70 backdrop-blur-xl shadow-[0_20px_80px_rgba(15,23,42,0.12)]">
-        {/* Фоновое изображение из Cloudinary */}
-        <div className="absolute inset-0">
-          <img
-            src="https://res.cloudinary.com/qunkgqft/image/upload/v1784271762/hero-employer_pzn4sn.png"
-            alt="Работодатель"
-            className="w-full h-full object-cover opacity-90"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/88 to-white/55" />
+      <div className="container-custom py-8">
+        {/* Навигация */}
+        <div className="flex items-center justify-between flex-wrap gap-4 pb-4 border-b border-[#EEF3F8] mb-6">
+          <div className="text-2xl font-bold text-[#0B1E33] tracking-tight">
+            Lokven
+          </div>
+
+          <div className="flex items-center gap-6 text-sm font-medium text-[#1E3A5F]">
+            <Link href="/" className="hover:text-[#2B7BE4] transition">Главная</Link>
+            <Link href="/listings" className="hover:text-[#2B7BE4] transition">Объявления</Link>
+            <Link href="/listings/create" className="hover:text-[#2B7BE4] transition">Подать</Link>
+          </div>
+
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="relative flex items-center">
+              <Search className="absolute left-4 text-[#8AA3BC] w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Поиск..."
+                className="pl-10 pr-4 py-2 rounded-full border border-[#D9E2EC] bg-[#F8FAFC] text-sm outline-none focus:border-[#2B7BE4] focus:bg-white transition w-40 md:w-48"
+              />
+            </div>
+            <Link
+              href="/auth/login"
+              className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#D0DDEE] text-sm font-medium text-[#1E3A5F] hover:bg-[#F0F6FE] hover:border-[#2B7BE4] transition"
+            >
+              <User className="w-4 h-4" />
+              Войти
+            </Link>
+            <Link
+              href="/auth/register"
+              className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#D0DDEE] text-sm font-medium text-[#1E3A5F] hover:bg-[#F0F6FE] hover:border-[#2B7BE4] transition"
+            >
+              <UserPlus className="w-4 h-4" />
+              Регистрация
+            </Link>
+            <Link
+              href="/listings/create"
+              className="flex items-center gap-2 px-5 py-2 rounded-full bg-[#2B7BE4] text-white text-sm font-semibold hover:bg-[#1A66C4] transition shadow-md"
+            >
+              <PlusCircle className="w-4 h-4" />
+              Подать объявление
+            </Link>
+          </div>
         </div>
 
-        <div className="relative z-10 px-6 py-10 md:px-10 md:py-14">
-          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-8 items-center">
-            {/* Левый контент */}
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#BFDBFE] bg-[#EFF6FF] px-4 py-2 text-sm font-medium text-[#1D4ED8] mb-6">
-                <Briefcase className="w-4 h-4" />
-                Для работодателей
-              </div>
+        {/* Хлебные крошки */}
+        <div className="text-sm text-[#5E7A99] mb-4">
+          Главная / <span className="text-[#0B1E33] font-medium">Создание вакансии</span>
+        </div>
 
-              <h1 className="text-3xl md:text-5xl font-bold text-[#111827] leading-tight mb-5">
-                Размещайте вакансии
-                <br />
-                и находите лучших сотрудников
-              </h1>
+        {/* Герой-блок */}
+        <div className="bg-gradient-to-br from-[#EEF6FE] to-white rounded-3xl p-8 md:p-12 mb-8 border border-[#E2EDF7] flex flex-col lg:flex-row items-center justify-between gap-8">
+          <div className="flex-1">
+            <h1 className="text-3xl md:text-5xl font-bold text-[#0B1E33] leading-tight mb-3">
+              Создавайте <span className="text-[#2B7BE4]">вакансии</span> на Lokven
+            </h1>
+            <p className="text-[#2E4A6E] text-base md:text-lg max-w-lg mb-5">
+              Размещайте вакансии и находите лучших специалистов среди тысяч пользователей платформы.
+            </p>
 
-              <p className="text-lg text-[#4B5563] leading-relaxed mb-8 max-w-2xl">
-                Создайте компанию в Lokven, публикуйте вакансии и получайте отклики от тысяч соискателей по всей стране. Интерфейс адаптирован под HR-команды и владельцев бизнеса.
-              </p>
+            <ul className="flex flex-wrap gap-4 md:gap-8 text-[#1A3452] mb-6">
+              <li className="flex items-center gap-2">
+                <Shield className="w-5 h-5 text-[#2B7BE4]" />
+                Проверенные работодатели
+              </li>
+              <li className="flex items-center gap-2">
+                <Zap className="w-5 h-5 text-[#2B7BE4]" />
+                Быстрая публикация
+              </li>
+              <li className="flex items-center gap-2">
+                <Users className="w-5 h-5 text-[#2B7BE4]" />
+                Большая аудитория
+              </li>
+            </ul>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
-                <div className="flex items-center gap-3 rounded-2xl border border-white/60 bg-white/80 px-4 py-3 shadow-sm">
-                  <Shield className="w-5 h-5 text-[#2563EB]" />
-                  <span className="font-medium text-[#111827]">Проверенные работодатели</span>
-                </div>
-                <div className="flex items-center gap-3 rounded-2xl border border-white/60 bg-white/80 px-4 py-3 shadow-sm">
-                  <Zap className="w-5 h-5 text-[#2563EB]" />
-                  <span className="font-medium text-[#111827]">Публикация за несколько минут</span>
-                </div>
-                <div className="flex items-center gap-3 rounded-2xl border border-white/60 bg-white/80 px-4 py-3 shadow-sm">
-                  <Users className="w-5 h-5 text-[#2563EB]" />
-                  <span className="font-medium text-[#111827]">Большая аудитория соискателей</span>
-                </div>
-                <div className="flex items-center gap-3 rounded-2xl border border-white/60 bg-white/80 px-4 py-3 shadow-sm">
-                  <Briefcase className="w-5 h-5 text-[#2563EB]" />
-                  <span className="font-medium text-[#111827]">Удобное управление вакансиями</span>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-4">
-                <Link
-                  href="/profile/company"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#2563EB] text-white font-semibold hover:bg-[#1D4ED8] transition shadow-lg shadow-blue-500/20"
-                >
-                  Заполнить компанию
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-                <Link
-                  href="/listings/create/resume"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-[#D1D5DB] bg-white/80 text-[#111827] font-semibold hover:bg-white transition"
-                >
-                  Разместить резюме
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Правая карточка */}
-            <div className="rounded-[28px] border border-white/60 bg-white/78 backdrop-blur-xl p-6 md:p-7 shadow-[0_18px_50px_rgba(15,23,42,0.14)]">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-12 h-12 rounded-2xl bg-[#EFF6FF] flex items-center justify-center">
-                  <Building2 className="w-6 h-6 text-[#2563EB]" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-[#111827]">Что потребуется</h3>
-                  <p className="text-sm text-[#6B7280]">Подготовьте данные компании перед публикацией вакансии.</p>
-                </div>
-              </div>
-
-              <div className="space-y-3 mb-6">
-                {[
-                  'Название компании и описание деятельности',
-                  'Контактный телефон и email',
-                  'Город и адрес работы',
-                  'Информация о зарплате и графике',
-                  'Требования к кандидату',
-                ].map((item) => (
-                  <div key={item} className="flex items-start gap-3 rounded-xl border border-[#E5E7EB] bg-white/80 px-4 py-3">
-                    <CheckCircle2 className="w-5 h-5 text-[#16A34A] mt-0.5" />
-                    <span className="text-[#111827]">{item}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="rounded-2xl border border-[#DBEAFE] bg-[#EFF6FF] px-4 py-4">
-                <div className="flex items-center gap-2 text-[#1D4ED8] font-semibold mb-1">
-                  <Shield className="w-4 h-4" />
-                  Проверка компании
-                </div>
-                <p className="text-sm text-[#1E3A8A] leading-relaxed">
-                  После заполнения профиля компания получает статус работодателя и может публиковать вакансии без дополнительных ограничений.
-                </p>
-              </div>
+            <div className="flex flex-wrap gap-4">
+              <Link
+                href="/profile/company"
+                className="flex items-center gap-2 px-6 py-3 rounded-full bg-[#2B7BE4] text-white font-semibold hover:bg-[#1A66C4] transition shadow-md"
+              >
+                <Building2 className="w-5 h-5" />
+                Заполнить данные компании
+              </Link>
+              <Link
+                href="/listings/create/resume"
+                className="flex items-center gap-2 px-6 py-3 rounded-full border-2 border-[#C9D9EB] text-[#1E3A5F] font-semibold hover:bg-[#F0F6FE] hover:border-[#2B7BE4] transition"
+              >
+                <Briefcase className="w-5 h-5" />
+                Разместить резюме
+              </Link>
             </div>
           </div>
+
+          <div className="flex-shrink-0 w-full lg:w-48">
+            <img
+              src="https://res.cloudinary.com/qunkgqft/image/upload/v1784271762/hero-employer_pzn4sn.png"
+              alt="Работодатель"
+              className="w-full h-auto rounded-xl"
+            />
+          </div>
+        </div>
+
+        {/* Преимущества */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div className="bg-[#F9FCFF] p-6 rounded-2xl border border-[#E6EFF8] text-center hover:border-[#2B7BE4] hover:shadow-md transition">
+            <Zap className="w-9 h-9 text-[#2B7BE4] mx-auto mb-2" />
+            <h3 className="text-xl font-semibold text-[#0B1E33]">Быстрая публикация</h3>
+            <p className="text-sm text-[#3C5B7C]">Разместите вакансию за несколько минут и получайте отклик.</p>
+          </div>
+          <div className="bg-[#F9FCFF] p-6 rounded-2xl border border-[#E6EFF8] text-center hover:border-[#2B7BE4] hover:shadow-md transition">
+            <Shield className="w-9 h-9 text-[#2B7BE4] mx-auto mb-2" />
+            <h3 className="text-xl font-semibold text-[#0B1E33]">Проверенные компании</h3>
+            <p className="text-sm text-[#3C5B7C]">Все работодатели проходят проверку, повышая доверие соискателей.</p>
+          </div>
+          <div className="bg-[#F9FCFF] p-6 rounded-2xl border border-[#E6EFF8] text-center hover:border-[#2B7BE4] hover:shadow-md transition">
+            <Users className="w-9 h-9 text-[#2B7BE4] mx-auto mb-2" />
+            <h3 className="text-xl font-semibold text-[#0B1E33]">Тысячи соискателей</h3>
+            <p className="text-sm text-[#3C5B7C]">Ваша вакансия будет доступна тысячам пользователей платформы.</p>
+          </div>
+        </div>
+
+        <div className="text-center text-sm text-[#6B88A6] pt-4 border-t border-[#ECF2F8]">
+          Lokven — создайте вакансию и найдите лучших специалистов
         </div>
       </div>
     );
